@@ -120,6 +120,7 @@ Use outside references to check facts, then write original explanations:
 - CP-Algorithms for algorithm references
 - Official language documentation for language syntax and standard library behavior
 - MDN for JavaScript behavior
+- Curated DSA and system-design sources listed in `docs/SOURCES_AND_LEARNINGS.md`
 - Other sources only when they add clarity and are linked in the lesson
 
 ## Learning Experience Strategy

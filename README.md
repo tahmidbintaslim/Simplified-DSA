@@ -67,6 +67,7 @@ Read these before contributing:
 - [Contributor Guide](./docs/CONTRIBUTING.md)
 - [JavaScript and OOP Guide](./docs/JS_OOP_GUIDE.md)
 - [Content Guide](./docs/CONTENT_GUIDE.md)
+- [Sources and Learnings](./docs/SOURCES_AND_LEARNINGS.md)
 - [Language Comparison Guide](./docs/LANGUAGE_COMPARISON_GUIDE.md)
 - [CSS Guide](./docs/CSS_GUIDE.md)
 - [Learning Experience Guide](./docs/LEARNING_EXPERIENCE.md)

@@ -161,6 +161,7 @@ Good sources:
 - Official language documentation
 - MDN for JavaScript behavior
 - University course notes when relevant
+- Curated repositories and roadmaps listed in [Sources and Learnings](./SOURCES_AND_LEARNINGS.md)
 
 Do not copy another site. Read, understand, then explain in our voice.
 
