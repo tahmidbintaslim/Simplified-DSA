@@ -1,0 +1,354 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+:root {
+  color-scheme: dark;
+  font-family:
+    "Aptos", "Avenir Next", "Gill Sans", "Helvetica Neue", sans-serif;
+  background: #11110f;
+  color: #ece8dd;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: #11110f;
+}
+
+button {
+  font: inherit;
+}
+
+a {
+  color: #d9b36a;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.app-shell {
+  /* Sidebar and lesson content sit side by side on desktop. */
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+.lesson-sidebar {
+  border-right: 1px solid #2d2a24;
+  background: #171612;
+  padding: 28px 20px;
+}
+
+.sidebar-header {
+  margin-bottom: 28px;
+}
+
+.sidebar-header h1 {
+  margin: 0 0 8px;
+  color: #f5f0e6;
+  font-size: 1.35rem;
+  line-height: 1.2;
+}
+
+.sidebar-header p {
+  margin: 0;
+  color: #b9ae9d;
+  font-size: 0.94rem;
+  line-height: 1.45;
+}
+
+.nav-section + .nav-section {
+  margin-top: 18px;
+}
+
+.section-button,
+.lesson-button {
+  width: 100%;
+  border: 1px solid #302d26;
+  background: #1d1b16;
+  color: #ece8dd;
+  cursor: pointer;
+  text-align: left;
+  /* Only animate color changes. Layout movement makes reading harder. */
+  transition:
+    background-color 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease;
+}
+
+.section-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 46px;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-weight: 700;
+}
+
+.section-button span:last-child {
+  color: #a99f8d;
+  font-size: 0.86rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.section-button:hover,
+.lesson-button:hover,
+.section-button.is-active,
+.lesson-button.is-active {
+  border-color: #7b6842;
+  background: #272318;
+}
+
+.lesson-list {
+  display: grid;
+  gap: 8px;
+  padding-top: 10px;
+}
+
+.lesson-button {
+  display: grid;
+  gap: 5px;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.lesson-button strong {
+  color: #f2ead7;
+  font-size: 0.96rem;
+}
+
+.lesson-button span {
+  color: #b9ae9d;
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+
+.lesson-main {
+  /* Keep reading lines comfortable instead of stretching across wide screens. */
+  width: min(100%, 980px);
+  padding: 48px clamp(20px, 5vw, 72px);
+}
+
+.lesson-header {
+  max-width: 72ch;
+  margin-bottom: 34px;
+  border-bottom: 1px solid #302d26;
+  padding-bottom: 22px;
+}
+
+.lesson-header strong {
+  display: block;
+  margin-bottom: 8px;
+  color: #fbf5e8;
+  font-size: 1.06rem;
+}
+
+.lesson-header p {
+  margin: 0;
+  max-width: 62ch;
+  color: #bdb3a3;
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+.lesson-content {
+  max-width: 72ch;
+  color: #ddd5c6;
+}
+
+.lesson-content h1,
+.lesson-content h2 {
+  color: #f5f0e6;
+  line-height: 1.12;
+}
+
+.lesson-content h1 {
+  margin: 0 0 24px;
+  font-size: clamp(2rem, 4vw, 3.4rem);
+}
+
+.lesson-content h2 {
+  margin: 38px 0 12px;
+  font-size: 1.45rem;
+}
+
+.lesson-content p,
+.lesson-content li {
+  font-size: 1.03rem;
+  line-height: 1.68;
+}
+
+.lesson-content p {
+  margin: 0 0 18px;
+}
+
+.lesson-content ul {
+  margin: 0 0 22px;
+  padding-left: 1.15rem;
+}
+
+.lesson-content li + li {
+  margin-top: 8px;
+}
+
+.lesson-content code {
+  border: 1px solid #3a352b;
+  border-radius: 5px;
+  background: #201d17;
+  color: #f1cd86;
+  padding: 0.08rem 0.28rem;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 0.92em;
+}
+
+.lesson-content pre {
+  overflow-x: auto;
+  border: 1px solid #332f27;
+  border-radius: 8px;
+  background: #191711;
+  padding: 16px;
+}
+
+.lesson-content pre code {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: #eadfc9;
+}
+
+.language-panel {
+  max-width: 72ch;
+  margin-top: 42px;
+  border-top: 1px solid #302d26;
+  padding-top: 28px;
+}
+
+.language-panel-header h2 {
+  margin: 0 0 8px;
+  color: #f5f0e6;
+  font-size: 1.45rem;
+  line-height: 1.2;
+}
+
+.language-panel-header p {
+  margin: 0 0 18px;
+  color: #bdb3a3;
+  line-height: 1.55;
+}
+
+.language-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.language-tab {
+  border: 1px solid #302d26;
+  border-radius: 7px;
+  background: #1d1b16;
+  color: #d8cfbf;
+  cursor: pointer;
+  padding: 8px 10px;
+  transition:
+    background-color 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease;
+}
+
+.language-tab:hover,
+.language-tab.is-active {
+  border-color: #7b6842;
+  background: #272318;
+  color: #f5f0e6;
+}
+
+.language-example {
+  border: 1px solid #302d26;
+  border-radius: 8px;
+  background: #171612;
+  padding: 16px;
+}
+
+.language-meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.language-meta strong {
+  color: #f5f0e6;
+  font-size: 1.05rem;
+}
+
+.language-meta span {
+  color: #f1cd86;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 0.9rem;
+}
+
+.language-example pre {
+  overflow-x: auto;
+  margin: 0 0 16px;
+  border: 1px solid #332f27;
+  border-radius: 8px;
+  background: #11110f;
+  padding: 16px;
+}
+
+.language-example code {
+  color: #eadfc9;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.language-example dl {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+}
+
+.language-example dt {
+  margin-bottom: 4px;
+  color: #f5f0e6;
+  font-weight: 700;
+}
+
+.language-example dd {
+  margin: 0;
+  color: #bdb3a3;
+  line-height: 1.5;
+}
+
+@media (max-width: 760px) {
+  /* On small screens, stack navigation above the lesson. */
+  .app-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .lesson-sidebar {
+    border-right: 0;
+    border-bottom: 1px solid #2d2a24;
+    padding: 22px 16px;
+  }
+
+  .lesson-main {
+    padding: 30px 16px 48px;
+  }
+
+  .language-meta {
+    display: grid;
+    gap: 4px;
+  }
+}
