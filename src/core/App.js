@@ -108,7 +108,8 @@ export class App {
     // order, and arrow keys, Home and End move between tabs.
     this.root.addEventListener('keydown', (event) => {
       const tab = event.target.closest('[role="tab"]');
-      if (!tab) return;
+      // Alt+Arrow is the browser's back/forward shortcut; leave it alone.
+      if (!tab || event.altKey || event.ctrlKey || event.metaKey) return;
 
       const tabs = [...this.root.querySelectorAll('[role="tab"]')];
       const index = tabs.indexOf(tab);
