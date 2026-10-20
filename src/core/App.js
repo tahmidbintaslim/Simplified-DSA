@@ -1,5 +1,6 @@
 import { curriculum } from '../content/curriculum.js';
 import { escapeHtml, MarkdownRenderer } from '../utils/markdown.js';
+import { lessonPath, resolvePath } from './router.js';
 
 /**
  * App owns the small amount of state needed by the page.
@@ -21,6 +22,14 @@ export class App {
 
   init() {
     if (!this.root) return;
+
+    const route = this.applyRoute(window.location.pathname);
+    if (route.path !== window.location.pathname) {
+      // Clean up unknown or partial URLs without adding a history entry.
+      const { search, hash } = window.location;
+      window.history.replaceState(null, '', `${route.path}${search}${hash}`);
+    }
+
     this.render();
     this.bindEvents();
   }
@@ -37,7 +46,9 @@ export class App {
             <h1>Simplified DSA</h1>
             <p>Learn the shape of data first, then the steps that act on it.</p>
           </div>
-          ${this.renderSectionMenu()}
+          <nav aria-label="Lessons">
+            ${this.renderSectionMenu()}
+          </nav>
         </aside>
         <main class="lesson-main">
           ${this.renderLessonHeader()}
@@ -48,6 +59,7 @@ export class App {
         </main>
       </div>
     `;
+    document.title = `${this.activeLesson.title} | Simplified DSA`;
   }
 
   /**
@@ -57,17 +69,16 @@ export class App {
    */
   bindEvents() {
     this.root.addEventListener('click', (event) => {
-      const sectionButton = event.target.closest('[data-section-id]');
-      const lessonButton = event.target.closest('[data-lesson-id]');
+      const lessonLink = event.target.closest('a[data-lesson-id]');
       const languageButton = event.target.closest('[data-language-id]');
 
-      if (sectionButton) {
-        this.selectSection(sectionButton.dataset.sectionId);
-        return;
-      }
-
-      if (lessonButton) {
-        this.selectLesson(lessonButton.dataset.lessonId);
+      if (lessonLink) {
+        // Let the browser handle Ctrl/Cmd/Shift/Alt clicks (new tab, new window).
+        if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+          return;
+        }
+        event.preventDefault();
+        this.openLesson(lessonLink.dataset.sectionId, lessonLink.dataset.lessonId);
         return;
       }
 
@@ -75,32 +86,43 @@ export class App {
         this.selectLanguage(languageButton.dataset.languageId);
       }
     });
+
+    // Back and forward buttons change the URL; show the lesson it names.
+    window.addEventListener('popstate', () => {
+      this.applyRoute(window.location.pathname);
+      this.render();
+    });
   }
 
   /**
-   * Selecting a section also selects its first lesson.
-   * That gives the learner something useful immediately after switching menus.
+   * Routing: the URL decides which lesson is open, so a refresh, the back
+   * button, or a shared link all land on the same lesson.
+   * Moving to another lesson also resets the language tabs to the first one.
    */
-  selectSection(sectionId) {
-    const section = this.sections.find((item) => item.id === sectionId);
-    if (!section) return;
+  applyRoute(pathname) {
+    const route = resolvePath(this.sections, pathname);
+    const lessonChanged =
+      route.sectionId !== this.activeSectionId || route.lessonId !== this.activeLessonId;
 
-    this.activeSectionId = section.id;
-    this.activeLessonId = section.lessons[0].id;
-    this.activeLanguageId = section.lessons[0].languageExamples?.[0]?.id ?? null;
-    this.render();
+    if (lessonChanged) {
+      this.activeSectionId = route.sectionId;
+      this.activeLessonId = route.lessonId;
+      this.activeLanguageId = this.activeLesson.languageExamples?.[0]?.id ?? null;
+    }
+
+    return route;
   }
 
   /**
-   * Selecting a lesson only changes activeLessonId.
-   * The section does not change because lessons live inside one section.
+   * Opening a lesson adds a history entry. pushState changes the URL without
+   * reloading the page. A section link opens the first lesson in that section.
    */
-  selectLesson(lessonId) {
-    const lesson = this.activeSection.lessons.find((item) => item.id === lessonId);
-    if (!lesson) return;
+  openLesson(sectionId, lessonId) {
+    const path = lessonPath(sectionId, lessonId);
+    if (path === window.location.pathname) return;
 
-    this.activeLessonId = lesson.id;
-    this.activeLanguageId = lesson.languageExamples?.[0]?.id ?? null;
+    window.history.pushState(null, '', path);
+    this.applyRoute(path);
     this.render();
   }
 
@@ -124,18 +146,22 @@ export class App {
       .map((section) => {
         const isActive = section.id === this.activeSectionId;
         const lessons = isActive ? this.renderLessonMenu(section) : '';
+        const firstLesson = section.lessons[0];
 
+        // aria-current="true" marks the current section in the list of
+        // sections; the lesson link below carries aria-current="page".
         return `
           <section class="nav-section">
-            <button
-              class="section-button ${isActive ? 'is-active' : ''}"
-              type="button"
+            <a
+              class="section-link ${isActive ? 'is-active' : ''}"
+              href="${lessonPath(section.id, firstLesson.id)}"
               data-section-id="${section.id}"
-              aria-pressed="${isActive}"
+              data-lesson-id="${firstLesson.id}"
+              ${isActive ? 'aria-current="true"' : ''}
             >
-              <span>${section.title}</span>
+              <span>${escapeHtml(section.title)}</span>
               <span>${section.lessons.length}</span>
-            </button>
+            </a>
             ${lessons}
           </section>
         `;
@@ -155,15 +181,16 @@ export class App {
             const isActive = lesson.id === this.activeLessonId;
 
             return `
-              <button
-                class="lesson-button ${isActive ? 'is-active' : ''}"
-                type="button"
+              <a
+                class="lesson-link ${isActive ? 'is-active' : ''}"
+                href="${lessonPath(section.id, lesson.id)}"
+                data-section-id="${section.id}"
                 data-lesson-id="${lesson.id}"
-                aria-pressed="${isActive}"
+                ${isActive ? 'aria-current="page"' : ''}
               >
-                <strong>${lesson.title}</strong>
-                <span>${lesson.summary}</span>
-              </button>
+                <strong>${escapeHtml(lesson.title)}</strong>
+                <span>${escapeHtml(lesson.summary)}</span>
+              </a>
             `;
           })
           .join('')}

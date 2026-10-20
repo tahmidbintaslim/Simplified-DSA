@@ -65,7 +65,7 @@ The class keeps related behavior in one place:
 Good:
 
 ```javascript
-selectLesson(lessonId) {}
+openLesson(sectionId, lessonId) {}
 ```
 
 Bad:

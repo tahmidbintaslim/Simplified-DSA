@@ -67,14 +67,15 @@ a {
   margin-top: 18px;
 }
 
-.section-button,
-.lesson-button {
+.section-link,
+.lesson-link {
   width: 100%;
   border: 1px solid #302d26;
   background: #1d1b16;
   color: #ece8dd;
   cursor: pointer;
   text-align: left;
+  text-decoration: none;
   /* Only animate color changes. Layout movement makes reading harder. */
   transition:
     background-color 140ms ease,
@@ -82,7 +83,7 @@ a {
     color 140ms ease;
 }
 
-.section-button {
+.section-link {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -92,16 +93,16 @@ a {
   font-weight: 700;
 }
 
-.section-button span:last-child {
+.section-link span:last-child {
   color: #a99f8d;
   font-size: 0.86rem;
   font-variant-numeric: tabular-nums;
 }
 
-.section-button:hover,
-.lesson-button:hover,
-.section-button.is-active,
-.lesson-button.is-active {
+.section-link:hover,
+.lesson-link:hover,
+.section-link.is-active,
+.lesson-link.is-active {
   border-color: #7b6842;
   background: #272318;
 }
@@ -112,19 +113,19 @@ a {
   padding-top: 10px;
 }
 
-.lesson-button {
+.lesson-link {
   display: grid;
   gap: 5px;
   border-radius: 8px;
   padding: 12px;
 }
 
-.lesson-button strong {
+.lesson-link strong {
   color: #f2ead7;
   font-size: 0.96rem;
 }
 
-.lesson-button span {
+.lesson-link span {
   color: #b9ae9d;
   font-size: 0.88rem;
   line-height: 1.4;
