@@ -37,8 +37,17 @@ export class App {
   /**
    * Render converts current state into HTML.
    * When activeSectionId or activeLessonId changes, render runs again.
+   *
+   * innerHTML replaces every element, including the one that has keyboard
+   * focus, and focus would drop to <body>. So render remembers the focused
+   * element's id and focuses the new element with that id afterwards.
+   * `focusId` overrides that, for example when an arrow key picks a new tab.
    */
-  render() {
+  render({ focusId } = {}) {
+    const focused = document.activeElement;
+    const hadFocus = focused !== this.root && this.root.contains(focused);
+    const restoreId = focusId ?? (hadFocus ? focused.id : '');
+
     this.root.innerHTML = `
       <div class="app-shell">
         <aside class="lesson-sidebar" aria-label="Course navigation">
@@ -60,6 +69,14 @@ export class App {
       </div>
     `;
     document.title = `${this.activeLesson.title} | Simplified DSA`;
+
+    if (restoreId || hadFocus) {
+      // If that element no longer exists, the current lesson link takes focus.
+      const target =
+        (restoreId && document.getElementById(restoreId)) ||
+        this.root.querySelector('[aria-current="page"]');
+      target?.focus({ preventScroll: true });
+    }
   }
 
   /**
@@ -85,6 +102,26 @@ export class App {
       if (languageButton) {
         this.selectLanguage(languageButton.dataset.languageId);
       }
+    });
+
+    // Tabs follow the ARIA tabs pattern: only the selected tab is in the Tab
+    // order, and arrow keys, Home and End move between tabs.
+    this.root.addEventListener('keydown', (event) => {
+      const tab = event.target.closest('[role="tab"]');
+      if (!tab) return;
+
+      const tabs = [...this.root.querySelectorAll('[role="tab"]')];
+      const index = tabs.indexOf(tab);
+      const nextIndex = {
+        ArrowRight: (index + 1) % tabs.length,
+        ArrowLeft: (index - 1 + tabs.length) % tabs.length,
+        Home: 0,
+        End: tabs.length - 1,
+      }[event.key];
+      if (nextIndex === undefined) return;
+
+      event.preventDefault();
+      this.selectLanguage(tabs[nextIndex].dataset.languageId, { moveFocus: true });
     });
 
     // Back and forward buttons change the URL; show the lesson it names.
@@ -129,12 +166,12 @@ export class App {
   /**
    * Language tabs let learners compare syntax without leaving the concept.
    */
-  selectLanguage(languageId) {
+  selectLanguage(languageId, { moveFocus = false } = {}) {
     const example = this.activeLesson.languageExamples?.find((item) => item.id === languageId);
     if (!example) return;
 
     this.activeLanguageId = example.id;
-    this.render();
+    this.render({ focusId: moveFocus ? `language-tab-${example.id}` : undefined });
   }
 
   /**
@@ -153,6 +190,7 @@ export class App {
         return `
           <section class="nav-section">
             <a
+              id="section-link-${section.id}"
               class="section-link ${isActive ? 'is-active' : ''}"
               href="${lessonPath(section.id, firstLesson.id)}"
               data-section-id="${section.id}"
@@ -182,6 +220,7 @@ export class App {
 
             return `
               <a
+                id="lesson-link-${section.id}-${lesson.id}"
                 class="lesson-link ${isActive ? 'is-active' : ''}"
                 href="${lessonPath(section.id, lesson.id)}"
                 data-section-id="${section.id}"
@@ -233,7 +272,13 @@ export class App {
             .map((example) => this.renderLanguageTab(example, activeExample.id))
             .join('')}
         </div>
-        <div class="language-example">
+        <div
+          id="language-tabpanel"
+          class="language-example"
+          role="tabpanel"
+          aria-labelledby="language-tab-${activeExample.id}"
+          tabindex="0"
+        >
           <div class="language-meta">
             <strong>${escapeHtml(activeExample.language)}</strong>
             <span>${escapeHtml(activeExample.dataStructure)}</span>
@@ -267,10 +312,13 @@ export class App {
 
     return `
       <button
+        id="language-tab-${example.id}"
         class="language-tab ${isActive ? 'is-active' : ''}"
         type="button"
         role="tab"
         aria-selected="${isActive}"
+        aria-controls="language-tabpanel"
+        tabindex="${isActive ? '0' : '-1'}"
         data-language-id="${example.id}"
       >
         ${escapeHtml(example.language)}

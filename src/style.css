@@ -32,6 +32,17 @@ a {
   text-underline-offset: 3px;
 }
 
+/*
+ * Keyboard users need to see where focus is. :focus-visible shows the ring
+ * for keyboard focus and skips it for most mouse clicks.
+ */
+a:focus-visible,
+button:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid #f1cd86;
+  outline-offset: 2px;
+}
+
 .app-shell {
   /* Sidebar and lesson content sit side by side on desktop. */
   display: grid;
