@@ -88,7 +88,7 @@ Use Vite, HTML, CSS, and JavaScript until the product proves it needs more. Do n
 ### CSS Style
 
 - Prefer readable custom CSS for the app shell and lesson UI.
-- Tailwind and DaisyUI are installed, but they are not a reason to fill HTML with long class strings.
+- Tailwind is installed for its base reset (preflight), but it is not a reason to fill HTML with long class strings.
 - Use stable spacing, readable type, and direct hierarchy.
 - Avoid decorative UI that distracts from learning.
 
