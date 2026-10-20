@@ -5,7 +5,7 @@ This project is intentionally beginner friendly. Write code that a new HTML, CSS
 ## Working Rules
 
 1. Make one small change at a time.
-2. Run `pnpm build` before saying the change works.
+2. Run `pnpm test` and `pnpm build` before saying the change works.
 3. Keep file names clear.
 4. Prefer simple code over clever code.
 5. Add a short comment when a beginner would not understand why something exists.
@@ -16,6 +16,7 @@ This project is intentionally beginner friendly. Write code that a new HTML, CSS
 ```bash
 pnpm install
 pnpm dev
+pnpm test
 pnpm build
 pnpm dlx vercel deploy -y --target preview
 ```
@@ -70,8 +71,8 @@ changes
 1. Create a Markdown file in the right folder.
 2. Add that file to `src/content/curriculum.js`.
 3. Add language examples in `src/content/languageExamples.js` when the concept has meaningful language differences.
-4. Run `pnpm dev` and click the lesson in the browser.
-5. Run `pnpm build`.
+4. Run `pnpm dev` and open the lesson in the browser. Its URL is `/<section-id>/<lesson-id>`.
+5. Run `pnpm test` and `pnpm build`.
 6. Commit the lesson and registry update together.
 
 Example folders:

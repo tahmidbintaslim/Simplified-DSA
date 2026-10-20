@@ -1,8 +1,20 @@
 # Simplified DSA
 
+**Live demo:** [dsa.tahmid.space](https://dsa.tahmid.space) (working demo, 2 lessons so far)
+
 Simplified DSA is a beginner-friendly core computer science learning app built with Vite, plain HTML, CSS, JavaScript, and Markdown.
 
-The project has two learning goals:
+## What exists today
+
+- 2 lessons: Arrays and Strings (Data Structures) and Big O (Algorithms).
+- The Arrays lesson has read-only tabs that show the same array in 10 languages (JavaScript, Python, C, C++, Java, Go, Rust, C#, Kotlin, Swift), each with a runtime note, a memory note and a source link.
+- Each lesson has its own URL, so a refresh or a shared link opens the same lesson.
+
+Not built yet: more lessons, visualizers, quizzes and a code runner. See the [Project Plan](./PLAN.md).
+
+## Goals
+
+The project has two learning goals. The app covers a small part of the first one today.
 
 1. Help end users learn DSA, memory, language runtimes, compiler/interpreter ideas, CPU/RAM basics, and operating-system connections through clear explanations and interactive practice.
 2. Help contributors learn JavaScript, OOP, clean code, CSS, documentation, and deployment by working inside a small real project.
@@ -11,8 +23,9 @@ The project has two learning goals:
 
 - Vite
 - Plain JavaScript with ES modules
-- Plain CSS
+- Hand-written CSS, with Tailwind CSS v4 only for its base reset
 - Markdown content files
+- Node's built-in test runner (`node --test`)
 - Vercel for deployment
 - pnpm for package management
 
@@ -28,6 +41,16 @@ Open:
 ```text
 http://127.0.0.1:3000/
 ```
+
+Each lesson lives at `/<section>/<lesson>`, for example `http://127.0.0.1:3000/algorithms/big-o`.
+
+## Test
+
+```bash
+pnpm test
+```
+
+The tests cover the Markdown renderer and the lesson URL helpers.
 
 ## Build
 
@@ -51,6 +74,7 @@ Use preview deployments while building. Use production deploys only when the tea
 src/
   core/
     App.js
+    router.js
   content/
     curriculum.js
     data-structures/
@@ -59,6 +83,7 @@ src/
     markdown.js
   main.js
   style.css
+tests/
 ```
 
 Read these before contributing:
