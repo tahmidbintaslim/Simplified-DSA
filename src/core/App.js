@@ -155,9 +155,11 @@ export class App {
    * reloading the page. A section link opens the first lesson in that section.
    */
   openLesson(sectionId, lessonId) {
-    const path = lessonPath(sectionId, lessonId);
-    if (path === window.location.pathname) return;
+    // Opening the lesson that is already open adds no history entry. On "/"
+    // the first lesson is open, so a click there must not push its path.
+    if (sectionId === this.activeSectionId && lessonId === this.activeLessonId) return;
 
+    const path = lessonPath(sectionId, lessonId);
     window.history.pushState(null, '', path);
     this.applyRoute(path);
     this.render();
