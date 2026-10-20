@@ -71,3 +71,10 @@ Read these before contributing:
 - [Language Comparison Guide](./docs/LANGUAGE_COMPARISON_GUIDE.md)
 - [CSS Guide](./docs/CSS_GUIDE.md)
 - [Learning Experience Guide](./docs/LEARNING_EXPERIENCE.md)
+
+## License
+
+- Code (the app and every code example, including snippets inside lessons) is under the [MIT License](./LICENSE).
+- Lesson text (the Markdown files in `src/content/` and the prose notes in `src/content/languageExamples.js`) is under [CC BY 4.0](./LICENSE-CONTENT). You can reuse and adapt it with credit.
+
+By contributing, you agree that your code is licensed under MIT and your lesson text under CC BY 4.0.
