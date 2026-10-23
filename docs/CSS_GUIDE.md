@@ -58,7 +58,7 @@ Use names that describe purpose:
 ```css
 .lesson-sidebar {}
 .lesson-content {}
-.section-button {}
+.section-link {}
 ```
 
 Avoid names that describe appearance only:

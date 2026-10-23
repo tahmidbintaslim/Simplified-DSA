@@ -1,5 +1,6 @@
 import { curriculum } from '../content/curriculum.js';
 import { escapeHtml, MarkdownRenderer } from '../utils/markdown.js';
+import { lessonPath, resolvePath } from './router.js';
 
 /**
  * App owns the small amount of state needed by the page.
@@ -21,6 +22,14 @@ export class App {
 
   init() {
     if (!this.root) return;
+
+    const route = this.applyRoute(window.location.pathname);
+    if (route.path !== window.location.pathname) {
+      // Clean up unknown or partial URLs without adding a history entry.
+      const { search, hash } = window.location;
+      window.history.replaceState(null, '', `${route.path}${search}${hash}`);
+    }
+
     this.render();
     this.bindEvents();
   }
@@ -28,8 +37,17 @@ export class App {
   /**
    * Render converts current state into HTML.
    * When activeSectionId or activeLessonId changes, render runs again.
+   *
+   * innerHTML replaces every element, including the one that has keyboard
+   * focus, and focus would drop to <body>. So render remembers the focused
+   * element's id and focuses the new element with that id afterwards.
+   * `focusId` overrides that, for example when an arrow key picks a new tab.
    */
-  render() {
+  render({ focusId } = {}) {
+    const focused = document.activeElement;
+    const hadFocus = focused !== this.root && this.root.contains(focused);
+    const restoreId = focusId ?? (hadFocus ? focused.id : '');
+
     this.root.innerHTML = `
       <div class="app-shell">
         <aside class="lesson-sidebar" aria-label="Course navigation">
@@ -37,7 +55,9 @@ export class App {
             <h1>Simplified DSA</h1>
             <p>Learn the shape of data first, then the steps that act on it.</p>
           </div>
-          ${this.renderSectionMenu()}
+          <nav aria-label="Lessons">
+            ${this.renderSectionMenu()}
+          </nav>
         </aside>
         <main class="lesson-main">
           ${this.renderLessonHeader()}
@@ -48,6 +68,15 @@ export class App {
         </main>
       </div>
     `;
+    document.title = `${this.activeLesson.title} | Simplified DSA`;
+
+    if (restoreId || hadFocus) {
+      // If that element no longer exists, the current lesson link takes focus.
+      const target =
+        (restoreId && document.getElementById(restoreId)) ||
+        this.root.querySelector('[aria-current="page"]');
+      target?.focus({ preventScroll: true });
+    }
   }
 
   /**
@@ -57,17 +86,16 @@ export class App {
    */
   bindEvents() {
     this.root.addEventListener('click', (event) => {
-      const sectionButton = event.target.closest('[data-section-id]');
-      const lessonButton = event.target.closest('[data-lesson-id]');
+      const lessonLink = event.target.closest('a[data-lesson-id]');
       const languageButton = event.target.closest('[data-language-id]');
 
-      if (sectionButton) {
-        this.selectSection(sectionButton.dataset.sectionId);
-        return;
-      }
-
-      if (lessonButton) {
-        this.selectLesson(lessonButton.dataset.lessonId);
+      if (lessonLink) {
+        // Let the browser handle Ctrl/Cmd/Shift/Alt clicks (new tab, new window).
+        if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+          return;
+        }
+        event.preventDefault();
+        this.openLesson(lessonLink.dataset.sectionId, lessonLink.dataset.lessonId);
         return;
       }
 
@@ -75,44 +103,78 @@ export class App {
         this.selectLanguage(languageButton.dataset.languageId);
       }
     });
+
+    // Tabs follow the ARIA tabs pattern: only the selected tab is in the Tab
+    // order, and arrow keys, Home and End move between tabs.
+    this.root.addEventListener('keydown', (event) => {
+      const tab = event.target.closest('[role="tab"]');
+      // Alt+Arrow is the browser's back/forward shortcut; leave it alone.
+      if (!tab || event.altKey || event.ctrlKey || event.metaKey) return;
+
+      const tabs = [...this.root.querySelectorAll('[role="tab"]')];
+      const index = tabs.indexOf(tab);
+      const nextIndex = {
+        ArrowRight: (index + 1) % tabs.length,
+        ArrowLeft: (index - 1 + tabs.length) % tabs.length,
+        Home: 0,
+        End: tabs.length - 1,
+      }[event.key];
+      if (nextIndex === undefined) return;
+
+      event.preventDefault();
+      this.selectLanguage(tabs[nextIndex].dataset.languageId, { moveFocus: true });
+    });
+
+    // Back and forward buttons change the URL; show the lesson it names.
+    window.addEventListener('popstate', () => {
+      this.applyRoute(window.location.pathname);
+      this.render();
+    });
   }
 
   /**
-   * Selecting a section also selects its first lesson.
-   * That gives the learner something useful immediately after switching menus.
+   * Routing: the URL decides which lesson is open, so a refresh, the back
+   * button, or a shared link all land on the same lesson.
+   * Moving to another lesson also resets the language tabs to the first one.
    */
-  selectSection(sectionId) {
-    const section = this.sections.find((item) => item.id === sectionId);
-    if (!section) return;
+  applyRoute(pathname) {
+    const route = resolvePath(this.sections, pathname);
+    const lessonChanged =
+      route.sectionId !== this.activeSectionId || route.lessonId !== this.activeLessonId;
 
-    this.activeSectionId = section.id;
-    this.activeLessonId = section.lessons[0].id;
-    this.activeLanguageId = section.lessons[0].languageExamples?.[0]?.id ?? null;
-    this.render();
+    if (lessonChanged) {
+      this.activeSectionId = route.sectionId;
+      this.activeLessonId = route.lessonId;
+      this.activeLanguageId = this.activeLesson.languageExamples?.[0]?.id ?? null;
+    }
+
+    return route;
   }
 
   /**
-   * Selecting a lesson only changes activeLessonId.
-   * The section does not change because lessons live inside one section.
+   * Opening a lesson adds a history entry. pushState changes the URL without
+   * reloading the page. A section link opens the first lesson in that section.
    */
-  selectLesson(lessonId) {
-    const lesson = this.activeSection.lessons.find((item) => item.id === lessonId);
-    if (!lesson) return;
+  openLesson(sectionId, lessonId) {
+    // Opening the lesson that is already open adds no history entry. On "/"
+    // the first lesson is open, so a click there must not push its path.
+    if (sectionId === this.activeSectionId && lessonId === this.activeLessonId) return;
 
-    this.activeLessonId = lesson.id;
-    this.activeLanguageId = lesson.languageExamples?.[0]?.id ?? null;
+    const path = lessonPath(sectionId, lessonId);
+    window.history.pushState(null, '', path);
+    this.applyRoute(path);
     this.render();
   }
 
   /**
    * Language tabs let learners compare syntax without leaving the concept.
    */
-  selectLanguage(languageId) {
+  selectLanguage(languageId, { moveFocus = false } = {}) {
     const example = this.activeLesson.languageExamples?.find((item) => item.id === languageId);
     if (!example) return;
 
     this.activeLanguageId = example.id;
-    this.render();
+    this.render({ focusId: moveFocus ? `language-tab-${example.id}` : undefined });
   }
 
   /**
@@ -124,18 +186,23 @@ export class App {
       .map((section) => {
         const isActive = section.id === this.activeSectionId;
         const lessons = isActive ? this.renderLessonMenu(section) : '';
+        const firstLesson = section.lessons[0];
 
+        // aria-current="true" marks the current section in the list of
+        // sections; the lesson link below carries aria-current="page".
         return `
           <section class="nav-section">
-            <button
-              class="section-button ${isActive ? 'is-active' : ''}"
-              type="button"
+            <a
+              id="section-link-${section.id}"
+              class="section-link ${isActive ? 'is-active' : ''}"
+              href="${lessonPath(section.id, firstLesson.id)}"
               data-section-id="${section.id}"
-              aria-pressed="${isActive}"
+              data-lesson-id="${firstLesson.id}"
+              ${isActive ? 'aria-current="true"' : ''}
             >
-              <span>${section.title}</span>
+              <span>${escapeHtml(section.title)}</span>
               <span>${section.lessons.length}</span>
-            </button>
+            </a>
             ${lessons}
           </section>
         `;
@@ -155,15 +222,17 @@ export class App {
             const isActive = lesson.id === this.activeLessonId;
 
             return `
-              <button
-                class="lesson-button ${isActive ? 'is-active' : ''}"
-                type="button"
+              <a
+                id="lesson-link-${section.id}-${lesson.id}"
+                class="lesson-link ${isActive ? 'is-active' : ''}"
+                href="${lessonPath(section.id, lesson.id)}"
+                data-section-id="${section.id}"
                 data-lesson-id="${lesson.id}"
-                aria-pressed="${isActive}"
+                ${isActive ? 'aria-current="page"' : ''}
               >
-                <strong>${lesson.title}</strong>
-                <span>${lesson.summary}</span>
-              </button>
+                <strong>${escapeHtml(lesson.title)}</strong>
+                <span>${escapeHtml(lesson.summary)}</span>
+              </a>
             `;
           })
           .join('')}
@@ -206,7 +275,13 @@ export class App {
             .map((example) => this.renderLanguageTab(example, activeExample.id))
             .join('')}
         </div>
-        <div class="language-example">
+        <div
+          id="language-tabpanel"
+          class="language-example"
+          role="tabpanel"
+          aria-labelledby="language-tab-${activeExample.id}"
+          tabindex="0"
+        >
           <div class="language-meta">
             <strong>${escapeHtml(activeExample.language)}</strong>
             <span>${escapeHtml(activeExample.dataStructure)}</span>
@@ -240,10 +315,13 @@ export class App {
 
     return `
       <button
+        id="language-tab-${example.id}"
         class="language-tab ${isActive ? 'is-active' : ''}"
         type="button"
         role="tab"
         aria-selected="${isActive}"
+        aria-controls="language-tabpanel"
+        tabindex="${isActive ? '0' : '-1'}"
         data-language-id="${example.id}"
       >
         ${escapeHtml(example.language)}
