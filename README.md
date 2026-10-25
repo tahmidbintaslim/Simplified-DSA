@@ -49,7 +49,7 @@ There is no framework, no backend and no runtime dependency. The production bund
 
 ## Architecture
 
-The site is a single static page. `App` reads the lesson registry, picks a lesson from the URL and renders it into `#app`.
+The site is one HTML page with no server code. `App` reads the lesson registry, picks a lesson from the URL and renders it into `#app`.
 
 ```mermaid
 flowchart LR
