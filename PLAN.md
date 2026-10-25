@@ -13,7 +13,7 @@ The codebase is also a teaching tool. Collaborators should be able to learn HTML
 - **Runtime:** Vite
 - **UI:** Plain HTML, CSS, and modern JavaScript
 - **Content:** Markdown files stored in `src/content`
-- **Deployment:** Vercel preview deployments
+- **Deployment:** Vercel (production at dsa.tahmid.space from `main`, previews for other branches)
 - **Package Manager:** pnpm
 
 ## Current Product Shape
@@ -98,6 +98,7 @@ Use Vite, HTML, CSS, and JavaScript until the product proves it needs more. Do n
 src/
   core/
     App.js              App coordinator and screen rendering
+    router.js           Lesson URL helpers (no DOM, unit tested)
   content/
     curriculum.js       Lesson registry and raw Markdown imports
     languageExamples.js Language-specific code and runtime notes
@@ -142,14 +143,16 @@ This follows a multimodal and Universal Design for Learning direction: multiple 
 ## Near-Term Roadmap
 
 - [x] Keep the project on Vite, plain JavaScript, CSS, and Markdown.
-- [ ] Build the first real learning shell with Data Structures and Algorithms sections.
-- [ ] Write the first Data Structures lesson: Arrays and Strings.
-- [ ] Write the first Algorithms lesson: Big O.
-- [ ] Add contributor docs for HTML, CSS, JavaScript, OOP, content, Git, and deployment.
-- [ ] Add language comparison tabs for the Arrays lesson.
+- [x] Build the first real learning shell with Data Structures and Algorithms sections.
+- [x] Write the first Data Structures lesson: Arrays and Strings.
+- [x] Write the first Algorithms lesson: Big O.
+- [x] Add contributor docs for CSS, JavaScript, OOP, content, Git, and deployment.
+- [ ] Add a contributor guide for HTML.
+- [x] Add language comparison tabs for the Arrays lesson.
+- [x] Give every lesson its own URL.
 - [ ] Add the first small interactive visualizer after the concept and language comparison shape feel right.
 - [ ] Add a browser editor after we define safe execution and language support.
-- [ ] Deploy preview builds to Vercel.
+- [x] Deploy preview builds to Vercel.
 
 ## Future Evaluation
 
