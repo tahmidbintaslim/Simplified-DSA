@@ -46,10 +46,12 @@ On small screens, the layout becomes one column:
 ```css
 @media (max-width: 760px) {
   .app-shell {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 ```
+
+`minmax(0, 1fr)` matters here. A plain `1fr` column never shrinks below the minimum width of its content, so one long line in a code block would make the whole page scroll sideways on a phone. With a minimum of `0`, the column stays at the screen width and the code block scrolls inside its own box.
 
 ## Naming
 

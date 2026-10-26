@@ -21,7 +21,7 @@ Beginner lessons on data structures and algorithms, written in Markdown, with on
 - **Language comparison tabs** on the Arrays lesson: the same array in JavaScript, Python, C, C++, Java, Go, Rust, C#, Kotlin and Swift. Each tab has a runtime note, a memory note and a link to the source checked. The tabs follow the ARIA tabs pattern, so arrow keys, Home and End move between them.
 - **A URL per lesson**, such as `/algorithms/big-o`. Refresh, shared links and the back and forward buttons all open the right lesson. Unknown URLs fall back to the first lesson.
 - **A small Markdown renderer** (`src/utils/markdown.js`) that escapes HTML before it formats anything, so lesson text cannot inject markup. Only `http` and `https` links become anchors.
-- **Responsive layout:** below 760px the lesson list stacks above the lesson.
+- **Responsive layout:** at 760px and narrower, the lesson list stacks above the lesson, and wide code blocks scroll sideways inside their own box.
 - **13 unit tests** for the Markdown renderer and the URL helpers, run with Node's built-in test runner.
 
 Not built yet: more lessons, visualizers, quizzes and a code runner. See [Status and roadmap](#status-and-roadmap).
