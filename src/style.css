@@ -1,4 +1,9 @@
-@import "tailwindcss";
+/*
+ * Tailwind is imported only for its preflight reset. source(none) turns off
+ * class scanning, so words in the README, docs or lessons cannot add utility
+ * classes to the built CSS.
+ */
+@import "tailwindcss" source(none);
 
 :root {
   color-scheme: dark;
@@ -345,7 +350,8 @@ button:focus-visible,
 @media (max-width: 760px) {
   /* On small screens, stack navigation above the lesson. */
   .app-shell {
-    grid-template-columns: 1fr;
+    /* minmax(0, 1fr) lets a wide code block scroll instead of widening the page. */
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .lesson-sidebar {
