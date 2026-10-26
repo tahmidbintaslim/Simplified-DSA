@@ -39,7 +39,7 @@ The project has two learning goals. The app covers a small part of the first one
 | --- | --- |
 | Build tool and dev server | Vite 8 |
 | UI | Plain JavaScript (ES modules and one `App` class), hand-written CSS |
-| CSS reset | Tailwind CSS v4, used only for its base reset (preflight) |
+| CSS reset | Tailwind CSS v4, used only for its base reset (preflight). Class scanning is off (`source(none)`), so it generates no utility classes |
 | Content | Markdown files, imported as text with Vite's `?raw` suffix |
 | Tests | Node's built-in test runner (`node --test`) |
 | Package manager | pnpm 11 (pinned in `package.json` `packageManager`) |

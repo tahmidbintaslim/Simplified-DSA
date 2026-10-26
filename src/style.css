@@ -1,4 +1,9 @@
-@import "tailwindcss";
+/*
+ * Tailwind is imported only for its preflight reset. source(none) turns off
+ * class scanning, so words in the README, docs or lessons cannot add utility
+ * classes to the built CSS.
+ */
+@import "tailwindcss" source(none);
 
 :root {
   color-scheme: dark;
