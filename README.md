@@ -69,8 +69,8 @@ flowchart LR
 
 ### Prerequisites
 
-- Node.js 20.19+ or 22.12+ (Vite 8's requirement). CI uses Node 22.
-- pnpm 11. Run `corepack enable` once and Corepack uses the version pinned in `package.json`.
+- Node.js 22.14 or newer (CI uses Node 22). pnpm 11 needs Node 22.13+, and 22.14 is the first 22.x release whose bundled Corepack can verify pnpm 11's signature.
+- pnpm 11. Run `corepack enable` once and Corepack uses the version pinned in `package.json`. Node 25 and newer no longer bundle Corepack, so run `npm install -g corepack` first.
 
 No environment variables are needed. The app has no backend, API keys or `.env` file.
 
