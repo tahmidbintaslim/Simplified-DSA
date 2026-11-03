@@ -112,3 +112,7 @@ Only use production deploy when the team agrees:
 ```bash
 pnpm dlx vercel deploy --prod
 ```
+
+## Contact
+
+Open an issue with the [issue forms](https://github.com/tahmidbintaslim/Simplified-DSA/issues/new/choose) for bugs and ideas. For anything else, email tahmidbintaslimrafi@gmail.com. Report security problems privately as described in [SECURITY.md](../SECURITY.md).
