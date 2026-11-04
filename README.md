@@ -1,9 +1,19 @@
+<div align="center">
+
 # Simplified DSA
 
+Beginner lessons on data structures and algorithms, with one array example compared across 10 programming languages.
+
 [![CI](https://github.com/tahmidbintaslim/Simplified-DSA/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/tahmidbintaslim/Simplified-DSA/actions/workflows/ci.yml)
-[![Live demo](https://img.shields.io/website?url=https%3A%2F%2Fdsa.tahmid.space&label=live%20demo)](https://dsa.tahmid.space)
 [![Code: MIT](https://img.shields.io/badge/code-MIT-blue)](./LICENSE)
 [![Lessons: CC BY 4.0](https://img.shields.io/badge/lessons-CC%20BY%204.0-lightgrey)](./LICENSE-CONTENT)
+[![Last commit](https://img.shields.io/github/last-commit/tahmidbintaslim/Simplified-DSA/main)](https://github.com/tahmidbintaslim/Simplified-DSA/commits/main)
+[![Live demo](https://img.shields.io/website?url=https%3A%2F%2Fdsa.tahmid.space&label=live%20demo)](https://dsa.tahmid.space)
+[![GitHub stars](https://img.shields.io/github/stars/tahmidbintaslim/Simplified-DSA?style=flat)](https://github.com/tahmidbintaslim/Simplified-DSA/stargazers)
+
+**[Live demo](https://dsa.tahmid.space)** · [Quick start](#quick-start) · [Contributing](#contributing)
+
+</div>
 
 Beginner lessons on data structures and algorithms, written in Markdown, with one array example compared across 10 programming languages. Built with Vite and plain JavaScript.
 
@@ -14,6 +24,34 @@ Beginner lessons on data structures and algorithms, written in Markdown, with on
 | Language comparison tabs | Phone layout |
 | --- | --- |
 | ![The language comparison panel with the Rust tab selected, showing a Vec example, a runtime note, a memory note and a source link](docs/images/language-tabs.png) | ![The Big O lesson at a 390 pixel phone width, with the lesson list stacked above the lesson](docs/images/big-o-mobile.png) |
+
+## Quick start
+
+You need Node.js 22.14 or newer and pnpm 11 (`corepack enable`). Details are in [Prerequisites](#prerequisites).
+
+```bash
+git clone https://github.com/tahmidbintaslim/Simplified-DSA.git
+cd Simplified-DSA
+pnpm install --frozen-lockfile
+pnpm dev        # http://localhost:3000/
+pnpm test       # 13 unit tests
+```
+
+## Contents
+
+- [Quick start](#quick-start)
+- [Features](#features)
+- [Goals](#goals)
+- [Tech stack](#tech-stack)
+- [Architecture](#architecture)
+- [Getting started](#getting-started)
+- [Deployment](#deployment)
+- [Project structure](#project-structure)
+- [Status and roadmap](#status-and-roadmap)
+- [Known limitations](#known-limitations)
+- [Contributing](#contributing)
+- [Security](#security)
+- [License](#license)
 
 ## Features
 
@@ -149,6 +187,17 @@ Next, from the [Project Plan](./PLAN.md) and [`CURRICULUM.md`](./src/content/CUR
 - A first small interactive visualizer, once the written lessons feel right.
 - A browser code editor, after safe execution and language support are defined.
 
+## Known limitations
+
+These follow from the code as it is today:
+
+- 2 lessons are written. The language comparison tabs exist only on the Arrays and Strings lesson.
+- There are no visualizers, quizzes or code runner yet. Code samples are read-only text.
+- The Markdown renderer (`src/utils/markdown.js`) handles only the syntax the lessons use: `#` and `##` headings, `- ` bullet lists, fenced code blocks, inline code, bold text and `http`/`https` links. Tables, numbered lists, images and deeper headings are not rendered as Markdown.
+- Code blocks have no syntax highlighting.
+- An unknown lesson URL opens the first lesson instead of a "not found" page.
+- The tests cover the Markdown renderer and the URL helpers. There are no browser or end-to-end tests.
+
 ## Contributing
 
 Contributions are welcome, and the codebase is written to be read by beginners. Start with:
@@ -160,6 +209,12 @@ Contributions are welcome, and the codebase is written to be read by beginners. 
 - [Sources and Learnings](./docs/SOURCES_AND_LEARNINGS.md) and [Learning Experience Guide](./docs/LEARNING_EXPERIENCE.md)
 
 Run `pnpm test` and `pnpm build` before opening a pull request. Questions and review notes on the code and docs go in [issue #1](https://github.com/tahmidbintaslim/Simplified-DSA/issues/1).
+
+Bug reports and feature ideas use the [issue forms](https://github.com/tahmidbintaslim/Simplified-DSA/issues/new/choose). Pull requests get a short checklist from the [pull request template](./.github/pull_request_template.md).
+
+## Security
+
+Please report security problems privately, not in a public issue. See [SECURITY.md](./SECURITY.md).
 
 ## License
 
