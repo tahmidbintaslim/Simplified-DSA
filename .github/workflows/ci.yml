@@ -36,6 +36,13 @@ jobs:
       - name: Build
         run: pnpm build
 
+      # Browser tests run against the build above in a real Chromium.
+      - name: Install Chromium for browser tests
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Browser tests
+        run: node --test "e2e/**/*.test.js"
+
       # The plugin ships a prebuilt server bundle; fail if it is out of date.
       - name: Check plugin bundle is current
         run: |
