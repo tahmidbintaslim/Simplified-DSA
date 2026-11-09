@@ -34,7 +34,7 @@ git clone https://github.com/tahmidbintaslim/Simplified-DSA.git
 cd Simplified-DSA
 pnpm install --frozen-lockfile
 pnpm dev        # http://localhost:3000/
-pnpm test       # 13 unit tests
+pnpm test       # unit tests
 ```
 
 ## Contents
@@ -186,7 +186,9 @@ The plugin runs the server with the `node` on your machine (Node 18 or newer).
 
 ### Use it inside this repository
 
-Open the repository in Claude Code and approve the `simplified-dsa` server from `.mcp.json`; the `dsa-tutor` skill loads from `.claude/skills/` (a link to `plugin/skills/`). Then ask, for example, "teach me hash tables" or "quiz me on BFS vs DFS". ### Add it to Claude as a connector
+Open the repository in Claude Code and approve the `simplified-dsa` server from `.mcp.json`; the `dsa-tutor` skill loads from `.claude/skills/` (a link to `plugin/skills/`). Then ask, for example, "teach me hash tables" or "quiz me on BFS vs DFS".
+
+### Add it to Claude as a connector
 
 The same server runs as a stateless HTTPS endpoint (`api/mcp.js`, a Vercel function) at `https://dsa.tahmid.space/mcp`. In claude.ai: Customize → Connectors → Add custom connector → paste that URL, no sign-in. Any MCP client that speaks Streamable HTTP can use it.
 
