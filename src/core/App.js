@@ -1,4 +1,5 @@
 import { curriculum } from '../content/curriculum.js';
+import { demos } from '../demos/index.js';
 import { escapeHtml, MarkdownRenderer } from '../utils/markdown.js';
 import { lessonPath, resolvePath } from './router.js';
 
@@ -64,11 +65,13 @@ export class App {
           <article class="lesson-content">
             ${this.markdownRenderer.render(this.activeLesson.markdown)}
           </article>
+          ${this.renderDemoPanel()}
           ${this.renderLanguageComparison()}
         </main>
       </div>
     `;
     document.title = `${this.activeLesson.title} | Simplified DSA`;
+    this.attachDemo();
 
     if (restoreId || hadFocus) {
       // If that element no longer exists, the current lesson link takes focus.
@@ -251,6 +254,45 @@ export class App {
         <p>${this.activeSection.description}</p>
       </header>
     `;
+  }
+
+  /**
+   * Lessons with a `demo` id get an interactive panel after the text.
+   * The panel only holds an empty slot; attachDemo fills it.
+   */
+  renderDemoPanel() {
+    const demo = demos[this.activeLesson.demo];
+    if (!demo) return '';
+
+    return `
+      <section class="demo-panel" aria-labelledby="demo-title">
+        <div class="language-panel-header">
+          <h2 id="demo-title">Try it: ${escapeHtml(demo.title)}</h2>
+          <p>${escapeHtml(demo.intro)}</p>
+        </div>
+        <div data-demo-slot></div>
+      </section>
+    `;
+  }
+
+  /**
+   * render() rebuilds the page with innerHTML, which would wipe the demo's
+   * state every time a language tab changes. So the demo is mounted once per
+   * lesson into its own element, and each render moves that same element
+   * into the new slot.
+   */
+  attachDemo() {
+    const slot = this.root.querySelector('[data-demo-slot]');
+    if (!slot) return;
+
+    const key = lessonPath(this.activeSectionId, this.activeLessonId);
+    if (this.demoKey !== key) {
+      this.demoKey = key;
+      this.demoElement = document.createElement('div');
+      this.demoElement.className = 'demo';
+      demos[this.activeLesson.demo].mount(this.demoElement);
+    }
+    slot.replaceWith(this.demoElement);
   }
 
   /**
