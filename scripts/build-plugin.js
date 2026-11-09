@@ -14,6 +14,7 @@ rmSync(outDir, { recursive: true, force: true });
 
 await build({
   configFile: false,
+  publicDir: false, // The site's public/ files do not belong in the plugin.
   logLevel: 'warn',
   ssr: { noExternal: true, target: 'node' },
   build: {
