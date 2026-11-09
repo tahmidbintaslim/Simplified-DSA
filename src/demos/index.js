@@ -659,6 +659,8 @@ function mountGridTraversal(root) {
 
   // Cells are buttons so keyboard users can toggle walls too.
   const draw = (frame) => {
+    // Redrawing replaces the buttons; remember the focused cell so arrow-key stepping keeps working.
+    const focusedCell = grid.contains(document.activeElement) ? document.activeElement.dataset.cell : null;
     const visited = new Set(frame?.visited);
     const frontier = new Set(frame?.frontier);
     const path = new Set(frame?.path);
@@ -683,6 +685,7 @@ function mountGridTraversal(root) {
       }
     }
     grid.innerHTML = html;
+    if (focusedCell) grid.querySelector(`[data-cell="${focusedCell}"]`)?.focus();
   };
 
   const player = createPlayer(root, draw);

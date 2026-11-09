@@ -185,6 +185,8 @@ export class App {
     window.history.pushState(null, '', path);
     this.applyRoute(path);
     this.render();
+    // A new lesson starts at its title, even when opened from the footer's Next link.
+    window.scrollTo(0, 0);
   }
 
   /**
@@ -298,7 +300,7 @@ export class App {
     return `
       ${this.renderLessonHeader()}
       <article class="lesson-content">
-        ${inline ? article.replace(DEMO_MARKER, panel) : article}
+        ${inline ? article.replace(DEMO_MARKER, () => panel) : article}
       </article>
       ${inline ? '' : panel}
       ${this.renderLanguageComparison()}

@@ -199,9 +199,11 @@ export class MarkdownRenderer {
         continue;
       }
 
+      // Each block flushes every other open block first, so blocks keep their written order.
       if (line.startsWith('> ') || line === '>') {
         flushParagraph();
         flushList();
+        flushTable();
         quote.push(line.slice(2));
         continue;
       }
@@ -209,6 +211,7 @@ export class MarkdownRenderer {
       if (line.startsWith('|')) {
         flushParagraph();
         flushList();
+        flushQuote();
         table.push(line.trim());
         continue;
       }
@@ -217,6 +220,8 @@ export class MarkdownRenderer {
       const item = line.match(/^(- |\d+\. )(.*)$/);
       if (item) {
         flushParagraph();
+        flushQuote();
+        flushTable();
         const tag = item[1] === '- ' ? 'ul' : 'ol';
         if (list.length && tag !== listTag) flushList();
         listTag = tag;
@@ -224,6 +229,8 @@ export class MarkdownRenderer {
         continue;
       }
 
+      flushQuote();
+      flushTable();
       paragraph.push(line.trim());
     }
 

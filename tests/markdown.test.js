@@ -76,3 +76,10 @@ test('quiz blocks mark the right option and keep the explanation hidden', () => 
 test('a demo fence leaves a marker for the app', () => {
   assert.equal(render('```demo\n```'), '<div data-demo-here></div>');
 });
+
+test('blocks keep their written order even without blank lines between them', () => {
+  const html = render('| A |\n| --- |\n| 1 |\nAfter the table\n> **Note:** callout\nAfter the callout\n- item');
+  const order = ['<table>', 'After the table', 'callout-note', 'After the callout', '<ul>'].map((part) => html.indexOf(part));
+  assert.ok(order.every((at) => at >= 0), html);
+  assert.deepEqual([...order].sort((a, b) => a - b), order);
+});

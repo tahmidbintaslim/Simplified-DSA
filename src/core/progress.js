@@ -6,8 +6,10 @@
  */
 const KEY = 'simplified-dsa:completed';
 
-export function loadCompleted(storage = globalThis.localStorage) {
+export function loadCompleted(storage) {
   try {
+    // Reading window.localStorage itself throws when site data is blocked, so it happens inside the try.
+    storage ??= globalThis.localStorage;
     const saved = JSON.parse(storage?.getItem(KEY) ?? '[]');
     return new Set(Array.isArray(saved) ? saved.filter((item) => typeof item === 'string') : []);
   } catch {
@@ -15,8 +17,9 @@ export function loadCompleted(storage = globalThis.localStorage) {
   }
 }
 
-export function saveCompleted(completed, storage = globalThis.localStorage) {
+export function saveCompleted(completed, storage) {
   try {
+    storage ??= globalThis.localStorage;
     storage?.setItem(KEY, JSON.stringify([...completed]));
   } catch {
     // Progress simply is not remembered; the lesson still works.

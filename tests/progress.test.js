@@ -24,3 +24,20 @@ test('broken, foreign or throwing storage gives empty progress instead of an err
   assert.doesNotThrow(() => saveCompleted(new Set(['x']), throwing));
   assert.equal(loadCompleted(undefined).size, 0);
 });
+
+test('a browser that throws on reading localStorage itself still loads', () => {
+  const original = Object.getOwnPropertyDescriptor(globalThis, 'localStorage');
+  Object.defineProperty(globalThis, 'localStorage', {
+    configurable: true,
+    get() {
+      throw new Error('SecurityError: site data is blocked');
+    },
+  });
+  try {
+    assert.equal(loadCompleted().size, 0);
+    assert.doesNotThrow(() => saveCompleted(new Set(['x'])));
+  } finally {
+    if (original) Object.defineProperty(globalThis, 'localStorage', original);
+    else delete globalThis.localStorage;
+  }
+});
