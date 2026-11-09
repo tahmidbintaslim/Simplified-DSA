@@ -231,6 +231,7 @@ Next, from the [Project Plan](./PLAN.md) and [`CURRICULUM.md`](./src/content/CUR
 - More Data Structures lessons: Heaps, Tries, Graph representations.
 - More Algorithms lessons: Recursion, Quicksort, Two Pointers, Sliding Window, Dijkstra.
 - Quizzes and progress tracking. See [Strategy](./docs/STRATEGY.md) for the product plan.
+- A remote MCP connector, then the [practice companion browser extension](./docs/LEETCODE_COMPANION.md).
 - A browser code editor, after safe execution and language support are defined.
 
 ## Known limitations
@@ -249,6 +250,9 @@ These follow from the code as it is today:
 
 Contributions are welcome, and the codebase is written to be read by beginners. Start with:
 
+- [Strategy](./docs/STRATEGY.md): product, brand, research, tech, legal and the AI plan
+- [Publishing Guide](./docs/PUBLISHING.md): how to release the site, plugin, skill, connector and MCP Registry entry
+- [Practice Companion Plan](./docs/LEETCODE_COMPANION.md): browser extension with hints, pattern mapping and GitHub sync
 - [Contributor Guide](./docs/CONTRIBUTING.md): working rules, commits, adding a lesson, deploy previews
 - [JavaScript and OOP Guide](./docs/JS_OOP_GUIDE.md)
 - [CSS Guide](./docs/CSS_GUIDE.md)
