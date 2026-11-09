@@ -376,3 +376,137 @@ export const growthRates = [
   { id: 'onlogn', label: 'O(n log n)', ops: (n) => Math.ceil(n * Math.max(1, Math.log2(n))) },
   { id: 'on2', label: 'O(n²)', ops: (n) => n * n },
 ];
+
+/* ---------- Pattern: two pointers ---------- */
+
+export const pairSumCode = [
+  'left = 0, right = n - 1',
+  'while left < right:',
+  '  sum = a[left] + a[right]',
+  '  if sum == target: return (left, right)',
+  '  if sum < target: left = left + 1',
+  '  else: right = right - 1',
+  'return "no pair"',
+];
+
+/**
+ * Two pointers on a sorted array: find two values that add up to target.
+ * Frame: { left, right, found: [i, j] | null, caption, line, vars }.
+ * Each step rules out a whole row of pairs, so it takes at most n - 1 steps
+ * instead of the n(n-1)/2 pairs a brute-force search checks.
+ */
+export function pairSumFrames(sorted, target) {
+  const frames = [];
+  let left = 0;
+  let right = sorted.length - 1;
+
+  while (left < right) {
+    const sum = sorted[left] + sorted[right];
+    const vars = { target, left, right, sum };
+    if (sum === target) {
+      frames.push({ left, right, found: [left, right], line: 3, vars, caption: `${sorted[left]} + ${sorted[right]} = ${target}. Found the pair.` });
+      return frames;
+    }
+    const tooSmall = sum < target;
+    frames.push({
+      left,
+      right,
+      found: null,
+      line: tooSmall ? 4 : 5,
+      vars,
+      caption: tooSmall
+        ? `${sorted[left]} + ${sorted[right]} = ${sum} is too small. Every pair with ${sorted[left]} is too small too, so move left right.`
+        : `${sorted[left]} + ${sorted[right]} = ${sum} is too big. Every pair with ${sorted[right]} is too big too, so move right left.`,
+    });
+    if (tooSmall) left++;
+    else right--;
+  }
+
+  frames.push({ left, right, found: null, line: 6, vars: { target, left, right }, caption: `The pointers met: no two values add up to ${target}.` });
+  return frames;
+}
+
+// How many pairs a brute-force search checks before it finds the target (or all of them).
+export function bruteForcePairChecks(values, target) {
+  let checks = 0;
+  for (let i = 0; i < values.length; i++) {
+    for (let j = i + 1; j < values.length; j++) {
+      checks++;
+      if (values[i] + values[j] === target) return checks;
+    }
+  }
+  return checks;
+}
+
+/* ---------- Pattern: sliding window ---------- */
+
+export const windowSumCode = [
+  'sum = a[0] + … + a[k-1];  best = sum',
+  'for end from k to n-1:',
+  '  sum = sum + a[end] - a[end-k]',
+  '  best = max(best, sum)',
+  'return best',
+];
+
+/**
+ * Fixed-size sliding window: the largest sum of k values in a row.
+ * Frame: { start, end, sum, best, bestStart, caption, line, vars }.
+ * Sliding adds the value entering and subtracts the value leaving, so each
+ * step costs O(1) instead of re-adding all k values.
+ */
+export function windowSumFrames(values, k) {
+  if (k < 1 || k > values.length) {
+    return [{ start: 0, end: -1, sum: 0, best: null, bestStart: -1, line: -1, vars: { k }, caption: `The window size must be between 1 and ${values.length}.` }];
+  }
+
+  let sum = values.slice(0, k).reduce((total, value) => total + value, 0);
+  let best = sum;
+  let bestStart = 0;
+  const frames = [
+    {
+      start: 0,
+      end: k - 1,
+      sum,
+      best,
+      bestStart,
+      line: 0,
+      vars: { k, start: 0, end: k - 1, sum, best },
+      caption: `First window: add the first ${k} values. Sum = ${sum}.`,
+    },
+  ];
+
+  for (let end = k; end < values.length; end++) {
+    const start = end - k + 1;
+    sum += values[end] - values[end - k];
+    const improved = sum > best;
+    if (improved) {
+      best = sum;
+      bestStart = start;
+    }
+    frames.push({
+      start,
+      end,
+      sum,
+      best,
+      bestStart,
+      line: improved ? 3 : 2,
+      vars: { k, start, end, sum, best },
+      caption: `Slide right: add ${values[end]}, drop ${values[end - k]}. Sum = ${sum}${improved ? ', a new best.' : `, best is still ${best}.`}`,
+    });
+  }
+
+  frames.push({
+    start: bestStart,
+    end: bestStart + k - 1,
+    sum: best,
+    best,
+    bestStart,
+    line: 4,
+    vars: { k, best },
+    caption: `Done. The best window starts at index ${bestStart} with sum ${best}.`,
+  });
+  return frames;
+}
+
+// Additions a brute-force version makes: k for every window.
+export const bruteForceWindowAdds = (n, k) => (k >= 1 && k <= n ? (n - k + 1) * k : 0);

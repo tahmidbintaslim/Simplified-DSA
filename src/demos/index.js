@@ -2,15 +2,21 @@ import { escapeHtml } from '../utils/markdown.js';
 import {
   binarySearchCode,
   binarySearchFrames,
+  bruteForcePairChecks,
+  bruteForceWindowAdds,
   bstInOrder,
   bstInsert,
   bstLayout,
   bstSearchPath,
   growthRates,
   gridTraversalFrames,
+  pairSumCode,
+  pairSumFrames,
   simpleHash,
   sortingAlgorithms,
   traversalCode,
+  windowSumCode,
+  windowSumFrames,
 } from './algorithms.js';
 import { createPlayer } from './player.js';
 
@@ -714,6 +720,129 @@ function mountGridTraversal(root) {
   run();
 }
 
+/* ---------- Pattern: two pointers on a sorted array ---------- */
+
+function mountTwoPointers(root) {
+  let values = [1, 3, 4, 6, 8, 11, 14, 17];
+
+  root.innerHTML = `
+    <div class="demo-controls">
+      <label>Target sum <input class="demo-input" type="number" value="19" data-field="target" /></label>
+      <button type="button" class="demo-button" data-op="run">Find pair</button>
+      <label>Your sorted list <input class="demo-input demo-input-wide" type="text" placeholder="e.g. 2 5 9 12 20" data-field="list" /></label>
+      <button type="button" class="demo-button" data-op="use">Use list</button>
+    </div>
+    <div class="demo-stage"><div class="array-row tp-row"></div></div>
+    <p class="bs-compare tp-compare"></p>
+  `;
+
+  const row = root.querySelector('.tp-row');
+  const compare = root.querySelector('.tp-compare');
+  const targetInput = root.querySelector('[data-field="target"]');
+  const listInput = root.querySelector('[data-field="list"]');
+
+  // Values outside left..right are ruled out for good: grey them.
+  const player = createPlayer(root, ({ left, right, found }) => {
+    row.innerHTML = values
+      .map((value, i) => {
+        const state = found?.includes(i) ? 'is-hit' : i === left || i === right ? 'is-mid' : i < left || i > right ? 'is-out' : '';
+        const tags = [i === left && 'L', i === right && 'R'].filter(Boolean).join(' ');
+        const pointer = tags ? `<span class="cell-pointer">${tags}</span>` : '';
+        return `<div class="array-cell ${state}"><span class="array-value">${value}</span><span class="array-index">${i}</span>${pointer}</div>`;
+      })
+      .join('');
+  });
+
+  const run = () => {
+    const target = readInt(targetInput) ?? 0;
+    const frames = pairSumFrames(values, target);
+    const steps = frames.at(-1).found ? frames.length : frames.length - 1;
+    const checks = bruteForcePairChecks(values, target);
+    compare.textContent = `Two pointers: ${steps} step${steps === 1 ? '' : 's'}. Brute force would check ${checks} pair${checks === 1 ? '' : 's'}.`;
+    player.load(frames, pairSumCode);
+  };
+
+  root.addEventListener('click', (event) => {
+    const op = event.target.closest('[data-op]')?.dataset.op;
+    if (op === 'run') run();
+    if (op === 'use') {
+      const list = readList(listInput, { min: -999, max: 999 });
+      if (!list || list.length < 2) {
+        compare.textContent = 'Type 2 to 20 whole numbers between -999 and 999, separated by spaces or commas.';
+        return;
+      }
+      // Two pointers relies on sorted order, so sort first.
+      values = [...list].sort((a, b) => a - b);
+      run();
+    }
+  });
+
+  run();
+}
+
+/* ---------- Pattern: fixed-size sliding window ---------- */
+
+function mountSlidingWindow(root) {
+  let values = [2, 1, 5, 1, 3, 2, 9, 4];
+
+  root.innerHTML = `
+    <div class="demo-controls">
+      <label>Window size k <input class="demo-input" type="number" value="3" min="1" max="20" data-field="k" /></label>
+      <button type="button" class="demo-button" data-op="run">Slide</button>
+      <label>Your list <input class="demo-input demo-input-wide" type="text" placeholder="e.g. 4 2 7 1 8 3" data-field="list" /></label>
+      <button type="button" class="demo-button" data-op="use">Use list</button>
+    </div>
+    <div class="demo-stage"><div class="array-row sw-row"></div></div>
+    <p class="bs-compare sw-compare"></p>
+  `;
+
+  const row = root.querySelector('.sw-row');
+  const compare = root.querySelector('.sw-compare');
+  const kInput = root.querySelector('[data-field="k"]');
+  const listInput = root.querySelector('[data-field="list"]');
+
+  // Teal = inside the window; gold = the value that just entered.
+  const player = createPlayer(root, ({ start, end, line }) => {
+    row.innerHTML = values
+      .map((value, i) => {
+        const inside = i >= start && i <= end;
+        const entering = i === end && line !== 0 && line !== 4;
+        const state = entering ? 'is-hit' : inside ? 'is-moved' : '';
+        const tags = [i === start && 'start', i === end && 'end'].filter(Boolean).join(' ');
+        const pointer = tags ? `<span class="cell-pointer">${tags}</span>` : '';
+        return `<div class="array-cell ${state}"><span class="array-value">${value}</span><span class="array-index">${i}</span>${pointer}</div>`;
+      })
+      .join('');
+  });
+
+  const run = () => {
+    const k = readInt(kInput) ?? 0;
+    const frames = windowSumFrames(values, k);
+    const slides = Math.max(0, values.length - k);
+    compare.textContent =
+      k >= 1 && k <= values.length
+        ? `Sliding window: ${k} additions for the first window, then 2 per slide (${k + 2 * slides} in total). Recomputing every window would make ${bruteForceWindowAdds(values.length, k)}.`
+        : `Choose k between 1 and ${values.length}.`;
+    player.load(frames, windowSumCode);
+  };
+
+  root.addEventListener('click', (event) => {
+    const op = event.target.closest('[data-op]')?.dataset.op;
+    if (op === 'run') run();
+    if (op === 'use') {
+      const list = readList(listInput, { min: -999, max: 999 });
+      if (!list) {
+        compare.textContent = 'Type 1 to 20 whole numbers between -999 and 999, separated by spaces or commas.';
+        return;
+      }
+      values = list;
+      run();
+    }
+  });
+
+  run();
+}
+
 export const demos = {
   'array-ops': {
     title: 'Insert, delete and read',
@@ -759,5 +888,15 @@ export const demos = {
     title: 'Breadth-first vs depth-first',
     intro: 'Same grid, same start and goal. The only change is a queue versus a stack.',
     mount: mountGridTraversal,
+  },
+  'two-pointers': {
+    title: 'Squeeze from both ends',
+    intro: 'Watch L and R close in on the target. Every grey value is ruled out for good.',
+    mount: mountTwoPointers,
+  },
+  'sliding-window': {
+    title: 'Slide the window',
+    intro: 'Each slide adds the value that enters and subtracts the one that leaves.',
+    mount: mountSlidingWindow,
   },
 };

@@ -7,6 +7,8 @@ import bigO from './algorithms/big-o.md?raw';
 import binarySearch from './algorithms/binary-search.md?raw';
 import sorting from './algorithms/sorting.md?raw';
 import graphTraversal from './algorithms/graph-traversal.md?raw';
+import twoPointers from './patterns/two-pointers.md?raw';
+import slidingWindow from './patterns/sliding-window.md?raw';
 import { arrayLanguageExamples } from './languageExamples.js';
 
 // `demo` names an interactive panel in src/demos/index.js; a ```demo block in the
@@ -115,6 +117,33 @@ export const curriculum = [
         goals: ['Run BFS and DFS by hand on a small graph', 'Explain why BFS finds the shortest path', 'Recognise grid problems as graph problems'],
         markdown: graphTraversal,
         demo: 'grid-traversal',
+      },
+    ],
+  },
+  {
+    id: 'patterns',
+    title: 'Interview Patterns',
+    description: 'Reusable ways of thinking that turn slow brute-force answers into fast ones.',
+    lessons: [
+      {
+        id: 'two-pointers',
+        title: 'Two Pointers',
+        summary: 'Move two positions toward each other to skip pairs that cannot work.',
+        level: 'Intermediate',
+        minutes: 15,
+        goals: ['Turn an O(n²) pair search into O(n)', 'Decide which pointer to move and why', 'Recognise problems that fit the pattern'],
+        markdown: twoPointers,
+        demo: 'two-pointers',
+      },
+      {
+        id: 'sliding-window',
+        title: 'Sliding Window',
+        summary: 'Update a running answer as values enter and leave a stretch.',
+        level: 'Intermediate',
+        minutes: 15,
+        goals: ['Slide a window in O(1) per step', 'Grow and shrink a flexible window', 'Spot "consecutive" problems that fit'],
+        markdown: slidingWindow,
+        demo: 'sliding-window',
       },
     ],
   },
