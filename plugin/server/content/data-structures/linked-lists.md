@@ -1,59 +1,111 @@
 # Linked Lists
 
-A linked list keeps values in order without keeping them next to each other in memory. Each value lives in its own small box called a node, and each node remembers where the next node is.
+A linked list keeps values in order without keeping them side by side in memory. Each value sits in its own little box, called a node, and every node remembers where the next one is.
+
+> **Analogy:** A treasure hunt. Each clue tells you where the next clue is hidden. To reach clue 5 you must follow clues 1, 2, 3 and 4. But adding a new first clue is easy: write it, point it at the old first clue, done.
 
 ## The Core Idea
 
-A node has two parts: the value, and a pointer (a reference) to the next node. The list itself only remembers the first node, called the head. The last node points to nothing, usually written `null`.
+A node holds two things: a value, and a pointer (the location of the next node). The list only remembers the first node, called the head. The last node points to nothing, written `null`.
 
 ```text
-head
- ↓
-[7 | •]──→[3 | •]──→[9 | •]──→ null
+ head
+  ↓
+┌───┬───┐   ┌───┬───┐   ┌───┬───┐
+│ 7 │ ●─┼──→│ 3 │ ●─┼──→│ 9 │ ●─┼──→ null
+└───┴───┘   └───┴───┘   └───┴───┘
+ value next
 ```
 
-To reach the third value, you start at the head and follow two pointers. There is no address formula like the one arrays use, because the nodes can be anywhere in memory.
+Compare that with an array. An array is one block of lockers in a row; a linked list is boxes scattered around a room, joined by string.
 
-## What It Is Good At
+## Walking The List
 
-Adding or removing a node is just pointer surgery. To insert at the head, make a new node, point it at the old head, and call it the new head. No other value moves.
+There is no index formula, so reaching a position means walking from the head, one pointer at a time.
 
 ```text
-insert 5 at head:
-
-[5 | •]──→[7 | •]──→[3 | •]──→[9 | •]──→ null
+find 9:   7 → 3 → 9   found after visiting 3 nodes
+find 5:   7 → 3 → 9 → null   not found after visiting all 3
 ```
 
-Compare that with an array, where inserting at the front shifts every value one slot to the right.
+```quiz
+Q: A linked list has 1,000 nodes. How many nodes do you visit to reach the last one?
+- 1, by jumping straight there
+* 1,000, by walking from the head
+- About 10, by halving
+Why: Nodes are not side by side, so there is no address formula. You must follow every pointer from the head.
+```
 
-## What It Pays For That
+## Where Linked Lists Win: Inserting At The Front
 
-Because nodes are scattered, reading position `i` means walking `i` pointers from the head. That makes access and search `O(n)`.
+Adding a new head is just pointer surgery. Nothing else moves.
 
-Each node also stores a pointer on top of its value, so a linked list uses more memory than an array of the same values. Scattered nodes are also harder for the CPU cache to predict, so walking a list is often slower in practice than scanning an array, even when both are `O(n)`.
+1. Make a new node holding `5`.
+2. Point its `next` at the current head (`7`).
+3. Call the new node the head.
+
+```text
+ head
+  ↓
+┌───┬───┐   ┌───┬───┐   ┌───┬───┐   ┌───┬───┐
+│ 5 │ ●─┼──→│ 7 │ ●─┼──→│ 3 │ ●─┼──→│ 9 │ ●─┼──→ null
+└───┴───┘   └───┴───┘   └───┴───┘   └───┴───┘
+  new
+```
+
+That is `O(1)` whether the list has 3 nodes or 3 million. An array would have to shift every value right.
+
+## Removing A Node
+
+To remove `3`, point the node before it (`7`) past it, straight at `9`. The `3` node is no longer reachable, and the language frees it.
+
+```text
+7 ──→ 3 ──→ 9     becomes     7 ─────────→ 9
+```
+
+> **Watch out:** Unlinking is `O(1)`, but first you have to find the node before it, which is a walk: `O(n)`. Beginners often quote only the cheap half.
+
+Insert at the head, then at the tail, then search. Teal nodes are the ones the operation had to walk past.
+
+```demo
+```
+
+```quiz
+Q: Which is cheaper in a singly linked list without a tail pointer?
+* Inserting at the head
+- Inserting at the tail
+- They cost the same
+Why: The head is already known, so inserting there is O(1). Reaching the tail means walking every node first, which is O(n).
+```
 
 ## Variations
 
-- **Singly linked:** each node points to the next one. This is the version in the demo.
+- **Singly linked:** each node points to the next one (the demo).
 - **Doubly linked:** each node also points to the previous one, so you can walk backwards and remove a node you already hold in `O(1)`.
-- **With a tail pointer:** the list remembers its last node too, so appending is `O(1)` instead of a walk.
+- **Tail pointer:** the list also remembers its last node, so appending becomes `O(1)`.
 
-## Cost Summary
+> **When to use it:** You add and remove at the front a lot, or remove nodes you already hold (an "undo" history, a cache that drops the oldest item). If you mostly read by position, an array is faster.
 
-- Insert or remove at the head: `O(1)`.
-- Insert or remove after a node you already hold: `O(1)`.
-- Find a value or reach position `i`: `O(n)`.
-- Append without a tail pointer: `O(n)`; with one: `O(1)`.
+## Cost Cheat Sheet
+
+| Operation | Linked list | Array |
+| --- | --- | --- |
+| Read position `i` | `O(n)` | `O(1)` |
+| Insert or remove at the front | `O(1)` | `O(n)` |
+| Append at the end | `O(1)` with a tail pointer | `O(1)` usually |
+| Search for a value | `O(n)` | `O(n)` |
+
+> **Interview tip:** Many linked list problems are solved by moving two pointers at different speeds, such as finding the middle node or detecting a loop.
 
 ## What To Remember
 
-- Arrays win at reading by position. Linked lists win at changing the front.
-- "Finding" and "unlinking" are separate costs. Unlinking is cheap; finding usually is not.
-- Many real programs use dynamic arrays by default and reach for linked lists only when they need cheap inserts and removals at known positions.
+- A node is a value plus a pointer to the next node.
+- Linked lists win at changing the front; arrays win at reading by position.
+- Finding and unlinking are separate costs. Finding is the expensive one.
 
 ## Practice Prompt
 
-You keep a list of the 10 most recent songs played, adding each new song to the front and dropping the oldest from the back. Which version of linked list makes both operations `O(1)`?
+Draw the list `2 → 4 → 6`. Insert `1` at the head and `8` at the tail. How many pointers changed for each insert, and how many nodes did you walk past?
 
 ## Sources Checked
 

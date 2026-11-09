@@ -1,60 +1,105 @@
 # Binary Search Trees
 
-A binary search tree keeps values sorted while still letting you insert and remove them cheaply. It takes the "halve the search space" idea from binary search and builds it into the shape of the data.
+A binary search tree keeps values sorted while still letting you add and remove them cheaply. Every comparison throws away a whole branch, so a search only visits a handful of nodes.
+
+> **Analogy:** The "higher or lower" guessing game. You guess 50; "lower"; you guess 25; "higher"; you guess 37. Each answer rules out a whole range. A binary search tree stores the guesses in advance, so finding a value follows the same path.
 
 ## The Core Idea
 
-Each node has a value and up to two children, left and right. One rule holds everywhere:
+Each node has a value and up to two children: left and right. One rule holds at every node:
 
-- Every value in the left subtree is smaller than the node.
-- Every value in the right subtree is larger than the node.
+- everything in the **left** branch is **smaller**,
+- everything in the **right** branch is **larger**.
 
 ```text
-        50
-       /  \
-     30    70
-    /  \  /  \
-   20  40 60  80
+          50
+        /    \
+      30      70
+     /  \    /  \
+   20   40  60   80
 ```
 
-## Searching
+Check the rule at 30: 20 is on its left (smaller), 40 on its right (larger). And the whole left branch of 50 (30, 20, 40) is smaller than 50.
 
-Start at the root. If the target is smaller, go left; if larger, go right. Each comparison throws away a whole subtree.
+## Searching, Step By Step
 
-To find `60`: compare with `50` (go right), compare with `70` (go left), found. Three comparisons for seven values.
+Find `60`:
+
+1. Start at the root, `50`. `60` is larger, so go **right**.
+2. At `70`. `60` is smaller, so go **left**.
+3. At `60`. Found, after 3 comparisons out of 7 values.
+
+```quiz
+Q: In the tree above, which nodes do you visit when searching for 40?
+- 50, 70, 40
+* 50, 30, 40
+- 20, 30, 40
+Why: 40 is smaller than 50 (go left to 30), then larger than 30 (go right to 40).
+```
 
 ## Inserting
 
-Search for the value. When you fall off the tree, that empty spot is exactly where the value belongs. Attach it there as a new leaf. Nothing else moves.
+Search for the new value. Where you fall off the tree is exactly where it belongs. Attach it there as a new leaf; nothing else moves.
 
-## Reading In Order
+Insert `45`: 50 (go left) → 30 (go right) → 40 (go right) → empty spot, so `45` becomes the right child of `40`.
 
-Visit the left subtree, then the node, then the right subtree. This in-order walk prints every value in sorted order, for free, because of the left-smaller, right-larger rule.
+Insert a few values and search for them. The teal path is every comparison made. Then press "Insert sorted 1-7" and compare.
+
+```demo
+```
 
 ## Height Is Everything
 
-Search, insert and remove all cost one comparison per level, so their cost is the height of the tree.
+Every operation costs one comparison per level, so the cost is the tree's height.
 
-- A **balanced** tree with `n` nodes has a height around `log₂ n`. A million values fit in about 20 levels.
-- A **degenerate** tree has a height of `n`. Insert `1, 2, 3, 4, 5` in that order and every node becomes a right child. The tree is now a linked list with extra steps.
+- **Balanced:** with `n` values the height is about `log₂ n`. A million values fit in about 20 levels.
+- **Degenerate:** insert `1, 2, 3, 4, 5` in order and every node goes right. The tree becomes a line, and search is `O(n)`, no better than a list.
 
-Self-balancing trees (AVL trees, red-black trees) add rotations after inserts and removals to keep the height near `log n`. Java `TreeMap`, C++ `std::map` and Rust `BTreeMap` all use balanced trees for this reason.
+```text
+balanced (height 3)      degenerate (height 5)
+      3                   1
+    /   \                  \
+   2     4                  2
+  /       \                  \
+ 1         5                  3 ...
+```
 
-## Cost Summary
+> **Watch out:** A plain binary search tree is only fast if values arrive in a mixed-up order. Self-balancing trees (AVL, red-black) rotate nodes after inserts to keep the height near `log n`. Java `TreeMap`, C++ `std::map` and Rust `BTreeMap` all use balanced trees.
 
-- Search, insert, remove: `O(h)`, where `h` is the height.
-- Balanced: `O(log n)`. Degenerate: `O(n)`.
-- In-order traversal: `O(n)`, and the output is sorted.
+```quiz
+Q: You insert 10, 20, 30, 40 into an empty BST in that order. What is the height?
+- 2
+- 3
+* 4
+Why: Each value is larger than the last, so each becomes the right child of the previous one: a straight line of 4 levels.
+```
+
+## Reading In Order
+
+Visit the left branch, then the node, then the right branch. This "in-order walk" lists every value in sorted order, for free, because of the left-smaller, right-larger rule.
+
+> **When to use it:** You need data kept sorted while it changes: "smallest or largest so far", "all values between 10 and 20", "the next bigger value". If you only need lookups by key, a hash table is simpler and faster.
+
+## Cost Cheat Sheet
+
+| Operation | Balanced | Degenerate |
+| --- | --- | --- |
+| Search | `O(log n)` | `O(n)` |
+| Insert | `O(log n)` | `O(n)` |
+| Remove | `O(log n)` | `O(n)` |
+| In-order walk (sorted output) | `O(n)` | `O(n)` |
+
+> **Interview tip:** Many tree problems are short recursive functions: "solve it for the left branch, solve it for the right branch, combine the answers". Validating a BST, finding the height and in-order traversal all follow that shape.
 
 ## What To Remember
 
-- The ordering rule makes every comparison rule out half of what is left, but only when the tree is balanced.
+- Left is smaller, right is larger, at every node.
+- Each comparison rules out a whole branch, but only when the tree is balanced.
 - Insertion order decides the shape of a plain binary search tree.
-- Pick a tree over a hash table when you need sorted order, ranges ("all keys between 10 and 20") or the smallest and largest keys.
 
 ## Practice Prompt
 
-Insert `40, 20, 60, 10, 30, 50, 70` into an empty tree. Draw it. Now insert the same values in sorted order. How many comparisons does it take to find `70` in each tree?
+Insert `40, 20, 60, 10, 30, 50, 70` and draw the tree. Then insert the same values in sorted order and draw that one. How many comparisons does it take to find `70` in each?
 
 ## Sources Checked
 

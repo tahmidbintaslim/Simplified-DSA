@@ -1,6 +1,7 @@
 import { curriculum } from '../content/curriculum.js';
 import { demos } from '../demos/index.js';
-import { escapeHtml, MarkdownRenderer } from '../utils/markdown.js';
+import { DEMO_MARKER, escapeHtml, MarkdownRenderer } from '../utils/markdown.js';
+import { loadCompleted, saveCompleted } from './progress.js';
 import { lessonPath, resolvePath } from './router.js';
 
 /**
@@ -16,6 +17,8 @@ export class App {
     this.root = document.querySelector(rootSelector);
     this.sections = curriculum;
     this.markdownRenderer = new MarkdownRenderer();
+    // Lessons marked complete, as "section/lesson" keys. Stored in this browser only.
+    this.completed = loadCompleted();
     this.activeSectionId = this.sections[0].id;
     this.activeLessonId = this.sections[0].lessons[0].id;
     this.activeLanguageId = this.activeLesson.languageExamples?.[0]?.id ?? null;
@@ -92,6 +95,18 @@ export class App {
     this.root.addEventListener('click', (event) => {
       const lessonLink = event.target.closest('a[data-lesson-id]');
       const languageButton = event.target.closest('[data-language-id]');
+      const quizOption = event.target.closest('[data-quiz-option]');
+      const completeButton = event.target.closest('[data-complete]');
+
+      if (quizOption) {
+        this.answerQuiz(quizOption);
+        return;
+      }
+
+      if (completeButton) {
+        this.toggleComplete();
+        return;
+      }
 
       if (lessonLink) {
         // Let the browser handle Ctrl/Cmd/Shift/Alt clicks (new tab, new window).
@@ -207,7 +222,7 @@ export class App {
               ${isActive ? 'aria-current="true"' : ''}
             >
               <span>${escapeHtml(section.title)}</span>
-              <span>${section.lessons.length}</span>
+              <span>${section.lessons.filter((lesson) => this.completed.has(`${section.id}/${lesson.id}`)).length}/${section.lessons.length}</span>
             </a>
             ${lessons}
           </section>
@@ -226,6 +241,7 @@ export class App {
         ${section.lessons
           .map((lesson) => {
             const isActive = !this.notFound && lesson.id === this.activeLessonId;
+            const isDone = this.completed.has(`${section.id}/${lesson.id}`);
 
             return `
               <a
@@ -236,7 +252,7 @@ export class App {
                 data-lesson-id="${lesson.id}"
                 ${isActive ? 'aria-current="page"' : ''}
               >
-                <strong>${escapeHtml(lesson.title)}</strong>
+                <strong>${isDone ? '<span class="lesson-done" aria-label="Completed">✓</span> ' : ''}${escapeHtml(lesson.title)}</strong>
                 <span>${escapeHtml(lesson.summary)}</span>
               </a>
             `;
@@ -247,27 +263,107 @@ export class App {
   }
 
   /**
-   * The header explains which section the current lesson belongs to.
-   * The lesson title itself comes from the Markdown file as the article h1.
+   * The header says where the lesson sits, how long it takes and what the
+   * learner will be able to do afterwards. The lesson title itself comes from
+   * the Markdown file as the article h1.
    */
   renderLessonHeader() {
+    const lesson = this.activeLesson;
+    const position = this.activeSection.lessons.indexOf(lesson) + 1;
+    const goals = lesson.goals?.length
+      ? `<div class="lesson-goals"><p>You will be able to:</p><ul>${lesson.goals.map((goal) => `<li>${escapeHtml(goal)}</li>`).join('')}</ul></div>`
+      : '';
+
     return `
       <header class="lesson-header">
-        <strong>${this.activeSection.title}</strong>
-        <p>${this.activeSection.description}</p>
+        <p class="lesson-meta">
+          <span>${escapeHtml(this.activeSection.title)} · Lesson ${position} of ${this.activeSection.lessons.length}</span>
+          ${lesson.minutes ? `<span>About ${lesson.minutes} min</span>` : ''}
+          ${lesson.level ? `<span class="lesson-level">${escapeHtml(lesson.level)}</span>` : ''}
+        </p>
+        ${goals}
       </header>
     `;
   }
 
+  /**
+   * A lesson can place its demo with a ```demo block, so learners try the idea
+   * right after reading it. Without one, the demo follows the text.
+   */
   renderLesson() {
+    const article = this.markdownRenderer.render(this.activeLesson.markdown);
+    const panel = this.renderDemoPanel();
+    const inline = article.includes(DEMO_MARKER);
+
     return `
       ${this.renderLessonHeader()}
       <article class="lesson-content">
-        ${this.markdownRenderer.render(this.activeLesson.markdown)}
+        ${inline ? article.replace(DEMO_MARKER, panel) : article}
       </article>
-      ${this.renderDemoPanel()}
+      ${inline ? '' : panel}
       ${this.renderLanguageComparison()}
+      ${this.renderLessonFooter()}
     `;
+  }
+
+  /** Mark-as-complete plus previous and next lessons, across sections. */
+  renderLessonFooter() {
+    const all = this.sections.flatMap((section) => section.lessons.map((lesson) => ({ section, lesson })));
+    const index = all.findIndex(({ lesson }) => lesson === this.activeLesson);
+    const link = (entry, label) =>
+      entry
+        ? `<a class="lesson-step" href="${lessonPath(entry.section.id, entry.lesson.id)}" data-section-id="${entry.section.id}" data-lesson-id="${entry.lesson.id}">
+            <span>${label}</span><strong>${escapeHtml(entry.lesson.title)}</strong>
+          </a>`
+        : '<span></span>';
+    const done = this.completed.has(this.activeKey);
+
+    return `
+      <footer class="lesson-footer">
+        <button id="complete-button" type="button" class="demo-button ${done ? 'is-done' : 'is-primary'}" data-complete aria-pressed="${done}">
+          ${done ? '✓ Completed' : 'Mark as complete'}
+        </button>
+        <nav class="lesson-steps" aria-label="Previous and next lesson">
+          ${link(all[index - 1], '← Previous')}
+          ${link(all[index + 1], 'Next →')}
+        </nav>
+      </footer>
+    `;
+  }
+
+  get activeKey() {
+    return `${this.activeSectionId}/${this.activeLessonId}`;
+  }
+
+  toggleComplete() {
+    if (this.completed.has(this.activeKey)) this.completed.delete(this.activeKey);
+    else this.completed.add(this.activeKey);
+    saveCompleted(this.completed);
+    this.render({ focusId: 'complete-button' });
+  }
+
+  /**
+   * Quizzes answer instantly. A wrong pick says "try again" without the
+   * answer, so the learner gets a second think; the explanation appears on a
+   * right answer, or after two wrong ones together with the right option.
+   * This changes only the quiz's own elements, so no re-render is needed.
+   */
+  answerQuiz(option) {
+    const quiz = option.closest('.quiz');
+    const correct = option.dataset.quizOption === 'true';
+    const misses = Number(quiz.dataset.misses ?? 0) + (correct ? 0 : 1);
+    quiz.dataset.misses = misses;
+    option.classList.add(correct ? 'is-right' : 'is-wrong');
+    option.setAttribute('aria-pressed', 'true');
+
+    const reveal = correct || misses >= 2;
+    if (reveal) quiz.querySelector('[data-quiz-option="true"]').classList.add('is-right');
+    const why = quiz.querySelector('.quiz-why').textContent;
+    quiz.querySelector('.quiz-feedback').textContent = correct
+      ? `Correct. ${why}`
+      : reveal
+        ? `Not quite. The answer is highlighted. ${why}`
+        : 'Not quite. Have another think and try again.';
   }
 
   /**

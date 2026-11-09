@@ -1,5 +1,6 @@
 import { escapeHtml } from '../utils/markdown.js';
 import {
+  binarySearchCode,
   binarySearchFrames,
   bstInOrder,
   bstInsert,
@@ -9,6 +10,7 @@ import {
   gridTraversalFrames,
   simpleHash,
   sortingAlgorithms,
+  traversalCode,
 } from './algorithms.js';
 import { createPlayer } from './player.js';
 
@@ -31,6 +33,13 @@ const readInt = (input) => {
 };
 
 const formatNumber = (value) => value.toLocaleString('en-US');
+
+// "5, 2 9" → [5, 2, 9]: whole numbers in range, at most `max` of them; null when empty or invalid.
+const readList = (input, { min = 1, max = 99, count = 20 } = {}) => {
+  const values = input.value.split(/[\s,]+/).filter(Boolean).map(Number);
+  const valid = values.length > 0 && values.length <= count && values.every((v) => Number.isInteger(v) && v >= min && v <= max);
+  return valid ? values : null;
+};
 
 /* ---------- Arrays: insert and delete shift values ---------- */
 
@@ -482,6 +491,8 @@ function mountBinarySearch(root) {
       <label>Target <input class="demo-input" type="number" value="0" data-field="target" /></label>
       <button type="button" class="demo-button" data-op="search">Search</button>
       <button type="button" class="demo-button" data-op="shuffle">New list</button>
+      <label>Your list <input class="demo-input demo-input-wide" type="text" placeholder="e.g. 4 8 15 16 23 42" data-field="list" /></label>
+      <button type="button" class="demo-button" data-op="use">Use list</button>
     </div>
     <div class="demo-stage"><div class="array-row bs-row"></div></div>
     <p class="bs-compare"></p>
@@ -490,13 +501,16 @@ function mountBinarySearch(root) {
   const row = root.querySelector('.bs-row');
   const compare = root.querySelector('.bs-compare');
   const input = root.querySelector('[data-field="target"]');
+  const listInput = root.querySelector('[data-field="list"]');
 
+  // Pointer names sit under the cells they point at, like the hand-drawn traces in the lessons.
   const player = createPlayer(root, ({ lo, hi, mid, found }) => {
     row.innerHTML = values
       .map((value, i) => {
         const state = i === found ? 'is-hit' : i === mid ? 'is-mid' : i < lo || i > hi ? 'is-out' : '';
         const tags = [i === lo && 'lo', i === mid && 'mid', i === hi && 'hi'].filter(Boolean).join(' ');
-        return `<div class="array-cell ${state}"><span class="array-value">${value}</span><span class="array-index">${tags || i}</span></div>`;
+        const pointer = tags ? `<span class="cell-pointer">${tags}</span>` : '';
+        return `<div class="array-cell ${state}"><span class="array-value">${value}</span><span class="array-index">${i}</span>${pointer}</div>`;
       })
       .join('');
   });
@@ -506,7 +520,7 @@ function mountBinarySearch(root) {
     const frames = binarySearchFrames(values, target);
     const linear = values.indexOf(target);
     compare.textContent = `Binary search: ${frames.length - (frames.at(-1).found === -1 ? 1 : 0)} checks. Linear search would check ${linear === -1 ? values.length : linear + 1} of ${values.length} values.`;
-    player.load(frames);
+    player.load(frames, binarySearchCode);
   };
 
   const shuffle = () => {
@@ -520,6 +534,16 @@ function mountBinarySearch(root) {
     const op = event.target.closest('[data-op]')?.dataset.op;
     if (op === 'search') run();
     if (op === 'shuffle') shuffle();
+    if (op === 'use') {
+      const list = readList(listInput, { min: -999, max: 999 });
+      if (!list) {
+        compare.textContent = 'Type 1 to 20 whole numbers between -999 and 999, separated by spaces or commas.';
+        return;
+      }
+      // Binary search only works on sorted data, so sort (and drop repeats) first.
+      values = [...new Set(list)].sort((a, b) => a - b);
+      run();
+    }
   });
 
   shuffle();
@@ -543,6 +567,9 @@ function mountSorting(root) {
       </label>
       <button type="button" class="demo-button" data-op="shuffle">Shuffle</button>
       <button type="button" class="demo-button" data-op="nearly">Nearly sorted</button>
+      <button type="button" class="demo-button" data-op="reversed">Reversed</button>
+      <label>Your values <input class="demo-input demo-input-wide" type="text" placeholder="e.g. 5 2 9 1" data-field="list" /></label>
+      <button type="button" class="demo-button" data-op="use">Use values</button>
     </div>
     <div class="demo-stage"><div class="sort-bars"></div></div>
     <p class="sort-meta"></p>
@@ -552,6 +579,7 @@ function mountSorting(root) {
   const meta = root.querySelector('.sort-meta');
   const algorithmSelect = root.querySelector('[data-field="algorithm"]');
   const sizeSelect = root.querySelector('[data-field="size"]');
+  const listInput = root.querySelector('[data-field="list"]');
 
   const player = createPlayer(root, ({ values: frameValues, active, sorted }) => {
     bars.innerHTML = frameValues
@@ -566,13 +594,14 @@ function mountSorting(root) {
     const algorithm = sortingAlgorithms[algorithmSelect.value];
     const frames = algorithm.frames(values);
     meta.textContent = `${algorithm.label} · ${algorithm.big} · ${frames.length} recorded steps for ${values.length} values.`;
-    player.load(frames);
+    player.load(frames, algorithm.code);
   };
 
-  const shuffle = (nearly = false) => {
+  const shuffle = (shape = 'random') => {
     const size = Number(sizeSelect.value);
     values = randomValues(size, 8, 99);
-    if (nearly) {
+    if (shape === 'reversed') values.sort((a, b) => b - a);
+    if (shape === 'nearly') {
       values.sort((a, b) => a - b);
       // Swap two neighbours so the list is almost, but not quite, sorted.
       const i = randomInt(0, size - 2);
@@ -584,7 +613,16 @@ function mountSorting(root) {
   root.addEventListener('click', (event) => {
     const op = event.target.closest('[data-op]')?.dataset.op;
     if (op === 'shuffle') shuffle();
-    if (op === 'nearly') shuffle(true);
+    if (op === 'nearly' || op === 'reversed') shuffle(op);
+    if (op === 'use') {
+      const list = readList(listInput);
+      if (!list) {
+        meta.textContent = 'Type 1 to 20 whole numbers from 1 to 99, separated by spaces or commas.';
+        return;
+      }
+      values = list;
+      load();
+    }
   });
   algorithmSelect.addEventListener('change', load);
   sizeSelect.addEventListener('change', () => shuffle());
@@ -648,7 +686,10 @@ function mountGridTraversal(root) {
   };
 
   const player = createPlayer(root, draw);
-  const run = () => player.load(gridTraversalFrames({ rows: ROWS, cols: COLS, walls, start, goal, mode: modeSelect.value }));
+  const run = () => {
+    const mode = modeSelect.value;
+    player.load(gridTraversalFrames({ rows: ROWS, cols: COLS, walls, start, goal, mode }), traversalCode(mode));
+  };
 
   root.addEventListener('click', (event) => {
     const cell = event.target.closest('[data-cell]')?.dataset.cell;

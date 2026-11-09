@@ -1,22 +1,43 @@
 # Big O
 
-Big O is a way to talk about growth. It asks one question: as the input gets bigger, how quickly does the work grow?
+Big O is a way to talk about growth. It answers one question: when the input gets bigger, how fast does the work grow? It is the shared language every algorithm lesson (and every coding interview) uses.
 
-We do not use Big O to count every tiny computer step. We use it to compare shapes of growth.
+> **Analogy:** Three ways to find a friend's name. Looking at their name tag takes the same time in any crowd (constant). Asking every person in the room takes longer as the room fills (linear). Introducing every person to every other person explodes as the room fills (quadratic).
 
-## Constant Time: O(1)
+## The Core Idea
 
-Constant time means the work does not grow with the input.
+We do not count exact steps or seconds; those change with the computer. We describe the shape of growth, using `n` for the size of the input.
+
+- **`O(1)`**: the work stays flat.
+- **`O(log n)`**: the work grows very slowly; doubling the input adds one step.
+- **`O(n)`**: the work grows in step with the input.
+- **`O(n log n)`**: a little more than linear; what good sorting costs.
+- **`O(n²)`**: the work grows with the square of the input.
+
+## See It In Numbers
+
+| n | `O(1)` | `O(log n)` | `O(n)` | `O(n log n)` | `O(n²)` |
+| --- | --- | --- | --- | --- | --- |
+| 10 | 1 | ~3 | 10 | ~33 | 100 |
+| 100 | 1 | ~7 | 100 | ~664 | 10,000 |
+| 1,000 | 1 | ~10 | 1,000 | ~9,966 | 1,000,000 |
+
+Read the last row: at 1,000 items, quadratic work is a million steps while logarithmic work is ten.
+
+Drag `n` and watch the bars. They share one scale, so the slow shapes take over quickly. The time column assumes one step takes a microsecond.
+
+```demo
+```
+
+## Spotting Each Shape In Code
+
+**Constant: one direct step.**
 
 ```javascript
 const first = numbers[0];
 ```
 
-Reading the first item takes one direct lookup whether the array has 5 items or 5 million.
-
-## Linear Time: O(n)
-
-Linear time means the work grows with the input.
+**Linear: one loop over the input.**
 
 ```javascript
 for (const number of numbers) {
@@ -24,11 +45,7 @@ for (const number of numbers) {
 }
 ```
 
-If the array doubles in size, the loop does about twice as much work.
-
-## Quadratic Time: O(n²)
-
-Quadratic time often appears when every item is compared with every other item.
+**Quadratic: a loop inside a loop over the same input.**
 
 ```javascript
 for (const a of numbers) {
@@ -38,41 +55,53 @@ for (const a of numbers) {
 }
 ```
 
-If the input grows from 10 to 100, the pair checks grow from 100 to 10,000.
+**Logarithmic: the problem halves each step.**
 
-## Logarithmic Time: O(log n)
+```javascript
+while (n > 1) {
+  n = Math.floor(n / 2);
+}
+```
 
-Logarithmic time means each step throws away a large share of what is left, usually half. Doubling the input adds only one more step.
+```quiz
+Q: A function loops over an array once, and inside the loop does one hash-table lookup. What is its Big O?
+- O(1)
+* O(n)
+- O(n²)
+Why: The loop runs n times and each hash lookup is O(1) on average, so the total is n × 1 = O(n).
+```
 
-Binary search on a sorted list of 1,000,000 values needs about 20 checks, because 2²⁰ is just over a million.
+## Two Rules That Simplify Everything
 
-## Linearithmic Time: O(n log n)
+1. **Drop constants.** Two separate loops over the input is `2n` steps, still `O(n)`. Big O is about shape, not exact count.
+2. **Keep the biggest term.** `n² + n` is `O(n²)`, because at large sizes the `n²` part dwarfs the rest.
 
-`O(n log n)` appears when you do `O(n)` work on each of `log n` levels. Good general-purpose sorting algorithms, like merge sort, live here. It grows a little faster than `O(n)` and far slower than `O(n²)`.
+```quiz
+Q: A function has one loop over the input, followed by a nested loop over the input. What is its Big O?
+- O(n)
+- O(n + n²), and you cannot simplify it
+* O(n²)
+Why: The total is n + n² steps. Keep the biggest term: n² dominates, so it is O(n²).
+```
 
-## Why Beginners Need It
+> **Watch out:** Hidden loops count. `array.includes(x)`, `list.index(x)` and slicing a string all scan. A loop that calls `includes` is a nested loop in disguise: `O(n²)`.
 
-Big O helps you choose between approaches before writing too much code. Two solutions can both work on small examples, but one may fall apart when the input grows.
+## Time And Space
 
-For now, focus on these questions:
+Big O describes memory too. Making a copy of the input costs `O(n)` extra space; using a few variables costs `O(1)`. Interviewers usually ask for both: "time `O(n)`, space `O(1)`".
 
-- Do I touch one item?
-- Do I scan every item?
-- Do I scan every item for every other item?
-- Do I make a new copy of the data?
+> **Interview tip:** State the brute-force Big O first, then improve it. "Checking every pair is `O(n²)`; with a hash set I can do it in `O(n)` time and `O(n)` space" shows exactly the reasoning interviewers look for.
 
 ## What To Remember
 
-- `O(1)` means the work stays flat.
-- `O(log n)` means each step cuts the problem down, so the work barely grows.
-- `O(n)` means the work grows with the input.
-- `O(n log n)` is the usual cost of a good sort.
-- `O(n²)` means nested growth, often from nested loops.
-- Big O ignores small constants so we can focus on the growth pattern.
+- Big O describes how work grows, not exact time.
+- Find the shape: one step, halving, one loop, sorting, or nested loops.
+- Drop constants and keep the biggest term.
+- Watch for library calls that hide a loop.
 
 ## Practice Prompt
 
-You have a list of 100 names. How many names do you inspect if you print every name once? What if you compare every name with every other name?
+You have 100 names. How many checks does it take to print each name once? To compare every name with every other name? What about 1,000 names?
 
 ## Sources Checked
 
