@@ -9,7 +9,7 @@
  * The traces come from src/demos/algorithms.js, the code the website demos
  * and the unit tests already use: one source of truth for every step.
  */
-import { readdirSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
@@ -25,9 +25,12 @@ import {
   sortingAlgorithms,
 } from '../src/demos/algorithms.js';
 
-const contentDir = join(dirname(fileURLToPath(import.meta.url)), '..', 'src', 'content');
+// In the repo, lessons are in src/content; in the plugin bundle they sit beside the server.
+const here = dirname(fileURLToPath(import.meta.url));
+const contentDir = [join(here, 'content'), join(here, '..', 'src', 'content')].find(existsSync);
 const SECTIONS = ['data-structures', 'algorithms'];
 const MAX_FRAMES = 300;
+const SITE = 'https://dsa.tahmid.space';
 
 /**
  * Lessons are read from the Markdown files themselves, so a new lesson file
@@ -78,10 +81,10 @@ export function createServer() {
     'list_lessons',
     {
       title: 'List lessons',
-      description: 'List every Simplified DSA lesson with its section and id.',
+      description: 'List every Simplified DSA lesson with its section, id and web page URL (each page has an interactive demo).',
       annotations: { readOnlyHint: true },
     },
-    () => text(lessons.map((l) => `${l.section}/${l.id}: ${l.title}`).join('\n')),
+    () => text(lessons.map((l) => `${l.section}/${l.id}: ${l.title} (${SITE}/${l.section}/${l.id})`).join('\n')),
   );
 
   server.registerTool(

@@ -35,3 +35,9 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+      # The plugin ships a prebuilt server bundle; fail if it is out of date.
+      - name: Check plugin bundle is current
+        run: |
+          pnpm build:plugin
+          git diff --exit-code -- plugin/server

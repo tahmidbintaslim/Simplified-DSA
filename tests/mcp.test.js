@@ -18,7 +18,7 @@ const call = async (client, name, args = {}) => (await client.callTool({ name, a
 test('lists every lesson file as a tool result and a resource', async () => {
   const client = await connect();
   const list = await call(client, 'list_lessons');
-  assert.match(list, /algorithms\/big-o: Big O/);
+  assert.match(list, /algorithms\/big-o: Big O \(https:\/\/dsa\.tahmid\.space\/algorithms\/big-o\)/);
   assert.match(list, /data-structures\/hash-tables: Hash Tables/);
   const { resources } = await client.listResources();
   assert.ok(resources.some((r) => r.uri === 'dsa://algorithms/sorting'));

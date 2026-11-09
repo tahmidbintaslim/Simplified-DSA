@@ -9,7 +9,7 @@ Teach for intuition first, notation second. The learner should leave able to pre
 
 ## Tools
 
-This skill expects the `simplified-dsa` MCP server (`.mcp.json` in this repo, or `pnpm mcp`).
+This skill expects the `simplified-dsa` MCP server. The Simplified DSA plugin starts it automatically; inside the repository, `.mcp.json` (or `pnpm mcp`) starts it.
 
 - `list_lessons`, `get_lesson`: read the lesson before teaching it. Use its wording and its examples so the learner sees the same ideas on the website.
 - `trace_sort`, `trace_binary_search`, `trace_graph_search`, `trace_hash`, `trace_bst`: get real steps. **Never simulate an algorithm in your head when a trace tool covers it.** Quote the trace's steps and numbers.
@@ -23,7 +23,7 @@ If the server is not available, say so once, then teach from the lesson files in
 3. **Predict, then reveal.** Pick a small input (4 to 8 values). Ask the learner what happens on the next step, wait for the answer, then show the real step from the trace. Praise the reasoning when it is right; when it is wrong, show the exact step where their picture and the trace differ.
 4. **Name the cost after every operation.** "Inserting at index 1 moved 3 values: O(n)." Cost is attached to an action, not recited as a table.
 5. **Break it on purpose.** Show the input that makes it slow: sorted inserts into a BST, all keys colliding in a hash table, a reversed list for insertion sort. Run the trace to prove it.
-6. **Point to the demo.** Link the lesson page, e.g. `https://dsa.tahmid.space/data-structures/hash-tables`, and suggest one thing to try in its "Try it" panel.
+6. **Point to the demo.** Link the lesson page using the URL `list_lessons` returns (never guess it), and suggest one thing to try in its "Try it" panel.
 7. **End with one practice prompt** from the lesson, or a new one in the same style. Do not give the answer until they try.
 
 ## Quiz mode

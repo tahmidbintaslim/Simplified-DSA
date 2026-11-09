@@ -216,3 +216,11 @@ Demo rules:
 - Put the explanation in an `aria-live="polite"` caption. Say what happened and what it cost, for example "3 values shifted right: O(n)".
 - Escape anything the learner types with `escapeHtml` before it goes into HTML.
 - Cap sizes (values, nodes, keys) so the picture fits on a phone.
+
+## After Changing Lessons Or Demo Algorithms
+
+The Claude Code plugin ships its own copy of the lessons and a bundled MCP server. Rebuild it and commit the result, or CI fails:
+
+```bash
+pnpm build:plugin
+```

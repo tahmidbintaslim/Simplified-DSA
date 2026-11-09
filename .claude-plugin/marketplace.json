@@ -1,0 +1,14 @@
+{
+  "name": "simplified-dsa",
+  "owner": { "name": "Tahmid Bin Taslim Rafi" },
+  "description": "Plugins from the Simplified DSA project.",
+  "plugins": [
+    {
+      "name": "simplified-dsa",
+      "source": "./plugin",
+      "description": "A patient data structures and algorithms tutor: lessons, exact step-by-step algorithm traces, quizzes and Big O explanations.",
+      "version": "0.1.0",
+      "license": "MIT"
+    }
+  ]
+}

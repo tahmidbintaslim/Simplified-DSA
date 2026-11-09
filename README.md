@@ -166,7 +166,26 @@ Use production deploys only when the team agrees.
 
 The traces come from `src/demos/algorithms.js`, so an assistant quotes the same steps the website shows instead of guessing them.
 
-In Claude Code, open this repository and approve the `simplified-dsa` server from `.mcp.json`; the `dsa-tutor` skill loads from `.claude/skills/`. Then ask, for example, "teach me hash tables" or "quiz me on BFS vs DFS". Other MCP clients can start the server with:
+### Install the Claude Code plugin
+
+The `plugin/` folder is a Claude Code plugin with the MCP server (bundled, no install step), the `dsa-tutor` skill and three commands. Inside Claude Code, run:
+
+```text
+/plugin install simplified-dsa --marketplace tahmidbintaslim/Simplified-DSA
+```
+
+Then try:
+
+- `/simplified-dsa:trace merge 5 2 9 1`: exact steps, then why it costs what it costs.
+- `/simplified-dsa:quiz hash-tables`: five questions, one at a time.
+- `/simplified-dsa:explain-cost src/core/router.js`: the Big O of real code and the line that sets it.
+- Or just ask "teach me binary search trees" and the `dsa-tutor` skill takes over.
+
+The plugin runs the server with the `node` on your machine (Node 18 or newer).
+
+### Use it inside this repository
+
+Open the repository in Claude Code and approve the `simplified-dsa` server from `.mcp.json`; the `dsa-tutor` skill loads from `.claude/skills/` (a link to `plugin/skills/`). Then ask, for example, "teach me hash tables" or "quiz me on BFS vs DFS". Other MCP clients can start the server with:
 
 ```bash
 pnpm mcp
@@ -195,7 +214,9 @@ src/
   utils/
     markdown.js            Small Markdown-to-HTML renderer
 mcp/server.js              MCP server: lessons and algorithm traces for AI assistants
-.claude/skills/dsa-tutor/  Claude skill that teaches with the MCP tools
+plugin/                    Claude Code plugin: bundled server, dsa-tutor skill, /trace /quiz /explain-cost
+.claude-plugin/            Marketplace file, so the plugin installs from this repository
+scripts/build-plugin.js    Bundles mcp/server.js into plugin/server (pnpm build:plugin)
 tests/                     node:test files for markdown.js, router.js, the demo algorithms and the MCP server
 docs/                      Contributor guides and README screenshots
 vercel.json                Vercel build settings and the SPA rewrite

@@ -1,0 +1,10 @@
+{
+  "name": "simplified-dsa",
+  "version": "0.1.0",
+  "description": "A patient data structures and algorithms tutor: lessons, exact step-by-step algorithm traces, quizzes and Big O explanations.",
+  "author": { "name": "Tahmid Bin Taslim Rafi" },
+  "homepage": "https://dsa.tahmid.space",
+  "repository": "https://github.com/tahmidbintaslim/Simplified-DSA",
+  "license": "MIT",
+  "keywords": ["dsa", "algorithms", "data-structures", "learning", "tutor", "big-o"]
+}
