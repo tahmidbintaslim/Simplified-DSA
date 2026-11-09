@@ -35,6 +35,7 @@ cd Simplified-DSA
 pnpm install --frozen-lockfile
 pnpm dev        # http://localhost:3000/
 pnpm test       # unit tests
+pnpm test:e2e   # browser tests: builds, then drives the site in Chromium
 ```
 
 ## Contents
@@ -225,7 +226,8 @@ mcp/server.js              MCP server: lessons and algorithm traces for AI assis
 plugin/                    Claude Code plugin: bundled server, dsa-tutor skill, /trace /quiz /explain-cost
 .claude-plugin/            Marketplace file, so the plugin installs from this repository
 scripts/build-plugin.js    Bundles mcp/server.js into plugin/server (pnpm build:plugin)
-tests/                     node:test files for markdown.js, router.js, the demo algorithms and the MCP server
+tests/                     node:test unit tests (renderer, router, progress, demo algorithms, MCP server)
+e2e/                       Browser tests in Chromium (pnpm test:e2e)
 docs/                      Contributor guides and README screenshots
 vercel.json                Vercel build settings and the SPA rewrite
 ```
@@ -252,7 +254,7 @@ These follow from the code as it is today:
 - The Markdown renderer (`src/utils/markdown.js`) handles only the syntax the lessons use (listed in the [content guide](./docs/CONTENT_GUIDE.md#markdown-support)). Images, italics and nested lists are not supported.
 - Code blocks have no syntax highlighting.
 - Unknown URLs show a "Page not found" message, but Vercel still answers them with HTTP 200, because every path is served by the single-page app.
-- The tests cover the Markdown renderer, the URL helpers and the demo algorithms. The demo UIs have no automated browser tests.
+- Browser tests (`e2e/`) cover rendering, quizzes, the step player, progress, navigation, storage-blocked browsers and phone layout in Chromium only, not Firefox or Safari.
 
 ## Contributing
 
