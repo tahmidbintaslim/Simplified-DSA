@@ -190,3 +190,37 @@ The current renderer supports:
 - Bold text
 
 If a lesson needs tables, images, or callouts, update `src/utils/markdown.js` first and document the new syntax here.
+
+## Add An Interactive Demo
+
+Demos live in `src/demos/`:
+
+- `algorithms.js` holds the algorithm itself as a pure function with no DOM access. Step-by-step algorithms return an array of frames: a snapshot of state plus a `caption` that explains the step. Add a test in `tests/algorithms.test.js`.
+- `player.js` gives any frame-based demo Back, Play, Step and speed controls. Call `createPlayer(root, drawFrame)` and then `player.load(frames)`.
+- `index.js` holds one `mount(element)` function per demo and the `demos` registry.
+
+To attach a demo to a lesson, add its id to the lesson in `curriculum.js`:
+
+```javascript
+{
+  id: 'hash-tables',
+  title: 'Hash Tables',
+  markdown: hashTables,
+  demo: 'hash-table',
+}
+```
+
+Demo rules:
+
+- Build the controls once and redraw only the picture, so keyboard focus stays on the button the learner pressed.
+- Put the explanation in an `aria-live="polite"` caption. Say what happened and what it cost, for example "3 values shifted right: O(n)".
+- Escape anything the learner types with `escapeHtml` before it goes into HTML.
+- Cap sizes (values, nodes, keys) so the picture fits on a phone.
+
+## After Changing Lessons Or Demo Algorithms
+
+The Claude Code plugin ships its own copy of the lessons and a bundled MCP server. Rebuild it and commit the result, or CI fails:
+
+```bash
+pnpm build:plugin
+```

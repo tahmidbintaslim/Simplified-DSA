@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "simplified-dsa": {
+      "command": "node",
+      "args": ["mcp/server.js"]
+    }
+  }
+}

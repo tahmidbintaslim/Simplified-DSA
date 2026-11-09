@@ -17,7 +17,7 @@ Beginner lessons on data structures and algorithms, with one array example compa
 
 Beginner lessons on data structures and algorithms, written in Markdown, with one array example compared across 10 programming languages. Built with Vite and plain JavaScript.
 
-**Live demo:** [dsa.tahmid.space](https://dsa.tahmid.space). It is an early learning project with 2 lessons so far.
+**Live demo:** [dsa.tahmid.space](https://dsa.tahmid.space). It is an early learning project with 9 lessons, each with an interactive demo.
 
 ![The Arrays and Strings lesson on a desktop screen, with the lesson list in a sidebar on the left](docs/images/arrays-lesson.png)
 
@@ -46,6 +46,7 @@ pnpm test       # 13 unit tests
 - [Architecture](#architecture)
 - [Getting started](#getting-started)
 - [Deployment](#deployment)
+- [AI tutor](#ai-tutor)
 - [Project structure](#project-structure)
 - [Status and roadmap](#status-and-roadmap)
 - [Known limitations](#known-limitations)
@@ -55,14 +56,17 @@ pnpm test       # 13 unit tests
 
 ## Features
 
-- **2 lessons:** Arrays and Strings (Data Structures) and Big O (Algorithms).
+- **9 lessons:** Arrays and Strings, Linked Lists, Stacks and Queues, Hash Tables and Binary Search Trees (Data Structures); Big O, Binary Search, Sorting and Graph Traversal (Algorithms).
+- **An interactive demo on every lesson** (`src/demos/`): shift values in an array, walk a linked list, push and pop, hash keys into buckets, build and search a tree, compare growth rates, and step through binary search, four sorting algorithms and BFS versus DFS on a grid you can draw walls on. Algorithm demos have Back, Play, Step and a speed control, and a caption that explains every step.
 - **Language comparison tabs** on the Arrays lesson: the same array in JavaScript, Python, C, C++, Java, Go, Rust, C#, Kotlin and Swift. Each tab has a runtime note, a memory note and a link to the source checked. The tabs follow the ARIA tabs pattern, so arrow keys, Home and End move between them.
 - **A URL per lesson**, such as `/algorithms/big-o`. Refresh, shared links and the back and forward buttons all open the right lesson. Unknown URLs fall back to the first lesson.
 - **A small Markdown renderer** (`src/utils/markdown.js`) that escapes HTML before it formats anything, so lesson text cannot inject markup. Only `http` and `https` links become anchors.
 - **Responsive layout:** at 760px and narrower, the lesson list stacks above the lesson, and wide code blocks scroll sideways inside their own box.
-- **13 unit tests** for the Markdown renderer and the URL helpers, run with Node's built-in test runner.
+- **Unit tests** for the Markdown renderer, the URL helpers and the demo algorithms, run with Node's built-in test runner.
 
-Not built yet: more lessons, visualizers, quizzes and a code runner. See [Status and roadmap](#status-and-roadmap).
+- **An MCP server** (`mcp/server.js`) that gives AI assistants the lessons and exact step-by-step traces from the same code the demos run, plus a `dsa-tutor` Claude skill (`.claude/skills/dsa-tutor/`). See [AI tutor](#ai-tutor).
+
+Not built yet: quizzes and a code runner. See [Status and roadmap](#status-and-roadmap).
 
 ## Goals
 
@@ -153,6 +157,40 @@ pnpm dlx vercel deploy -y --target preview
 
 Use production deploys only when the team agrees.
 
+## AI tutor
+
+`mcp/server.js` is a [Model Context Protocol](https://modelcontextprotocol.io/) server. It exposes every lesson as a `dsa://<section>/<lesson>` resource and these read-only tools:
+
+- `list_lessons`, `get_lesson`
+- `trace_sort` (bubble, selection, insertion, merge), `trace_binary_search`, `trace_graph_search` (BFS or DFS on a grid), `trace_hash`, `trace_bst`
+
+The traces come from `src/demos/algorithms.js`, so an assistant quotes the same steps the website shows instead of guessing them.
+
+### Install the Claude Code plugin
+
+The `plugin/` folder is a Claude Code plugin with the MCP server (bundled, no install step), the `dsa-tutor` skill and three commands. Inside Claude Code, run:
+
+```text
+/plugin install simplified-dsa --marketplace tahmidbintaslim/Simplified-DSA
+```
+
+Then try:
+
+- `/simplified-dsa:trace merge 5 2 9 1`: exact steps, then why it costs what it costs.
+- `/simplified-dsa:quiz hash-tables`: five questions, one at a time.
+- `/simplified-dsa:explain-cost src/core/router.js`: the Big O of real code and the line that sets it.
+- Or just ask "teach me binary search trees" and the `dsa-tutor` skill takes over.
+
+The plugin runs the server with the `node` on your machine (Node 18 or newer).
+
+### Use it inside this repository
+
+Open the repository in Claude Code and approve the `simplified-dsa` server from `.mcp.json`; the `dsa-tutor` skill loads from `.claude/skills/` (a link to `plugin/skills/`). Then ask, for example, "teach me hash tables" or "quiz me on BFS vs DFS". Other MCP clients can start the server with:
+
+```bash
+pnpm mcp
+```
+
 ## Project structure
 
 ```text
@@ -169,34 +207,43 @@ src/
     algorithms/            Algorithm lessons (Markdown)
     CURRICULUM.md          Planned lesson order and writing rules (not rendered)
     chapters/02-Arrays.md  Legacy note kept from the old layout (not rendered)
+  demos/
+    algorithms.js          Pure step generators for the demos (no DOM, unit tested)
+    player.js              Back / Play / Step controls shared by algorithm demos
+    index.js               One mount function per demo, keyed by the lesson's `demo` id
   utils/
     markdown.js            Small Markdown-to-HTML renderer
-tests/                     node:test files for markdown.js and router.js
+mcp/server.js              MCP server: lessons and algorithm traces for AI assistants
+plugin/                    Claude Code plugin: bundled server, dsa-tutor skill, /trace /quiz /explain-cost
+.claude-plugin/            Marketplace file, so the plugin installs from this repository
+scripts/build-plugin.js    Bundles mcp/server.js into plugin/server (pnpm build:plugin)
+tests/                     node:test files for markdown.js, router.js, the demo algorithms and the MCP server
 docs/                      Contributor guides and README screenshots
 vercel.json                Vercel build settings and the SPA rewrite
 ```
 
 ## Status and roadmap
 
-This is an early learning project. The shell, 2 lessons, the language tabs and lesson URLs work and are deployed. Everything else below is planned, not built.
+This is an early learning project. The shell, 9 lessons with interactive demos, the language tabs and lesson URLs work. Everything else below is planned, not built.
 
 Next, from the [Project Plan](./PLAN.md) and [`CURRICULUM.md`](./src/content/CURRICULUM.md):
 
-- More Data Structures lessons: Linked Lists, Stacks and Queues, Hash Tables, Trees, Heaps, Graphs.
-- More Algorithms lessons: Searching, Sorting, Recursion, Two Pointers, Sliding Window, BFS, DFS.
-- A first small interactive visualizer, once the written lessons feel right.
+- More Data Structures lessons: Heaps, Tries, Graph representations.
+- More Algorithms lessons: Recursion, Quicksort, Two Pointers, Sliding Window, Dijkstra.
+- Quizzes and progress tracking. See [Strategy](./docs/STRATEGY.md) for the product plan.
 - A browser code editor, after safe execution and language support are defined.
 
 ## Known limitations
 
 These follow from the code as it is today:
 
-- 2 lessons are written. The language comparison tabs exist only on the Arrays and Strings lesson.
-- There are no visualizers, quizzes or code runner yet. Code samples are read-only text.
+- The language comparison tabs exist only on the Arrays and Strings lesson.
+- There are no quizzes or code runner yet. Code samples are read-only text.
+- The hash table demo uses a sum-of-character-codes hash on purpose, so collisions are easy to see. Real hash functions mix bits far better.
 - The Markdown renderer (`src/utils/markdown.js`) handles only the syntax the lessons use: `#` and `##` headings, `- ` bullet lists, fenced code blocks, inline code, bold text and `http`/`https` links. Tables, numbered lists, images and deeper headings are not rendered as Markdown.
 - Code blocks have no syntax highlighting.
 - An unknown lesson URL opens the first lesson instead of a "not found" page.
-- The tests cover the Markdown renderer and the URL helpers. There are no browser or end-to-end tests.
+- The tests cover the Markdown renderer, the URL helpers and the demo algorithms. The demo UIs have no automated browser tests.
 
 ## Contributing
 
