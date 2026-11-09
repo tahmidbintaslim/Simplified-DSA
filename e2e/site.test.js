@@ -80,6 +80,10 @@ test('a quiz hides the answer after one miss and reveals it after two', async ()
 
 test('the step player moves the highlighted code line and the variables together', async () => {
   const { page } = await open('/algorithms/binary-search');
+  // Fixed input: the demo's random list could put the target at the first middle (a one-step search).
+  await page.fill('[data-field="list"]', '1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16');
+  await page.fill('[data-field="target"]', '16');
+  await page.click('[data-op="use"]');
   await page.click('[data-player="next"]');
   assert.match(await page.textContent('.demo-count'), /^Step 2 \//);
   assert.equal(await page.locator('.trace-lines li.is-current').count(), 1);
