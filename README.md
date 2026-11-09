@@ -46,6 +46,7 @@ pnpm test       # 13 unit tests
 - [Architecture](#architecture)
 - [Getting started](#getting-started)
 - [Deployment](#deployment)
+- [AI tutor](#ai-tutor)
 - [Project structure](#project-structure)
 - [Status and roadmap](#status-and-roadmap)
 - [Known limitations](#known-limitations)
@@ -62,6 +63,8 @@ pnpm test       # 13 unit tests
 - **A small Markdown renderer** (`src/utils/markdown.js`) that escapes HTML before it formats anything, so lesson text cannot inject markup. Only `http` and `https` links become anchors.
 - **Responsive layout:** at 760px and narrower, the lesson list stacks above the lesson, and wide code blocks scroll sideways inside their own box.
 - **Unit tests** for the Markdown renderer, the URL helpers and the demo algorithms, run with Node's built-in test runner.
+
+- **An MCP server** (`mcp/server.js`) that gives AI assistants the lessons and exact step-by-step traces from the same code the demos run, plus a `dsa-tutor` Claude skill (`.claude/skills/dsa-tutor/`). See [AI tutor](#ai-tutor).
 
 Not built yet: quizzes and a code runner. See [Status and roadmap](#status-and-roadmap).
 
@@ -154,6 +157,21 @@ pnpm dlx vercel deploy -y --target preview
 
 Use production deploys only when the team agrees.
 
+## AI tutor
+
+`mcp/server.js` is a [Model Context Protocol](https://modelcontextprotocol.io/) server. It exposes every lesson as a `dsa://<section>/<lesson>` resource and these read-only tools:
+
+- `list_lessons`, `get_lesson`
+- `trace_sort` (bubble, selection, insertion, merge), `trace_binary_search`, `trace_graph_search` (BFS or DFS on a grid), `trace_hash`, `trace_bst`
+
+The traces come from `src/demos/algorithms.js`, so an assistant quotes the same steps the website shows instead of guessing them.
+
+In Claude Code, open this repository and approve the `simplified-dsa` server from `.mcp.json`; the `dsa-tutor` skill loads from `.claude/skills/`. Then ask, for example, "teach me hash tables" or "quiz me on BFS vs DFS". Other MCP clients can start the server with:
+
+```bash
+pnpm mcp
+```
+
 ## Project structure
 
 ```text
@@ -176,7 +194,9 @@ src/
     index.js               One mount function per demo, keyed by the lesson's `demo` id
   utils/
     markdown.js            Small Markdown-to-HTML renderer
-tests/                     node:test files for markdown.js, router.js and the demo algorithms
+mcp/server.js              MCP server: lessons and algorithm traces for AI assistants
+.claude/skills/dsa-tutor/  Claude skill that teaches with the MCP tools
+tests/                     node:test files for markdown.js, router.js, the demo algorithms and the MCP server
 docs/                      Contributor guides and README screenshots
 vercel.json                Vercel build settings and the SPA rewrite
 ```

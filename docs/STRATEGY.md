@@ -119,4 +119,6 @@ Because the traces come from real code, an AI tutor can answer "show me merge so
 
 Cost and safety rules: server-side key only, per-IP rate limits, a daily budget cap, and a clear "AI-generated" label.
 
+**Status:** the MCP server (`mcp/server.js`, without `practice_problem` yet) and the `dsa-tutor` skill are built. Next: the plugin bundle.
+
 **Suggested order:** MCP server (reuses `algorithms.js`, a few hundred lines) → `dsa-tutor` skill → plugin bundle → hosted connector → in-site AI, only once there are users asking for it.
