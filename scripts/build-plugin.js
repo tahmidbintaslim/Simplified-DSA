@@ -8,6 +8,7 @@
  */
 import { cpSync, rmSync } from 'node:fs';
 import { build } from 'vite';
+import { SECTIONS } from '../mcp/server.js';
 
 const outDir = 'plugin/server';
 rmSync(outDir, { recursive: true, force: true });
@@ -25,7 +26,7 @@ await build({
   },
 });
 
-for (const section of ['data-structures', 'algorithms']) {
+for (const section of SECTIONS) {
   cpSync(`src/content/${section}`, `${outDir}/content/${section}`, { recursive: true });
 }
 console.log(`Built ${outDir}/server.mjs and copied lessons.`);

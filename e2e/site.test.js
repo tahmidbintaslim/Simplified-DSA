@@ -127,3 +127,17 @@ test('the site still works when the browser blocks site data', async () => {
   assert.deepEqual(errors, []);
   await page.close();
 });
+
+test('pattern demos compare against brute force and trace their pseudocode', async () => {
+  const { page } = await open('/patterns/two-pointers');
+  assert.match(await page.textContent('.tp-compare'), /Two pointers: 7 steps\. Brute force would check 23 pairs\./);
+  await page.click('[data-player="next"]');
+  assert.match(await page.textContent('.trace-lines li.is-current'), /right = right - 1/);
+  await page.close();
+
+  const window = await open('/patterns/sliding-window');
+  assert.match(await window.page.textContent('.sw-compare'), /\(13 in total\)\. Recomputing every window would make 18\./);
+  await window.page.click('[data-player="next"]');
+  assert.match(await window.page.textContent('.demo-caption'), /add 1, drop 2\. Sum = 7/);
+  await window.page.close();
+});
