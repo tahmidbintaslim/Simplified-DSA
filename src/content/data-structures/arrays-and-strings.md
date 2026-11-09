@@ -1,73 +1,129 @@
 # Arrays and Strings
 
-Arrays are the first data structure worth understanding because many other structures build on the same idea: keep values in a predictable order, then use positions to reach them.
+An array is a row of values kept in order, where every value has a number called its index. Almost every other data structure is built on this idea, so it is the best place to start.
+
+> **Analogy:** Picture a row of numbered lockers in a school hallway. If you know the locker number, you walk straight to it. You never open lockers 0, 1 and 2 to find locker 3.
 
 ## The Core Idea
 
-An array-like structure is a numbered row of values. The number is called an index. In many programming languages, the first index is `0`, not `1`.
+Each slot in an array has an index. In most programming languages the first index is `0`, not `1`.
 
-```text
-numbers: [10, 20, 30, 40]
-index:    0   1   2   3
+```cells
+values: 10 20 30 40
+note: Four values. The small numbers underneath are the indexes: the first value is at index 0, the last at index 3.
 ```
 
-The important promise is direct access. If you know the index, the computer can often jump to that position without checking every earlier value.
+> **Key idea:** If you know the index, you can read the value in one step, no matter how long the array is. That is called `O(1)`, or "constant time".
 
-## Why Access Is Fast
-
-Classic arrays store same-sized values in nearby memory slots. When values are packed in order, the address of an item can be calculated from the array start, the item size, and the index.
-
-That is why reading `array[i]` is usually described as `O(1)`: one direct lookup, no scan.
-
-## How The Computer Sees It
-
-RAM is a long set of addressable memory locations. A CPU reads and writes values from those addresses.
-
-For a low-level array of integers, the computer can calculate an item address like this:
-
-```text
-item_address = start_address + index * item_size
+```quiz
+Q: In the array `[10, 20, 30, 40]`, what is at index 2?
+- 20
+* 30
+- 40
+Why: Indexes start at 0, so index 0 is 10, index 1 is 20 and index 2 is 30.
 ```
 
-High-level languages add layers on top. Python lists store references to objects. JavaScript arrays are objects optimized by the engine. Rust vectors own a buffer. Go slices point into backing arrays. The core idea stays the same, but each language gives you a different interface and different safety rules.
+## Why Reading Is Fast
 
-## Why Insert and Delete Can Be Slow
+A classic array keeps its values side by side in memory, all the same size. So the computer can work out where any value lives with one small calculation:
 
-Arrays stay useful because the order is stable. That order has a cost.
+```text
+address of item i = start address + i × size of one item
+```
 
-If you insert into the middle, every item after that point must shift right to make space. If you delete from the middle, every later item must shift left to close the gap.
+No searching is needed: one multiplication, one addition, and the computer jumps straight there.
 
-That shifting makes middle insert and delete operations `O(n)`.
+## Why Inserting In The Middle Is Slow
 
-## Strings Behave Like Ordered Data
+Order is the array's promise, and keeping that promise costs work. To insert in the middle, every value after that spot has to move one slot to the right first.
 
-A string is text, but many algorithm problems treat it like ordered data that can be scanned.
+Let's insert `23` at index `2` in `[4, 8, 15, 16]`, step by step.
 
-Strings are not identical across languages. Some store bytes, some store Unicode scalar values, some expose characters through iterators, and many make strings immutable. The shared lesson is that text has order and indexes can be tricky because human characters and memory bytes are not always the same thing.
+```cells
+values: 4 8 15 16
+pointers: insert=2
+highlight: 2
+note: Start. We want 23 at index 2, but 15 is sitting there.
+```
+
+```cells
+values: 4 8 15 16 16
+done: 4
+note: Step 1: copy the last value, 16, one slot right. Always start from the end so nothing is overwritten.
+```
+
+```cells
+values: 4 8 15 15 16
+done: 3 4
+note: Step 2: copy 15 one slot right. Index 2 is now free to reuse.
+```
+
+```cells
+values: 4 8 23 15 16
+highlight: 2
+done: 3 4
+note: Step 3: write 23 into index 2. Two values had to move.
+```
+
+In a list of a million values, inserting at the front would move a million values. That is why middle inserts and deletes are `O(n)`: the work grows with the size of the array.
+
+```quiz
+Q: You delete the first value of a 1,000-item array. About how many values have to move?
+- 1
+- 500
+* 999
+Why: Every value after the deleted one shifts one slot left to close the gap, so 999 values move.
+```
+
+Read a value, then insert and delete at different indexes. Watch the teal cells: those are the values that had to move.
+
+```demo
+```
+
+## Strings Are Ordered Too
+
+A string is text, but many problems treat it like an array of characters you can scan from left to right.
+
+```cells
+values: c o d e
+pointers: first=0 last=3
+note: The string "code" as four characters. Index 0 is "c".
+```
+
+> **Watch out:** In many languages strings cannot be changed in place (they are immutable). "Changing" one creates a new string, which costs `O(n)`. And one human character is not always one byte: emoji and many alphabets take several bytes.
+
+## When To Use An Array
+
+> **When to use it:** You need to read values by position, scan everything in order, or add to the end. Reach for something else when you constantly insert or delete at the front or in the middle.
+
+## Cost Cheat Sheet
+
+| Operation | Cost | Why |
+| --- | --- | --- |
+| Read or write `array[i]` | `O(1)` | One address calculation |
+| Append to the end | `O(1)` usually | Sometimes the array grows and copies itself |
+| Insert or delete in the middle | `O(n)` | Later values shift |
+| Search for a value | `O(n)` | You may have to check every slot |
 
 ## Language Differences
 
-Use the language tabs after this lesson to compare how popular languages create and use array-like structures.
-
-Focus on these questions:
+The language tabs below show how 10 popular languages create array-like structures. As you compare, ask:
 
 - Is the structure fixed-size or growable?
 - Does it store raw values or references to objects?
-- Does the language check bounds?
-- Is memory freed manually, by ownership rules, or by garbage collection?
-- Does the code compile to machine code, bytecode, or run through an interpreter?
+- Does the language check that the index is in range?
+- Is memory freed by hand, by ownership rules, or by a garbage collector?
 
 ## What To Remember
 
-- Access by index is fast when memory layout supports direct address calculation.
-- Appending to a growable array is usually fast, but sometimes triggers a copy.
-- Inserting or deleting near the front is expensive because later values shift.
-- Strings are ordered, but character indexing can be more complex than array indexing.
-- Language syntax changes, but the memory and complexity questions stay similar.
+- An index is a position number, starting at 0.
+- Reading by index is `O(1)` because the address is calculated, not searched.
+- Inserting or deleting near the front is `O(n)` because later values shift.
+- Strings are ordered like arrays, but characters and bytes are not always the same thing.
 
 ## Practice Prompt
 
-Given `[4, 8, 15, 16]`, insert `23` at index `2`. Which values have to move? Which languages below use a fixed-size structure, and which use a growable one?
+Given `[3, 6, 9, 12, 15]`, delete the value at index 1. Write the array after each shift. How many values moved?
 
 ## Sources Checked
 

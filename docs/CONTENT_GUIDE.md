@@ -178,18 +178,53 @@ This helps learners understand the concept before they compare languages.
 
 ## Markdown Support
 
-The current renderer supports:
+Standard syntax: `#`, `##` and `###` headings, paragraphs, `- ` and `1. ` lists, tables, fenced code, inline code, bold and `http`/`https` links.
 
-- `# Heading`
-- `## Heading`
-- Paragraphs
-- Bullet lists
-- Code blocks
-- Inline code
-- Links
-- Bold text
+Lesson blocks (see `src/utils/markdown.js`):
 
-If a lesson needs tables, images, or callouts, update `src/utils/markdown.js` first and document the new syntax here.
+- **Callouts:** a blockquote that starts with a bold label. The label picks the colour: `Analogy`, `Key idea`, `Watch out`, `When to use it` and `Interview tip`.
+
+  ```markdown
+  > **Analogy:** A coat check. You hand over your coat and get ticket number 4.
+  ```
+
+- **Hand-traced arrays:** a ```` ```cells ```` block draws boxes with indexes. Several in a row make a step-by-step worked example.
+
+  ```text
+  values: 3 9 14 21 30
+  pointers: lo=0 mid=2 hi=4
+  highlight: 2
+  done: 0 1
+  dim: 3 4
+  note: Check the middle first.
+  ```
+
+  `highlight` is gold (looking at it), `done` is teal (moved or finished), `dim` is grey (ruled out). Every line except `values` is optional.
+
+- **Quizzes:** a ```` ```quiz ```` block. `*` marks the right option. The explanation shows after a right answer, or after two wrong ones.
+
+  ```text
+  Q: In [10, 20, 30, 40], what is at index 2?
+  - 20
+  * 30
+  Why: Indexes start at 0.
+  ```
+
+- **Demo placement:** an empty ```` ```demo ```` block puts the lesson's interactive demo at that spot. Without one, the demo follows the text.
+
+## Lesson Shape
+
+Juniors and students arrive with no background, so every lesson follows the same order:
+
+1. One-sentence definition, then an `Analogy` callout from everyday life.
+2. The core idea with the smallest possible example, as `cells` or a `text` drawing.
+3. A worked example traced step by step, one `cells` block per step.
+4. A quiz right after the key idea, then the demo.
+5. Brute force against the better approach, with real numbers, where it fits.
+6. `When to use it` signals, a cost table, `Watch out` mistakes and an `Interview tip`.
+7. What To Remember, a Practice Prompt and Sources Checked.
+
+In `curriculum.js`, give each lesson a `level`, `minutes` and two or three `goals` ("You will be able to…"). They fill the lesson header.
 
 ## Add An Interactive Demo
 

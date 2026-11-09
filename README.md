@@ -57,7 +57,8 @@ pnpm test       # unit tests
 ## Features
 
 - **9 lessons:** Arrays and Strings, Linked Lists, Stacks and Queues, Hash Tables and Binary Search Trees (Data Structures); Big O, Binary Search, Sorting and Graph Traversal (Algorithms).
-- **An interactive demo on every lesson** (`src/demos/`): shift values in an array, walk a linked list, push and pop, hash keys into buckets, build and search a tree, compare growth rates, and step through binary search, four sorting algorithms and BFS versus DFS on a grid you can draw walls on. Algorithm demos have Back, Play, Step and a speed control, and a caption that explains every step.
+- **Lessons built for complete beginners:** each one opens with an everyday analogy, traces a small example step by step with drawn arrays and pointer labels, asks quick quizzes with instant feedback, and ends with when-to-use signals, a cost table and common mistakes. A header lists the level, the time and what you will be able to do; you can mark lessons complete (stored only in your browser) and move to the previous or next one.
+- **An interactive demo on every lesson** (`src/demos/`), placed right after the idea it shows: shift values in an array, walk a linked list, push and pop, hash keys into buckets, build and search a tree, compare growth rates, and step through binary search, four sorting algorithms and BFS versus DFS on a grid you can draw walls on. Algorithm demos have Back, Play, Step, a speed control and arrow-key stepping, a caption for every step, the pseudocode with the running line highlighted, a live variables panel, and your own input.
 - **Language comparison tabs** on the Arrays lesson: the same array in JavaScript, Python, C, C++, Java, Go, Rust, C#, Kotlin and Swift. Each tab has a runtime note, a memory note and a link to the source checked. The tabs follow the ARIA tabs pattern, so arrow keys, Home and End move between them.
 - **A URL per lesson**, such as `/algorithms/big-o`. Refresh, shared links and the back and forward buttons all open the right lesson. Unknown URLs show a "Page not found" message with the lesson list.
 - **Share and search basics:** link-preview tags and image, a per-lesson meta description, `robots.txt`, a `sitemap.xml` generated from the lesson files, and a [privacy page](https://dsa.tahmid.space/privacy.html).
@@ -248,7 +249,7 @@ These follow from the code as it is today:
 - The language comparison tabs exist only on the Arrays and Strings lesson.
 - There are no quizzes or code runner yet. Code samples are read-only text.
 - The hash table demo uses a sum-of-character-codes hash on purpose, so collisions are easy to see. Real hash functions mix bits far better.
-- The Markdown renderer (`src/utils/markdown.js`) handles only the syntax the lessons use: `#` and `##` headings, `- ` bullet lists, fenced code blocks, inline code, bold text and `http`/`https` links. Tables, numbered lists, images and deeper headings are not rendered as Markdown.
+- The Markdown renderer (`src/utils/markdown.js`) handles only the syntax the lessons use (listed in the [content guide](./docs/CONTENT_GUIDE.md#markdown-support)). Images, italics and nested lists are not supported.
 - Code blocks have no syntax highlighting.
 - Unknown URLs show a "Page not found" message, but Vercel still answers them with HTTP 200, because every path is served by the single-page app.
 - The tests cover the Markdown renderer, the URL helpers and the demo algorithms. The demo UIs have no automated browser tests.

@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  binarySearchCode,
   binarySearchFrames,
   bstInOrder,
   bstInsert,
@@ -9,6 +10,7 @@ import {
   gridTraversalFrames,
   simpleHash,
   sortingAlgorithms,
+  traversalCode,
 } from '../src/demos/algorithms.js';
 
 const inputs = [[], [1], [5, 1, 4, 2, 8], [3, 3, 1, 2, 1], [9, 8, 7, 6, 5, 4, 3, 2, 1], [1, 2, 3, 4]];
@@ -28,8 +30,8 @@ for (const [id, algorithm] of Object.entries(sortingAlgorithms)) {
 }
 
 test('bubble sort stops after one pass on sorted input', () => {
-  // Start + 3 compares + end-of-pass + done.
-  assert.equal(sortingAlgorithms.bubble.frames([1, 2, 3, 4]).length, 6);
+  // Start + 3 compares + end-of-pass + "stop early" + done.
+  assert.equal(sortingAlgorithms.bubble.frames([1, 2, 3, 4]).length, 7);
 });
 
 test('binary search finds every present value and rejects absent ones', () => {
@@ -72,4 +74,17 @@ test('BST keeps values ordered, rejects duplicates, and lays out without overlap
   const { nodes, edges } = bstLayout(root);
   assert.equal(new Set(nodes.map((node) => node.x)).size, nodes.length);
   assert.equal(edges.length, nodes.length - 1);
+});
+
+test('every step points at a real pseudocode line', () => {
+  const inRange = (frames, code) => frames.every((f) => f.line === -1 || (f.line >= 0 && f.line < code.length));
+  for (const algorithm of Object.values(sortingAlgorithms)) {
+    assert.ok(inRange(algorithm.frames([5, 1, 4, 2, 8]), algorithm.code), algorithm.label);
+  }
+  assert.ok(inRange(binarySearchFrames([1, 3, 5, 7], 5), binarySearchCode));
+  assert.ok(inRange(binarySearchFrames([1, 3, 5, 7], 4), binarySearchCode));
+  for (const mode of ['bfs', 'dfs']) {
+    const frames = gridTraversalFrames({ rows: 3, cols: 3, walls: new Set(), start: [0, 0], goal: [2, 2], mode });
+    assert.ok(inRange(frames, traversalCode(mode)), mode);
+  }
 });

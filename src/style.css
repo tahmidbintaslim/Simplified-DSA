@@ -850,3 +850,363 @@ button:focus-visible,
   margin: 24px 0 0;
   font-size: 0.88rem;
 }
+
+/* ---------- Lesson building blocks (src/utils/markdown.js) ---------- */
+
+.lesson-content h3 {
+  margin: 28px 0 10px;
+  color: #f5f0e6;
+  font-size: 1.12rem;
+}
+
+.lesson-content ol {
+  margin: 0 0 22px;
+  padding-left: 1.4rem;
+}
+
+.lesson-content ol li + li {
+  margin-top: 8px;
+}
+
+/* Callouts: "> **Analogy:** ..." and friends. Each label has its own accent. */
+.callout {
+  margin: 22px 0;
+  border: 1px solid #332f27;
+  border-left: 4px solid #b8924a;
+  border-radius: 8px;
+  background: #191711;
+  padding: 14px 16px;
+}
+
+.callout p {
+  margin: 4px 0 0;
+}
+
+.callout-label {
+  display: block;
+  color: #f1cd86;
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.callout-analogy { border-left-color: #6aa36f; }
+.callout-analogy .callout-label { color: #9bd09f; }
+.callout-key-idea { border-left-color: #f1cd86; }
+.callout-when-to-use-it,
+.callout-interview-tip { border-left-color: #4f9c94; }
+.callout-when-to-use-it .callout-label,
+.callout-interview-tip .callout-label { color: #8fd0c8; }
+.callout-watch-out { border-left-color: #c4574a; }
+.callout-watch-out .callout-label { color: #ec9a8f; }
+
+.table-wrap {
+  overflow-x: auto;
+  margin: 0 0 22px;
+}
+
+.lesson-content table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.lesson-content th,
+.lesson-content td {
+  border-bottom: 1px solid #302d26;
+  padding: 9px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.lesson-content th {
+  color: #f5f0e6;
+  font-size: 0.85rem;
+}
+
+/* ```cells: hand-traced arrays inside the lesson text. */
+.cells-figure {
+  overflow-x: auto;
+  margin: 18px 0 22px;
+  border: 1px solid #2a2721;
+  border-radius: 8px;
+  background: #11110f;
+  padding: 16px 16px 12px;
+}
+
+.cells-figure figcaption {
+  margin-top: 10px;
+  color: #d8cfbf;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.cell-pointer {
+  padding-top: 2px;
+  color: #f1cd86;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+/* ```quiz: one question, instant feedback. */
+.quiz {
+  margin: 26px 0;
+  border: 1px solid #3a352b;
+  border-radius: 10px;
+  background: #171612;
+  padding: 16px;
+}
+
+.quiz-label {
+  margin: 0 0 4px !important;
+  color: #f1cd86;
+  font-size: 0.8rem !important;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.quiz-question {
+  margin: 0 0 12px !important;
+  color: #f5f0e6;
+  font-weight: 700;
+}
+
+.quiz-options {
+  display: grid;
+  gap: 8px;
+}
+
+.quiz-option {
+  border: 1px solid #3a352b;
+  border-radius: 8px;
+  background: #1d1b16;
+  color: #ece8dd;
+  cursor: pointer;
+  padding: 10px 12px;
+  text-align: left;
+}
+
+.quiz-option:hover { border-color: #7b6842; }
+.quiz-option.is-right { border-color: #4f9c94; background: #18332f; }
+.quiz-option.is-wrong { border-color: #c4574a; background: #3a1f1b; }
+
+.quiz-feedback {
+  min-height: 1.4em;
+  margin: 12px 0 0 !important;
+  color: #f1e6cf;
+}
+
+/* ---------- Code tracer (src/demos/player.js) ---------- */
+
+.trace {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.trace[hidden] { display: none; }
+
+.trace-code {
+  /* Long pseudocode lines scroll inside the panel instead of widening the page. */
+  overflow-x: auto;
+}
+
+.trace-code,
+.trace-vars {
+  border: 1px solid #2a2721;
+  border-radius: 8px;
+  background: #11110f;
+  padding: 12px;
+}
+
+.trace-title {
+  margin: 0 0 8px;
+  color: #a99f8d;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.trace-lines {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: line;
+}
+
+.trace-lines li {
+  border-radius: 4px;
+  padding: 2px 6px;
+  white-space: pre;
+  counter-increment: line;
+}
+
+.trace-lines li::before {
+  content: counter(line);
+  display: inline-block;
+  width: 1.6em;
+  color: #6f675a;
+  font-size: 0.75rem;
+}
+
+.trace-lines code {
+  color: #d8cfbf;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 0.84rem;
+}
+
+.trace-lines li.is-current {
+  background: #4a3a17;
+}
+
+.trace-lines li.is-current code {
+  color: #fbf0d6;
+}
+
+.trace-var-list {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+}
+
+.trace-var-list div {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.trace-var-list dt {
+  color: #a99f8d;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 0.84rem;
+}
+
+.trace-var-list dd {
+  margin: 0;
+  color: #f1cd86;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-weight: 700;
+}
+
+/* ---------- Lesson header and footer (src/core/App.js) ---------- */
+
+.lesson-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin: 0 0 10px;
+  color: #a99f8d;
+  font-size: 0.92rem;
+}
+
+.lesson-level {
+  border: 1px solid #4f9c94;
+  border-radius: 999px;
+  padding: 0 8px;
+  color: #8fd0c8;
+}
+
+.lesson-goals p {
+  margin: 0 0 4px;
+  color: #f5f0e6;
+  font-weight: 700;
+}
+
+.lesson-goals ul {
+  margin: 0;
+  padding-left: 1.15rem;
+  color: #d8cfbf;
+  line-height: 1.6;
+}
+
+/* The demo panel can sit inside the article when a lesson places it there. */
+.lesson-content .demo-panel {
+  margin: 32px 0;
+}
+
+.lesson-footer {
+  display: grid;
+  gap: 18px;
+  max-width: 72ch;
+  margin-top: 42px;
+  border-top: 1px solid #302d26;
+  padding-top: 24px;
+}
+
+.lesson-footer > .demo-button {
+  justify-self: start;
+}
+
+.demo-button.is-done {
+  border-color: #4f9c94;
+  background: #18332f;
+  color: #c9ece7;
+}
+
+.lesson-steps {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.lesson-step {
+  display: grid;
+  gap: 3px;
+  border: 1px solid #302d26;
+  border-radius: 8px;
+  background: #1d1b16;
+  padding: 12px;
+  color: #ece8dd;
+  text-decoration: none;
+}
+
+.lesson-step:last-child {
+  text-align: right;
+}
+
+.lesson-step:hover {
+  border-color: #7b6842;
+}
+
+.lesson-step span {
+  color: #a99f8d;
+  font-size: 0.85rem;
+}
+
+.lesson-done {
+  color: #4f9c94;
+}
+
+@media (max-width: 760px) {
+  .trace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .lesson-steps {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .lesson-step:last-child {
+    text-align: left;
+  }
+}
+
+/* Demos now sit inside the article, so undo the article's inline-code and list styles there. */
+.lesson-content .trace-lines li {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+.lesson-content .trace-lines code {
+  border: 0;
+  background: transparent;
+  padding: 0;
+}
+
+/* Cells with a pointer label are taller; keep every value box on one line. */
+.array-row {
+  align-items: flex-start;
+}

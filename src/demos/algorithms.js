@@ -8,33 +8,42 @@
 
 /* ---------- Sorting ---------- */
 
-// Every sorting frame: { values, active: [i, j], sorted: [indexes], caption }.
-const frame = (values, active, sorted, caption) => ({
+/**
+ * Every sorting frame: { values, active: [i, j], sorted: [indexes], caption,
+ * line, vars }. `line` indexes the algorithm's pseudocode (`code` below) so the
+ * player can highlight it; `vars` are the variables shown beside the code.
+ */
+const frame = (values, active, sorted, caption, line = -1, vars = {}) => ({
   values: [...values],
   active,
   sorted: [...sorted],
   caption,
+  line,
+  vars,
 });
 
 export function bubbleSortFrames(input) {
   const a = [...input];
   const sorted = new Set();
-  const frames = [frame(a, [], sorted, 'Start: compare neighbours and swap them when they are out of order.')];
+  const frames = [frame(a, [], sorted, 'Start: compare neighbours and swap them when they are out of order.', 0)];
 
   for (let end = a.length - 1; end > 0; end--) {
     let swapped = false;
     for (let i = 0; i < end; i++) {
-      frames.push(frame(a, [i, i + 1], sorted, `Compare ${a[i]} and ${a[i + 1]}.`));
+      frames.push(frame(a, [i, i + 1], sorted, `Compare ${a[i]} and ${a[i + 1]}.`, 2, { end, i, 'a[i]': a[i], 'a[i+1]': a[i + 1] }));
       if (a[i] > a[i + 1]) {
         [a[i], a[i + 1]] = [a[i + 1], a[i]];
         swapped = true;
-        frames.push(frame(a, [i, i + 1], sorted, `${a[i + 1]} > ${a[i]}, so swap them.`));
+        frames.push(frame(a, [i, i + 1], sorted, `${a[i + 1]} > ${a[i]}, so swap them.`, 3, { end, i, swapped }));
       }
     }
     sorted.add(end);
-    frames.push(frame(a, [], sorted, `The largest unsorted value, ${a[end]}, has bubbled to index ${end}.`));
+    frames.push(frame(a, [], sorted, `The largest unsorted value, ${a[end]}, has bubbled to index ${end}.`, 4, { end, swapped }));
     // No swaps in a full pass means everything left is already in order.
-    if (!swapped) break;
+    if (!swapped) {
+      frames.push(frame(a, [], sorted, 'No swaps in a whole pass: the rest is already in order, so stop early.', 5, { swapped }));
+      break;
+    }
   }
 
   a.forEach((_, i) => sorted.add(i));
@@ -45,17 +54,17 @@ export function bubbleSortFrames(input) {
 export function selectionSortFrames(input) {
   const a = [...input];
   const sorted = new Set();
-  const frames = [frame(a, [], sorted, 'Start: find the smallest unsorted value and move it to the front.')];
+  const frames = [frame(a, [], sorted, 'Start: find the smallest unsorted value and move it to the front.', 0)];
 
   for (let start = 0; start < a.length - 1; start++) {
     let min = start;
     for (let i = start + 1; i < a.length; i++) {
-      frames.push(frame(a, [min, i], sorted, `Smallest so far is ${a[min]}. Check ${a[i]}.`));
+      frames.push(frame(a, [min, i], sorted, `Smallest so far is ${a[min]}. Check ${a[i]}.`, 3, { start, i, min, 'a[min]': a[min] }));
       if (a[i] < a[min]) min = i;
     }
     [a[start], a[min]] = [a[min], a[start]];
     sorted.add(start);
-    frames.push(frame(a, [start], sorted, `Place ${a[start]} at index ${start}.`));
+    frames.push(frame(a, [start], sorted, `Place ${a[start]} at index ${start}.`, 4, { start, min }));
   }
 
   a.forEach((_, i) => sorted.add(i));
@@ -66,18 +75,18 @@ export function selectionSortFrames(input) {
 export function insertionSortFrames(input) {
   const a = [...input];
   const sorted = new Set([0]);
-  const frames = [frame(a, [], sorted, 'Start: the first value alone is a sorted hand of cards.')];
+  const frames = [frame(a, [], sorted, 'Start: the first value alone is a sorted hand of cards.', 0)];
 
   for (let i = 1; i < a.length; i++) {
     let j = i;
-    frames.push(frame(a, [j], sorted, `Pick up ${a[j]} and slide it left into place.`));
+    frames.push(frame(a, [j], sorted, `Pick up ${a[j]} and slide it left into place.`, 1, { i, j, 'a[j]': a[j] }));
     while (j > 0 && a[j - 1] > a[j]) {
       [a[j - 1], a[j]] = [a[j], a[j - 1]];
-      frames.push(frame(a, [j - 1, j], sorted, `${a[j]} > ${a[j - 1]}, so ${a[j - 1]} moves left.`));
+      frames.push(frame(a, [j - 1, j], sorted, `${a[j]} > ${a[j - 1]}, so ${a[j - 1]} moves left.`, 3, { i, j: j - 1 }));
       j--;
     }
     for (let k = 0; k <= i; k++) sorted.add(k);
-    frames.push(frame(a, [j], sorted, `The first ${i + 1} values are now sorted.`));
+    frames.push(frame(a, [j], sorted, `The first ${i + 1} values are now sorted.`, 2, { i, j }));
   }
 
   frames.push(frame(a, [], sorted, 'Sorted.'));
@@ -86,11 +95,14 @@ export function insertionSortFrames(input) {
 
 export function mergeSortFrames(input) {
   const a = [...input];
-  const frames = [frame(a, [], [], 'Start: split the list in half until each piece has one value.')];
+  const frames = [frame(a, [], [], 'Start: split the list in half until each piece has one value.', 0)];
 
   const sort = (lo, hi) => {
     if (hi - lo < 1) return;
     const mid = Math.floor((lo + hi) / 2);
+    const range = [];
+    for (let k = lo; k <= hi; k++) range.push(k);
+    frames.push(frame(a, range, [], `Split indexes ${lo}-${hi} at ${mid}: sort each half first.`, 3, { lo, mid, hi }));
     sort(lo, mid);
     sort(mid + 1, hi);
 
@@ -104,7 +116,7 @@ export function mergeSortFrames(input) {
       a[k] = takeLeft ? left[i++] : right[j++];
       // Show values not merged yet after the merged ones, so no value appears twice.
       const view = [...a.slice(0, k + 1), ...left.slice(i), ...right.slice(j), ...a.slice(hi + 1)];
-      frames.push(frame(view, [k], [], `Merge indexes ${lo}-${hi}: take the smaller front value, ${a[k]}, into index ${k}.`));
+      frames.push(frame(view, [k], [], `Merge indexes ${lo}-${hi}: take the smaller front value, ${a[k]}, into index ${k}.`, 4, { lo, mid, hi, k }));
     }
   };
 
@@ -113,16 +125,71 @@ export function mergeSortFrames(input) {
   return frames;
 }
 
+// `code` is short pseudocode; frame.line points into it.
 export const sortingAlgorithms = {
-  bubble: { label: 'Bubble sort', big: 'O(n²)', frames: bubbleSortFrames },
-  selection: { label: 'Selection sort', big: 'O(n²)', frames: selectionSortFrames },
-  insertion: { label: 'Insertion sort', big: 'O(n²), O(n) if nearly sorted', frames: insertionSortFrames },
-  merge: { label: 'Merge sort', big: 'O(n log n)', frames: mergeSortFrames },
+  bubble: {
+    label: 'Bubble sort',
+    big: 'O(n²)',
+    frames: bubbleSortFrames,
+    code: [
+      'for end from n-1 down to 1:',
+      '  for i from 0 to end-1:',
+      '    if a[i] > a[i+1]:',
+      '      swap a[i] and a[i+1]',
+      '  a[end] is now in its final place',
+      '  if nothing was swapped: stop early',
+    ],
+  },
+  selection: {
+    label: 'Selection sort',
+    big: 'O(n²)',
+    frames: selectionSortFrames,
+    code: [
+      'for start from 0 to n-2:',
+      '  min = start',
+      '  for i from start+1 to n-1:',
+      '    if a[i] < a[min]: min = i',
+      '  swap a[start] and a[min]',
+    ],
+  },
+  insertion: {
+    label: 'Insertion sort',
+    big: 'O(n²), O(n) if nearly sorted',
+    frames: insertionSortFrames,
+    code: [
+      'for i from 1 to n-1:',
+      '  j = i',
+      '  while j > 0 and a[j-1] > a[j]:',
+      '    swap a[j-1] and a[j]; j = j - 1',
+    ],
+  },
+  merge: {
+    label: 'Merge sort',
+    big: 'O(n log n)',
+    frames: mergeSortFrames,
+    code: [
+      'mergeSort(lo, hi):',
+      '  if lo >= hi: return',
+      '  mid = (lo + hi) / 2',
+      '  mergeSort(lo, mid); mergeSort(mid+1, hi)',
+      '  merge: keep taking the smaller front value',
+    ],
+  },
 };
 
 /* ---------- Searching ---------- */
 
-// Frame: { lo, hi, mid, found, caption }. found is the index, or -1 when absent.
+export const binarySearchCode = [
+  'lo = 0, hi = n - 1',
+  'while lo <= hi:',
+  '  mid = (lo + hi) // 2',
+  '  if a[mid] == target: return mid',
+  '  if a[mid] < target: lo = mid + 1',
+  '  else: hi = mid - 1',
+  'return "not found"',
+];
+
+// Frame: { lo, hi, mid, found, caption, line, vars }. found is the index, or -1 when absent.
 export function binarySearchFrames(sorted, target) {
   const frames = [];
   let lo = 0;
@@ -131,8 +198,9 @@ export function binarySearchFrames(sorted, target) {
   while (lo <= hi) {
     const mid = Math.floor((lo + hi) / 2);
     const value = sorted[mid];
+    const vars = { target, lo, hi, mid, 'a[mid]': value };
     if (value === target) {
-      frames.push({ lo, hi, mid, found: mid, caption: `Middle value ${value} equals ${target}. Found at index ${mid}.` });
+      frames.push({ lo, hi, mid, found: mid, line: 3, vars, caption: `Middle value ${value} equals ${target}. Found at index ${mid}.` });
       return frames;
     }
     const goRight = value < target;
@@ -141,21 +209,36 @@ export function binarySearchFrames(sorted, target) {
       hi,
       mid,
       found: null,
+      line: goRight ? 4 : 5,
+      vars,
       caption: `Middle value ${value} is ${goRight ? 'smaller' : 'larger'} than ${target}, so drop the ${goRight ? 'left' : 'right'} half.`,
     });
     if (goRight) lo = mid + 1;
     else hi = mid - 1;
   }
 
-  frames.push({ lo, hi, mid: -1, found: -1, caption: `Nothing left to check: ${target} is not in the list.` });
+  frames.push({ lo, hi, mid: -1, found: -1, line: 6, vars: { target, lo, hi }, caption: `lo passed hi, so nothing is left to check: ${target} is not in the list.` });
   return frames;
 }
 
 /* ---------- Graph traversal on a grid ---------- */
 
+export const traversalCode = (mode) => {
+  const list = mode === 'bfs' ? 'queue' : 'stack';
+  return [
+    `${list} = [start]`,
+    `while ${list} is not empty:`,
+    `  cell = take from the ${mode === 'bfs' ? 'front' : 'top'} of ${list}`,
+    '  if cell was visited: skip it',
+    '  if cell is the goal: stop, follow parents back',
+    `  push each open, unvisited neighbour onto ${list}`,
+    'the goal cannot be reached',
+  ];
+};
+
 /**
  * BFS or DFS over a grid. `walls` is a Set of "row,col" strings.
- * Frame: { visited: [keys], frontier: [keys], current, path: [keys], caption }.
+ * Frame: { visited: [keys], frontier: [keys], current, path: [keys], caption, line, vars }.
  */
 export function gridTraversalFrames({ rows, cols, walls, start, goal, mode }) {
   const key = ([r, c]) => `${r},${c}`;
@@ -182,6 +265,8 @@ export function gridTraversalFrames({ rows, cols, walls, start, goal, mode }) {
         frontier: frontier.map(key),
         current: cellKey,
         path,
+        line: 4,
+        vars: { cell: `(${cellKey})`, visited: visited.length, 'path length': path.length - 1 },
         caption: `Reached the goal after visiting ${visited.length} cells. Path length: ${path.length - 1} steps.`,
       });
       return frames;
@@ -204,11 +289,13 @@ export function gridTraversalFrames({ rows, cols, walls, start, goal, mode }) {
       frontier: frontier.map(key),
       current: cellKey,
       path: [],
+      line: 5,
+      vars: { cell: `(${r},${c})`, visited: visited.length, [`${container} size`]: frontier.length },
       caption: `Visit (${r}, ${c}). Add its unvisited neighbours to the ${container}: ${frontier.length} waiting.`,
     });
   }
 
-  frames.push({ visited: [...visited], frontier: [], current: null, path: [], caption: 'The goal cannot be reached: walls block every route.' });
+  frames.push({ visited: [...visited], frontier: [], current: null, path: [], line: 6, vars: { visited: visited.length }, caption: 'The goal cannot be reached: walls block every route.' });
   return frames;
 }
 

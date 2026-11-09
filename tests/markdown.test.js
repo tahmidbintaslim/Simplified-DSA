@@ -40,3 +40,46 @@ test('only http and https links become anchors', () => {
   const unsafe = render('[click](javascript:alert(1))');
   assert.ok(!unsafe.includes('<a '));
 });
+
+test('### headings, numbered lists and tables', () => {
+  assert.equal(render('### Small'), '<h3>Small</h3>');
+  assert.equal(render('1. one\n2. two'), '<ol><li>one</li><li>two</li></ol>');
+  const table = render('| Op | Cost |\n| --- | --- |\n| read | `O(1)` |');
+  assert.match(table, /<th>Op<\/th><th>Cost<\/th>/);
+  assert.match(table, /<td>read<\/td><td><code>O\(1\)<\/code><\/td>/);
+});
+
+test('callouts take their style from the bold label', () => {
+  assert.equal(
+    render('> **Analogy:** A coat check.\n> You get a ticket.'),
+    '<aside class="callout callout-analogy"><strong class="callout-label">Analogy</strong><p>A coat check. You get a ticket.</p></aside>',
+  );
+});
+
+test('cells blocks draw values, pointers and states, escaped', () => {
+  const html = render('```cells\nvalues: 3 <b> 14\npointers: lo=0 hi=2 mid=2\nhighlight: 1\ndim: 0\nnote: Look **here**.\n```');
+  assert.match(html, /<span class="array-value">&lt;b&gt;<\/span>/);
+  assert.match(html, /array-cell is-hit/);
+  assert.match(html, /array-cell is-out/);
+  assert.match(html, /<span class="cell-pointer">hi mid<\/span>/);
+  assert.match(html, /<figcaption>Look <strong>here<\/strong>\.<\/figcaption>/);
+});
+
+test('quiz blocks mark the right option and keep the explanation hidden', () => {
+  const html = render('```quiz\nQ: Pick <one>\n- wrong\n* right\nWhy: Because.\n```');
+  assert.match(html, /Pick &lt;one&gt;/);
+  assert.match(html, /data-quiz-option="false">wrong/);
+  assert.match(html, /data-quiz-option="true">right/);
+  assert.match(html, /<p class="quiz-why" hidden>Because\.<\/p>/);
+});
+
+test('a demo fence leaves a marker for the app', () => {
+  assert.equal(render('```demo\n```'), '<div data-demo-here></div>');
+});
+
+test('blocks keep their written order even without blank lines between them', () => {
+  const html = render('| A |\n| --- |\n| 1 |\nAfter the table\n> **Note:** callout\nAfter the callout\n- item');
+  const order = ['<table>', 'After the table', 'callout-note', 'After the callout', '<ul>'].map((part) => html.indexOf(part));
+  assert.ok(order.every((at) => at >= 0), html);
+  assert.deepEqual([...order].sort((a, b) => a - b), order);
+});
