@@ -757,7 +757,8 @@ function mountTwoPointers(root) {
     const target = readInt(targetInput) ?? 0;
     const frames = pairSumFrames(values, target);
     const steps = frames.at(-1).found ? frames.length : frames.length - 1;
-    compare.textContent = `Two pointers: ${steps} step${steps === 1 ? '' : 's'}. Brute force would check ${bruteForcePairChecks(values, target)} pair${values.length === 2 ? '' : 's'}.`;
+    const checks = bruteForcePairChecks(values, target);
+    compare.textContent = `Two pointers: ${steps} step${steps === 1 ? '' : 's'}. Brute force would check ${checks} pair${checks === 1 ? '' : 's'}.`;
     player.load(frames, pairSumCode);
   };
 

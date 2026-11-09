@@ -259,7 +259,8 @@ export function createServer() {
     ({ values: input, k }) => {
       const frames = windowSumFrames(input, k);
       const state = (f) => (f.end >= f.start ? `  window [${input.slice(f.start, f.end + 1).join(', ')}]` : '');
-      return text(`${numbered(frames, state)}\n\nRecomputing every window would make ${bruteForceWindowAdds(input.length, k)} additions.`);
+      const brute = k <= input.length ? `\n\nRecomputing every window would make ${bruteForceWindowAdds(input.length, k)} additions.` : '';
+      return text(`${numbered(frames, state)}${brute}`);
     },
   );
 

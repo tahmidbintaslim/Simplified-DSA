@@ -48,6 +48,9 @@ test('trace tools return the same steps the website uses', async () => {
   assert.match(pair, /Brute force would check \d+ pairs\./);
   const windowTrace = await call(client, 'trace_sliding_window', { values: [2, 1, 5, 1, 3, 2], k: 3 });
   assert.match(windowTrace, /best window starts at index 2 with sum 9/);
+  const tooBig = await call(client, 'trace_sliding_window', { values: [1, 2], k: 5 });
+  assert.match(tooBig, /must be between 1 and 2/);
+  assert.doesNotMatch(tooBig, /Recomputing/);
   const bst = await call(client, 'trace_bst', { values: [1, 2, 3, 4], search: 4 });
   assert.match(bst, /Height: 4/);
   assert.match(bst, /1 → 2 → 3 → 4 → found/);
