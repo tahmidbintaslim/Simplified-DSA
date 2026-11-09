@@ -34,7 +34,7 @@ git clone https://github.com/tahmidbintaslim/Simplified-DSA.git
 cd Simplified-DSA
 pnpm install --frozen-lockfile
 pnpm dev        # http://localhost:3000/
-pnpm test       # 13 unit tests
+pnpm test       # unit tests
 ```
 
 ## Contents
@@ -59,7 +59,8 @@ pnpm test       # 13 unit tests
 - **9 lessons:** Arrays and Strings, Linked Lists, Stacks and Queues, Hash Tables and Binary Search Trees (Data Structures); Big O, Binary Search, Sorting and Graph Traversal (Algorithms).
 - **An interactive demo on every lesson** (`src/demos/`): shift values in an array, walk a linked list, push and pop, hash keys into buckets, build and search a tree, compare growth rates, and step through binary search, four sorting algorithms and BFS versus DFS on a grid you can draw walls on. Algorithm demos have Back, Play, Step and a speed control, and a caption that explains every step.
 - **Language comparison tabs** on the Arrays lesson: the same array in JavaScript, Python, C, C++, Java, Go, Rust, C#, Kotlin and Swift. Each tab has a runtime note, a memory note and a link to the source checked. The tabs follow the ARIA tabs pattern, so arrow keys, Home and End move between them.
-- **A URL per lesson**, such as `/algorithms/big-o`. Refresh, shared links and the back and forward buttons all open the right lesson. Unknown URLs fall back to the first lesson.
+- **A URL per lesson**, such as `/algorithms/big-o`. Refresh, shared links and the back and forward buttons all open the right lesson. Unknown URLs show a "Page not found" message with the lesson list.
+- **Share and search basics:** link-preview tags and image, a per-lesson meta description, `robots.txt`, a `sitemap.xml` generated from the lesson files, and a [privacy page](https://dsa.tahmid.space/privacy.html).
 - **A small Markdown renderer** (`src/utils/markdown.js`) that escapes HTML before it formats anything, so lesson text cannot inject markup. Only `http` and `https` links become anchors.
 - **Responsive layout:** at 760px and narrower, the lesson list stacks above the lesson, and wide code blocks scroll sideways inside their own box.
 - **Unit tests** for the Markdown renderer, the URL helpers and the demo algorithms, run with Node's built-in test runner.
@@ -185,7 +186,13 @@ The plugin runs the server with the `node` on your machine (Node 18 or newer).
 
 ### Use it inside this repository
 
-Open the repository in Claude Code and approve the `simplified-dsa` server from `.mcp.json`; the `dsa-tutor` skill loads from `.claude/skills/` (a link to `plugin/skills/`). Then ask, for example, "teach me hash tables" or "quiz me on BFS vs DFS". Other MCP clients can start the server with:
+Open the repository in Claude Code and approve the `simplified-dsa` server from `.mcp.json`; the `dsa-tutor` skill loads from `.claude/skills/` (a link to `plugin/skills/`). Then ask, for example, "teach me hash tables" or "quiz me on BFS vs DFS".
+
+### Add it to Claude as a connector
+
+The same server runs as a stateless HTTPS endpoint (`api/mcp.js`, a Vercel function) at `https://dsa.tahmid.space/mcp`. In claude.ai: Customize → Connectors → Add custom connector → paste that URL, no sign-in. Any MCP client that speaks Streamable HTTP can use it.
+
+Other MCP clients can also start the server locally with:
 
 ```bash
 pnpm mcp
@@ -231,6 +238,7 @@ Next, from the [Project Plan](./PLAN.md) and [`CURRICULUM.md`](./src/content/CUR
 - More Data Structures lessons: Heaps, Tries, Graph representations.
 - More Algorithms lessons: Recursion, Quicksort, Two Pointers, Sliding Window, Dijkstra.
 - Quizzes and progress tracking. See [Strategy](./docs/STRATEGY.md) for the product plan.
+- The [practice companion browser extension](./docs/LEETCODE_COMPANION.md).
 - A browser code editor, after safe execution and language support are defined.
 
 ## Known limitations
@@ -242,13 +250,16 @@ These follow from the code as it is today:
 - The hash table demo uses a sum-of-character-codes hash on purpose, so collisions are easy to see. Real hash functions mix bits far better.
 - The Markdown renderer (`src/utils/markdown.js`) handles only the syntax the lessons use: `#` and `##` headings, `- ` bullet lists, fenced code blocks, inline code, bold text and `http`/`https` links. Tables, numbered lists, images and deeper headings are not rendered as Markdown.
 - Code blocks have no syntax highlighting.
-- An unknown lesson URL opens the first lesson instead of a "not found" page.
+- Unknown URLs show a "Page not found" message, but Vercel still answers them with HTTP 200, because every path is served by the single-page app.
 - The tests cover the Markdown renderer, the URL helpers and the demo algorithms. The demo UIs have no automated browser tests.
 
 ## Contributing
 
 Contributions are welcome, and the codebase is written to be read by beginners. Start with:
 
+- [Strategy](./docs/STRATEGY.md): product, brand, research, tech, legal and the AI plan
+- [Publishing Guide](./docs/PUBLISHING.md): how to release the site, plugin, skill, connector and MCP Registry entry
+- [Practice Companion Plan](./docs/LEETCODE_COMPANION.md): browser extension with hints, pattern mapping and GitHub sync
 - [Contributor Guide](./docs/CONTRIBUTING.md): working rules, commits, adding a lesson, deploy previews
 - [JavaScript and OOP Guide](./docs/JS_OOP_GUIDE.md)
 - [CSS Guide](./docs/CSS_GUIDE.md)

@@ -44,14 +44,13 @@ test('a section path opens its first lesson', () => {
   assert.equal(resolvePath(sections, '/algorithms').path, '/algorithms/big-o');
 });
 
-test('an unknown lesson falls back to the first lesson of its section', () => {
-  assert.equal(resolvePath(sections, '/algorithms/heaps').path, '/algorithms/big-o');
-});
-
-test('unknown sections, extra segments and bad escapes fall back to "/"', () => {
-  for (const pathname of ['/nope', '/nope/big-o', '/algorithms/big-o/extra', '/%E0%A4%A']) {
+test('unknown lessons, sections, extra segments and bad escapes are not found', () => {
+  for (const pathname of ['/algorithms/heaps', '/nope', '/nope/big-o', '/algorithms/big-o/extra', '/%E0%A4%A']) {
     const route = resolvePath(sections, pathname);
-    assert.equal(route.path, '/', pathname);
+    assert.equal(route.notFound, true, pathname);
+    // The URL stays as typed, and the first lesson stays open in the sidebar.
+    assert.equal(route.path, pathname, pathname);
     assert.equal(route.lessonId, 'arrays-and-strings', pathname);
   }
+  assert.equal(resolvePath(sections, '/algorithms/big-o').notFound, undefined);
 });

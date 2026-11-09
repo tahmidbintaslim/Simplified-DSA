@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="What Simplified DSA, its Claude plugin and its MCP connector collect: nothing about you." />
+    <link rel="icon" type="image/png" href="/icon.png" />
+    <title>Privacy | Simplified DSA</title>
+    <style>
+      :root { color-scheme: dark; }
+      body {
+        margin: 0;
+        background: #11110f;
+        color: #ddd5c6;
+        font: 1.03rem/1.68 "Aptos", "Avenir Next", "Gill Sans", "Helvetica Neue", sans-serif;
+      }
+      main { max-width: 72ch; margin: 0 auto; padding: 48px 16px 64px; }
+      h1, h2 { color: #f5f0e6; line-height: 1.15; }
+      h1 { font-size: clamp(2rem, 5vw, 2.8rem); margin: 0 0 8px; }
+      h2 { font-size: 1.3rem; margin: 34px 0 10px; }
+      a { color: #d9b36a; text-underline-offset: 3px; }
+      a:focus-visible { outline: 2px solid #f1cd86; outline-offset: 2px; }
+      code { color: #f1cd86; }
+      .updated { color: #a99f8d; margin: 0 0 28px; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p><a href="/">← Back to the lessons</a></p>
+      <h1>Privacy</h1>
+      <p class="updated">Last updated: 9 November 2026</p>
+
+      <p>Short version: Simplified DSA does not collect, store, sell or share information about you. There are no accounts, no cookies, no analytics, no ads and no trackers.</p>
+
+      <h2>The website</h2>
+      <p>The lessons and demos run entirely in your browser. What you type into a demo stays on your device and disappears when you leave the page.</p>
+      <p>The site is hosted on Vercel. Like any web host, Vercel's servers see standard request data (such as your IP address, browser type and the page requested) to deliver the page and protect against abuse. We do not use that data. See <a href="https://vercel.com/legal/privacy-policy">Vercel's privacy policy</a>.</p>
+      <p>Links to sources and documentation open other websites, which have their own privacy policies.</p>
+
+      <h2>The Claude Code plugin and local MCP server</h2>
+      <p>The plugin's server runs on your own computer. It reads the bundled lessons and computes algorithm traces locally. It sends nothing to us or anyone else.</p>
+
+      <h2>The remote MCP connector</h2>
+      <p>If you add the connector at <code>https://dsa.tahmid.space/mcp</code> to an AI assistant, the assistant sends tool requests to it, such as "trace merge sort on 5, 2, 9, 1". The connector computes the answer and returns it. It does not store requests, does not ask you to sign in, and does not identify you. Vercel's standard request logs apply, as above.</p>
+      <p>The assistant you use (for example Claude) has its own privacy policy, which covers your conversations.</p>
+
+      <h2>Children</h2>
+      <p>Simplified DSA is meant for learners aged 13 and older.</p>
+
+      <h2>Changes and contact</h2>
+      <p>If this ever changes, for example if we add analytics, this page will say so before the change goes live. The full history of this page is public in the <a href="https://github.com/tahmidbintaslim/Simplified-DSA/commits/main/public/privacy.html">project repository</a>.</p>
+      <p>Questions: open an issue at <a href="https://github.com/tahmidbintaslim/Simplified-DSA/issues">github.com/tahmidbintaslim/Simplified-DSA/issues</a>.</p>
+    </main>
+  </body>
+</html>

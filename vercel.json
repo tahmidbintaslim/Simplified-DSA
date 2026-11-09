@@ -2,9 +2,18 @@
     "framework": "vite",
     "buildCommand": "pnpm run build",
     "outputDirectory": "dist",
+    "functions": {
+        "api/mcp.js": {
+            "includeFiles": "src/content/**"
+        }
+    },
     "rewrites": [
         {
-            "source": "/(.*)",
+            "source": "/mcp",
+            "destination": "/api/mcp"
+        },
+        {
+            "source": "/((?!api/).*)",
             "destination": "/index.html"
         }
     ]

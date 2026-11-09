@@ -59,19 +59,20 @@ export class App {
           <nav aria-label="Lessons">
             ${this.renderSectionMenu()}
           </nav>
+          <p class="sidebar-footer"><a href="/privacy.html">Privacy</a></p>
         </aside>
         <main class="lesson-main">
-          ${this.renderLessonHeader()}
-          <article class="lesson-content">
-            ${this.markdownRenderer.render(this.activeLesson.markdown)}
-          </article>
-          ${this.renderDemoPanel()}
-          ${this.renderLanguageComparison()}
+          ${this.notFound ? this.renderNotFound() : this.renderLesson()}
         </main>
       </div>
     `;
-    document.title = `${this.activeLesson.title} | Simplified DSA`;
-    this.attachDemo();
+    const title = this.notFound ? 'Page not found' : this.activeLesson.title;
+    document.title = `${title} | Simplified DSA`;
+    // Search engines and link previews read the description of the open lesson.
+    document
+      .querySelector('meta[name="description"]')
+      ?.setAttribute('content', this.notFound ? 'This page does not exist.' : this.activeLesson.summary);
+    if (!this.notFound) this.attachDemo();
 
     if (restoreId || hadFocus) {
       // If that element no longer exists, the current lesson link takes focus.
@@ -142,6 +143,7 @@ export class App {
    */
   applyRoute(pathname) {
     const route = resolvePath(this.sections, pathname);
+    this.notFound = Boolean(route.notFound);
     const lessonChanged =
       route.sectionId !== this.activeSectionId || route.lessonId !== this.activeLessonId;
 
@@ -161,7 +163,8 @@ export class App {
   openLesson(sectionId, lessonId) {
     // Opening the lesson that is already open adds no history entry. On "/"
     // the first lesson is open, so a click there must not push its path.
-    if (sectionId === this.activeSectionId && lessonId === this.activeLessonId) return;
+    // From the not-found page every lesson link must navigate, even the open one.
+    if (!this.notFound && sectionId === this.activeSectionId && lessonId === this.activeLessonId) return;
 
     const path = lessonPath(sectionId, lessonId);
     window.history.pushState(null, '', path);
@@ -222,7 +225,7 @@ export class App {
       <div class="lesson-list">
         ${section.lessons
           .map((lesson) => {
-            const isActive = lesson.id === this.activeLessonId;
+            const isActive = !this.notFound && lesson.id === this.activeLessonId;
 
             return `
               <a
@@ -253,6 +256,36 @@ export class App {
         <strong>${this.activeSection.title}</strong>
         <p>${this.activeSection.description}</p>
       </header>
+    `;
+  }
+
+  renderLesson() {
+    return `
+      ${this.renderLessonHeader()}
+      <article class="lesson-content">
+        ${this.markdownRenderer.render(this.activeLesson.markdown)}
+      </article>
+      ${this.renderDemoPanel()}
+      ${this.renderLanguageComparison()}
+    `;
+  }
+
+  /**
+   * Unknown URLs show this instead of quietly opening another lesson, so a
+   * mistyped or outdated link is obvious. The lesson list stays in the sidebar.
+   */
+  renderNotFound() {
+    const first = this.sections[0];
+    return `
+      <article class="lesson-content">
+        <h1>Page not found</h1>
+        <p>There is no lesson at <code>${escapeHtml(window.location.pathname)}</code>. Pick one from the list, or start from the beginning.</p>
+        <p>
+          <a href="/" data-section-id="${first.id}" data-lesson-id="${first.lessons[0].id}">
+            Start with ${escapeHtml(first.lessons[0].title)}
+          </a>
+        </p>
+      </article>
     `;
   }
 
