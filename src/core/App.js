@@ -2,6 +2,9 @@ import { curriculum } from '../content/curriculum.js';
 import { demos } from '../demos/index.js';
 import { DEMO_MARKER, escapeHtml, MarkdownRenderer } from '../utils/markdown.js';
 import { loadCompleted, saveCompleted } from './progress.js';
+
+// Matches the 760px layout breakpoint in style.css.
+const WIDE_SCREEN = '(min-width: 761px)';
 import { lessonPath, resolvePath } from './router.js';
 
 /**
@@ -52,19 +55,28 @@ export class App {
     const hadFocus = focused !== this.root && this.root.contains(focused);
     const restoreId = focusId ?? (hadFocus ? focused.id : '');
 
+    // On wide screens the lesson list is always open. On phones it folds into a
+    // "Lessons" bar so the lesson itself starts on the first screen.
+    const wide = window.matchMedia(WIDE_SCREEN).matches;
+    const current = this.notFound ? 'Choose a lesson' : `${this.activeSection.title} · ${this.activeLesson.title}`;
+
     this.root.innerHTML = `
+      <a class="skip-link" href="#main">Skip to the lesson</a>
       <div class="app-shell">
         <aside class="lesson-sidebar" aria-label="Course navigation">
           <div class="sidebar-header">
-            <h1>Simplified DSA</h1>
-            <p>Learn the shape of data first, then the steps that act on it.</p>
+            <p class="site-title">Simplified DSA</p>
+            <p class="site-tagline">Learn the shape of data first, then the steps that act on it.</p>
           </div>
-          <nav aria-label="Lessons">
-            ${this.renderSectionMenu()}
-          </nav>
-          <p class="sidebar-footer"><a href="/privacy.html">Privacy</a></p>
+          <details class="nav-drawer" ${wide ? 'open' : ''}>
+            <summary><span>Lessons</span><span class="nav-current">${escapeHtml(current)}</span></summary>
+            <nav aria-label="Lessons">
+              ${this.renderSectionMenu()}
+            </nav>
+            <p class="sidebar-footer"><a href="/privacy.html">Privacy</a></p>
+          </details>
         </aside>
-        <main class="lesson-main">
+        <main id="main" class="lesson-main" tabindex="-1">
           ${this.notFound ? this.renderNotFound() : this.renderLesson()}
         </main>
       </div>
@@ -144,6 +156,9 @@ export class App {
       this.selectLanguage(tabs[nextIndex].dataset.languageId, { moveFocus: true });
     });
 
+    // Crossing the phone/desktop breakpoint opens or folds the lesson list.
+    window.matchMedia(WIDE_SCREEN).addEventListener('change', () => this.render());
+
     // Back and forward buttons change the URL; show the lesson it names.
     window.addEventListener('popstate', () => {
       this.applyRoute(window.location.pathname);
@@ -187,6 +202,11 @@ export class App {
     this.render();
     // A new lesson starts at its title, even when opened from the footer's Next link.
     window.scrollTo(0, 0);
+    // On phones the clicked link is now inside the folded drawer, so focus would
+    // be lost; send it to the lesson instead.
+    if (!this.root.contains(document.activeElement) || !document.activeElement.offsetParent) {
+      document.getElementById('main')?.focus({ preventScroll: true });
+    }
   }
 
   /**
@@ -357,9 +377,15 @@ export class App {
     quiz.dataset.misses = misses;
     option.classList.add(correct ? 'is-right' : 'is-wrong');
     option.setAttribute('aria-pressed', 'true');
+    // A written mark as well as the colour, so the state never depends on colour alone.
+    option.dataset.mark = correct ? 'Correct' : 'Not this one';
 
     const reveal = correct || misses >= 2;
-    if (reveal) quiz.querySelector('[data-quiz-option="true"]').classList.add('is-right');
+    if (reveal) {
+      const right = quiz.querySelector('[data-quiz-option="true"]');
+      right.classList.add('is-right');
+      right.dataset.mark = 'Correct';
+    }
     const why = quiz.querySelector('.quiz-why').textContent;
     quiz.querySelector('.quiz-feedback').textContent = correct
       ? `Correct. ${why}`

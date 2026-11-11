@@ -53,12 +53,23 @@ export function createPlayer(root, onFrame) {
   const show = () => {
     const frame = frames[index];
     onFrame(frame);
-    caption.textContent = frame.caption;
+    // The visible counter is aria-hidden, so screen readers hear the step in the caption.
+    caption.innerHTML = `<span class="sr-only">Step ${index + 1} of ${frames.length}. </span>${escapeHtml(frame.caption)}`;
     count.textContent = `Step ${index + 1} / ${frames.length}`;
+    keepActiveCellInView();
     [...codeList.children].forEach((li, i) => li.classList.toggle('is-current', i === frame.line));
     varList.innerHTML = Object.entries(frame.vars ?? {})
       .map(([name, value]) => `<div><dt>${escapeHtml(name)}</dt><dd>${escapeHtml(value)}</dd></div>`)
       .join('');
+  };
+
+  // Wide arrays scroll sideways inside the stage. Centre the cell the caption
+  // talks about, so "mid = 7" is never describing a cell that is off-screen.
+  const keepActiveCellInView = () => {
+    const stage = root.querySelector('.demo-stage');
+    const cell = stage?.querySelector('.array-cell.is-hit, .array-cell.is-mid, .array-cell.is-active');
+    if (!cell || stage.scrollWidth <= stage.clientWidth) return;
+    stage.scrollLeft = cell.offsetLeft - stage.clientWidth / 2 + cell.offsetWidth / 2;
   };
 
   const stop = () => {
