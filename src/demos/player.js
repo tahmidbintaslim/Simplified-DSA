@@ -1,3 +1,4 @@
+import { icon } from '../utils/icons.js';
 import { escapeHtml } from '../utils/markdown.js';
 
 /**
@@ -16,10 +17,10 @@ export function createPlayer(root, onFrame) {
     'beforeend',
     `
     <div class="demo-player">
-      <button type="button" class="demo-button" data-player="first" aria-label="First step">⏮</button>
-      <button type="button" class="demo-button" data-player="back">◀ Back</button>
-      <button type="button" class="demo-button is-primary" data-player="play">Play</button>
-      <button type="button" class="demo-button" data-player="next">Step ▶</button>
+      <button type="button" class="demo-button" data-player="first" aria-label="First step">${icon('first')}</button>
+      <button type="button" class="demo-button" data-player="back">${icon('back')} Back</button>
+      <button type="button" class="demo-button is-primary" data-player="play">${icon('play')} Play</button>
+      <button type="button" class="demo-button" data-player="next">Step ${icon('next')}</button>
       <label class="demo-speed">Speed
         <input type="range" min="1" max="10" value="5" data-player="speed" />
       </label>
@@ -54,7 +55,8 @@ export function createPlayer(root, onFrame) {
     const frame = frames[index];
     onFrame(frame);
     // The visible counter is aria-hidden, so screen readers hear the step in the caption.
-    caption.innerHTML = `<span class="sr-only">Step ${index + 1} of ${frames.length}. </span>${escapeHtml(frame.caption)}`;
+    // A numbered step badge, like a numbered fold in a diagram; screen readers get the words.
+    caption.innerHTML = `<span class="step-badge" aria-hidden="true">${index + 1}</span><span class="sr-only">Step ${index + 1} of ${frames.length}. </span>${escapeHtml(frame.caption)}`;
     count.textContent = `Step ${index + 1} / ${frames.length}`;
     keepActiveCellInView();
     [...codeList.children].forEach((li, i) => li.classList.toggle('is-current', i === frame.line));
@@ -75,7 +77,7 @@ export function createPlayer(root, onFrame) {
   const stop = () => {
     clearInterval(timer);
     timer = null;
-    playButton.textContent = 'Play';
+    playButton.innerHTML = `${icon('play')} Play`;
     // Announce captions again once playback stops; during play they change too fast.
     caption.setAttribute('aria-live', 'polite');
   };
@@ -90,7 +92,7 @@ export function createPlayer(root, onFrame) {
 
   const play = () => {
     if (index >= frames.length - 1) index = -1; // Replay from the start.
-    playButton.textContent = 'Pause';
+    playButton.innerHTML = `${icon('pause')} Pause`;
     caption.setAttribute('aria-live', 'off');
     timer = setInterval(() => {
       // Stop when the learner has moved to another lesson or reached the end.

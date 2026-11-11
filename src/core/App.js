@@ -1,6 +1,7 @@
 import { curriculum } from '../content/curriculum.js';
 import { demos } from '../demos/index.js';
 import { DEMO_MARKER, escapeHtml, MarkdownRenderer } from '../utils/markdown.js';
+import { icon } from '../utils/icons.js';
 import { loadCompleted, saveCompleted } from './progress.js';
 
 // Matches the 760px layout breakpoint in style.css.
@@ -274,8 +275,9 @@ export class App {
                 data-lesson-id="${lesson.id}"
                 ${isActive ? 'aria-current="page"' : ''}
               >
-                <strong>${isDone ? '<span class="lesson-done" aria-label="Completed">✓</span> ' : ''}${escapeHtml(lesson.title)}</strong>
-                <span>${escapeHtml(lesson.summary)}</span>
+                <span class="lesson-status ${isDone ? 'is-done' : ''}">${isDone ? `${icon('check')}<span class="sr-only">Completed: </span>` : ''}</span>
+                <strong>${escapeHtml(lesson.title)}</strong>
+                <span class="lesson-summary">${escapeHtml(lesson.summary)}</span>
               </a>
             `;
           })
@@ -309,16 +311,22 @@ export class App {
   }
 
   /**
-   * A lesson can place its demo with a ```demo block, so learners try the idea
-   * right after reading it. Without one, the demo follows the text.
+   * A lesson opens on its title and the one-paragraph promise under it; where
+   * it sits, how long it takes and the goals follow, so the page never opens on
+   * admin text. A lesson can place its demo with a ```demo block, so learners
+   * try the idea right after reading it. Without one, the demo follows the text.
    */
   renderLesson() {
-    const article = this.markdownRenderer.render(this.activeLesson.markdown);
+    const header = this.renderLessonHeader();
+    let article = this.markdownRenderer.render(this.activeLesson.markdown);
+    const opening = /(<h1>[\s\S]*?<\/h1>)<p>([\s\S]*?<\/p>)/;
+    article = opening.test(article)
+      ? article.replace(opening, (_, title, lead) => `${title}<p class="lead">${lead}${header}`)
+      : header + article;
     const panel = this.renderDemoPanel();
     const inline = article.includes(DEMO_MARKER);
 
     return `
-      ${this.renderLessonHeader()}
       <article class="lesson-content">
         ${inline ? article.replace(DEMO_MARKER, () => panel) : article}
       </article>
@@ -343,11 +351,11 @@ export class App {
     return `
       <footer class="lesson-footer">
         <button id="complete-button" type="button" class="demo-button ${done ? 'is-done' : 'is-primary'}" data-complete aria-pressed="${done}">
-          ${done ? '✓ Completed' : 'Mark as complete'}
+          ${done ? `${icon('check')} Completed` : 'Mark as complete'}
         </button>
         <nav class="lesson-steps" aria-label="Previous and next lesson">
-          ${link(all[index - 1], '← Previous')}
-          ${link(all[index + 1], 'Next →')}
+          ${link(all[index - 1], `${icon('arrowLeft')} Previous`)}
+          ${link(all[index + 1], `Next ${icon('arrowRight')}`)}
         </nav>
       </footer>
     `;
