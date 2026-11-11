@@ -6,3 +6,6 @@ dist-ssr
 .DS_Store
 .vercel
 pnpm-lock.yaml
+# Impeccable design-tool runtime files (review captures, detector cache)
+.impeccable/review/
+.impeccable/hook.cache.json
