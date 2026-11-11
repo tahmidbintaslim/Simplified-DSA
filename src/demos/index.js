@@ -40,6 +40,19 @@ const readInt = (input) => {
 
 const formatNumber = (value) => value.toLocaleString('en-US');
 
+// A colour key under a picture, so "grey means ruled out" sits next to the grey cells.
+const legend = (items) =>
+  `<ul class="demo-legend" aria-label="Colour key">${items
+    .map(([swatch, label]) => `<li><span class="swatch swatch-${swatch}" aria-hidden="true"></span>${label}</li>`)
+    .join('')}</ul>`;
+
+// Status lines double as error messages; errors are styled and announced.
+const setStatus = (el, text, { error = false, keptPrevious = error } = {}) => {
+  el.textContent = keptPrevious ? `${text} The demo still shows the previous values.` : text;
+  el.classList.toggle('is-error', error);
+};
+
+
 // "5, 2 9" → [5, 2, 9]: whole numbers in range, at most `max` of them; null when empty or invalid.
 const readList = (input, { min = 1, max = 99, count = 20 } = {}) => {
   const values = input.value.split(/[\s,]+/).filter(Boolean).map(Number);
@@ -501,7 +514,8 @@ function mountBinarySearch(root) {
       <button type="button" class="demo-button" data-op="use">Use list</button>
     </div>
     <div class="demo-stage"><div class="array-row bs-row"></div></div>
-    <p class="bs-compare"></p>
+    ${legend([['mid', 'checking (mid)'], ['hit', 'found'], ['out', 'ruled out']])}
+    <p class="bs-compare" aria-live="polite"></p>
   `;
 
   const row = root.querySelector('.bs-row');
@@ -525,7 +539,7 @@ function mountBinarySearch(root) {
     const target = readInt(input) ?? 0;
     const frames = binarySearchFrames(values, target);
     const linear = values.indexOf(target);
-    compare.textContent = `Binary search: ${frames.length - (frames.at(-1).found === -1 ? 1 : 0)} checks. Linear search would check ${linear === -1 ? values.length : linear + 1} of ${values.length} values.`;
+    setStatus(compare, `Binary search: ${frames.length - (frames.at(-1).found === -1 ? 1 : 0)} checks. Linear search would check ${linear === -1 ? values.length : linear + 1} of ${values.length} values.`);
     player.load(frames, binarySearchCode);
   };
 
@@ -543,7 +557,7 @@ function mountBinarySearch(root) {
     if (op === 'use') {
       const list = readList(listInput, { min: -999, max: 999 });
       if (!list) {
-        compare.textContent = 'Type 1 to 20 whole numbers between -999 and 999, separated by spaces or commas.';
+        setStatus(compare, 'Type 1 to 20 whole numbers between -999 and 999, separated by spaces or commas.', { error: true });
         return;
       }
       // Binary search only works on sorted data, so sort (and drop repeats) first.
@@ -578,7 +592,8 @@ function mountSorting(root) {
       <button type="button" class="demo-button" data-op="use">Use values</button>
     </div>
     <div class="demo-stage"><div class="sort-bars"></div></div>
-    <p class="sort-meta"></p>
+    ${legend([['active', 'being compared or moved'], ['sorted', 'in its final place']])}
+    <p class="sort-meta" aria-live="polite"></p>
   `;
 
   const bars = root.querySelector('.sort-bars');
@@ -599,7 +614,7 @@ function mountSorting(root) {
   const load = () => {
     const algorithm = sortingAlgorithms[algorithmSelect.value];
     const frames = algorithm.frames(values);
-    meta.textContent = `${algorithm.label} · ${algorithm.big} · ${frames.length} recorded steps for ${values.length} values.`;
+    setStatus(meta, `${algorithm.label} · ${algorithm.big} · ${frames.length} recorded steps for ${values.length} values.`);
     player.load(frames, algorithm.code);
   };
 
@@ -623,7 +638,7 @@ function mountSorting(root) {
     if (op === 'use') {
       const list = readList(listInput);
       if (!list) {
-        meta.textContent = 'Type 1 to 20 whole numbers from 1 to 99, separated by spaces or commas.';
+        setStatus(meta, 'Type 1 to 20 whole numbers from 1 to 99, separated by spaces or commas.', { error: true });
         return;
       }
       values = list;
@@ -656,6 +671,7 @@ function mountGridTraversal(root) {
     </div>
     <p class="demo-hint">Click a cell to add or remove a wall. S is the start, G is the goal.</p>
     <div class="demo-stage"><div class="grid" style="grid-template-columns: repeat(${COLS}, 1fr)"></div></div>
+    ${legend([['current', 'visiting now'], ['frontier', 'waiting in the queue or stack'], ['visited', 'visited (number = order)'], ['path', 'path found'], ['wall', 'wall']])}
   `;
 
   const grid = root.querySelector('.grid');
@@ -733,7 +749,8 @@ function mountTwoPointers(root) {
       <button type="button" class="demo-button" data-op="use">Use list</button>
     </div>
     <div class="demo-stage"><div class="array-row tp-row"></div></div>
-    <p class="bs-compare tp-compare"></p>
+    ${legend([['mid', 'L and R, being added'], ['hit', 'the pair'], ['out', 'ruled out for good']])}
+    <p class="bs-compare tp-compare" aria-live="polite"></p>
   `;
 
   const row = root.querySelector('.tp-row');
@@ -758,7 +775,7 @@ function mountTwoPointers(root) {
     const frames = pairSumFrames(values, target);
     const steps = frames.at(-1).found ? frames.length : frames.length - 1;
     const checks = bruteForcePairChecks(values, target);
-    compare.textContent = `Two pointers: ${steps} step${steps === 1 ? '' : 's'}. Brute force would check ${checks} pair${checks === 1 ? '' : 's'}.`;
+    setStatus(compare, `Two pointers: ${steps} step${steps === 1 ? '' : 's'}. Brute force would check ${checks} pair${checks === 1 ? '' : 's'}.`);
     player.load(frames, pairSumCode);
   };
 
@@ -768,7 +785,7 @@ function mountTwoPointers(root) {
     if (op === 'use') {
       const list = readList(listInput, { min: -999, max: 999 });
       if (!list || list.length < 2) {
-        compare.textContent = 'Type 2 to 20 whole numbers between -999 and 999, separated by spaces or commas.';
+        setStatus(compare, 'Type 2 to 20 whole numbers between -999 and 999, separated by spaces or commas.', { error: true });
         return;
       }
       // Two pointers relies on sorted order, so sort first.
@@ -793,7 +810,8 @@ function mountSlidingWindow(root) {
       <button type="button" class="demo-button" data-op="use">Use list</button>
     </div>
     <div class="demo-stage"><div class="array-row sw-row"></div></div>
-    <p class="bs-compare sw-compare"></p>
+    ${legend([['moved', 'inside the window'], ['hit', 'just entered']])}
+    <p class="bs-compare sw-compare" aria-live="polite"></p>
   `;
 
   const row = root.querySelector('.sw-row');
@@ -819,10 +837,14 @@ function mountSlidingWindow(root) {
     const k = readInt(kInput) ?? 0;
     const frames = windowSumFrames(values, k);
     const slides = Math.max(0, values.length - k);
-    compare.textContent =
-      k >= 1 && k <= values.length
+    const validK = k >= 1 && k <= values.length;
+    setStatus(
+      compare,
+      validK
         ? `Sliding window: ${k} additions for the first window, then 2 per slide (${k + 2 * slides} in total). Recomputing every window would make ${bruteForceWindowAdds(values.length, k)}.`
-        : `Choose k between 1 and ${values.length}.`;
+        : `Choose k between 1 and ${values.length}.`,
+      { error: !validK, keptPrevious: false },
+    );
     player.load(frames, windowSumCode);
   };
 
@@ -832,7 +854,7 @@ function mountSlidingWindow(root) {
     if (op === 'use') {
       const list = readList(listInput, { min: -999, max: 999 });
       if (!list) {
-        compare.textContent = 'Type 1 to 20 whole numbers between -999 and 999, separated by spaces or commas.';
+        setStatus(compare, 'Type 1 to 20 whole numbers between -999 and 999, separated by spaces or commas.', { error: true });
         return;
       }
       values = list;

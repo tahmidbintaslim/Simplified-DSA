@@ -65,14 +65,14 @@ button:focus-visible,
   margin-bottom: 28px;
 }
 
-.sidebar-header h1 {
+.site-title {
   margin: 0 0 8px;
   color: #f5f0e6;
   font-size: 1.35rem;
   line-height: 1.2;
 }
 
-.sidebar-header p {
+.site-tagline {
   margin: 0;
   color: #b9ae9d;
   font-size: 0.94rem;
@@ -196,22 +196,52 @@ button:focus-visible,
   font-size: 1.45rem;
 }
 
-.lesson-content p,
-.lesson-content li {
+/*
+ * Only the lesson's own paragraphs and lists (direct children of the article)
+ * get reading styles. Demos, quizzes and callouts live inside the article too,
+ * and a broad ".lesson-content p" used to override their own sizes and margins.
+ */
+.lesson-content > p,
+.lesson-content > ul > li,
+.lesson-content > ol > li {
   font-size: 1.03rem;
   line-height: 1.68;
 }
 
-.lesson-content p {
+/* Reading lines stay near 65 characters; figures and demos keep the full width. */
+.lesson-content > p,
+.lesson-content > ul,
+.lesson-content > ol {
+  max-width: 66ch;
+}
+
+.lesson-content > p {
   margin: 0 0 18px;
 }
 
-.lesson-content ul {
+/* Tailwind's reset removes list markers; lessons need them back. */
+.lesson-content > ul,
+.lesson-goals ul {
+  list-style: disc;
+}
+
+.lesson-content > ol {
+  list-style: decimal;
+}
+
+.lesson-content > ul ::marker,
+.lesson-content > ol ::marker,
+.lesson-goals ::marker {
+  color: #d9b36a;
+}
+
+.lesson-content > ul {
   margin: 0 0 22px;
   padding-left: 1.15rem;
 }
 
-.lesson-content li + li {
+.lesson-content > ul > li + li,
+.lesson-content > ol > li + li {
   margin-top: 8px;
 }
 
@@ -502,7 +532,7 @@ button:focus-visible,
 
 .demo-empty {
   margin: 0;
-  color: #6f675a;
+  color: #8f8676;
 }
 
 .demo-columns {
@@ -859,13 +889,9 @@ button:focus-visible,
   font-size: 1.12rem;
 }
 
-.lesson-content ol {
+.lesson-content > ol {
   margin: 0 0 22px;
   padding-left: 1.4rem;
-}
-
-.lesson-content ol li + li {
-  margin-top: 8px;
 }
 
 /* Callouts: "> **Analogy:** ..." and friends. Each label has its own accent. */
@@ -1047,7 +1073,7 @@ button:focus-visible,
   content: counter(line);
   display: inline-block;
   width: 1.6em;
-  color: #6f675a;
+  color: #8f8676;
   font-size: 0.75rem;
 }
 
@@ -1209,4 +1235,212 @@ button:focus-visible,
 /* Cells with a pointer label are taller; keep every value box on one line. */
 .array-row {
   align-items: flex-start;
+}
+
+/* ---------- Usability fixes from the design critique ---------- */
+
+/* Keyboard users can jump past the lesson list straight to the lesson. */
+.skip-link {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 10;
+  border-radius: 8px;
+  background: #f1cd86;
+  padding: 10px 14px;
+  color: #11110f;
+  font-weight: 700;
+  transform: translateY(-160%);
+}
+
+.skip-link:focus {
+  transform: none;
+}
+
+.lesson-main:focus {
+  outline: none;
+}
+
+/* Text for screen readers only. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* The lesson list is a <details> drawer: always open on wide screens (the
+   summary is hidden), a "Lessons" bar on phones. */
+.nav-drawer > summary {
+  display: none;
+}
+
+.sidebar-footer a {
+  display: inline-block;
+  padding: 12px 0;
+}
+
+/* Touch targets of at least 44px. */
+.demo-button,
+.demo-input,
+.language-tab,
+.quiz-option {
+  min-height: 44px;
+}
+
+.demo-button[data-player="first"] {
+  min-width: 44px;
+}
+
+/* The speed slider uses the palette, not the browser's blue. */
+input[type="range"] {
+  accent-color: #d9b36a;
+}
+
+/* offsetLeft of a cell is measured from the stage, for centring the active cell. */
+.demo-stage {
+  position: relative;
+}
+
+/* Colour key under each demo picture. */
+.demo-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+  color: #bdb3a3;
+  font-size: 0.88rem;
+}
+
+.demo-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.swatch {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 1px solid #3a352b;
+  border-radius: 3px;
+  background: #1d1b16;
+}
+
+.swatch-hit { border-color: #f1cd86; background: #4a3a17; }
+.swatch-mid { border-color: #f1cd86; background: #33291a; }
+.swatch-out { opacity: 0.35; }
+.swatch-moved { border-color: #4f9c94; background: #18332f; }
+.swatch-active { border-color: #f1cd86; background: #f1cd86; }
+.swatch-sorted { border-color: #4f9c94; background: #4f9c94; }
+.swatch-current { border-color: #f1cd86; background: #f1cd86; }
+.swatch-frontier { border-color: #b8924a; background: #33291a; }
+.swatch-visited { border-color: #2a2721; background: #1f3a36; }
+.swatch-path { border-color: #4f9c94; background: #4f9c94; }
+.swatch-wall { border-color: #5a523f; background: #5a523f; }
+
+/* Input mistakes in a demo read as mistakes, not as a normal result. */
+.is-error {
+  color: #ec9a8f;
+}
+
+/* Quiz answers carry a written mark as well as a colour. */
+.quiz-option[data-mark]::after {
+  content: attr(data-mark);
+  display: inline-block;
+  margin-left: 10px;
+  border-radius: 999px;
+  padding: 1px 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  vertical-align: middle;
+}
+
+.quiz-option.is-right[data-mark]::after {
+  background: #4f9c94;
+  color: #0e1f1d;
+}
+
+.quiz-option.is-wrong[data-mark]::after {
+  background: #c4574a;
+  color: #fff4f2;
+}
+
+/* Callout and figure text, now that the broad paragraph rule no longer reaches it. */
+.callout p,
+.cells-figure figcaption {
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+@media (max-width: 760px) {
+  /* The lesson starts on the first screen: the course list folds into a bar. */
+  .lesson-sidebar {
+    padding: 14px 16px;
+  }
+
+  .sidebar-header {
+    margin-bottom: 10px;
+  }
+
+  .site-title {
+    margin: 0;
+    font-size: 1.1rem;
+  }
+
+  .site-tagline {
+    display: none;
+  }
+
+  .nav-drawer > summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 48px;
+    border: 1px solid #302d26;
+    border-radius: 8px;
+    background: #1d1b16;
+    padding: 10px 14px;
+    color: #f5f0e6;
+    font-weight: 700;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .nav-drawer > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .nav-drawer > summary::after {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-right: 2px solid #d9b36a;
+    border-bottom: 2px solid #d9b36a;
+    transform: rotate(45deg);
+  }
+
+  .nav-drawer[open] > summary::after {
+    transform: rotate(-135deg);
+  }
+
+  .nav-current {
+    min-width: 0;
+    overflow: hidden;
+    color: #bdb3a3;
+    font-size: 0.88rem;
+    font-weight: 400;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .nav-drawer[open] > nav {
+    margin-top: 12px;
+  }
+
 }
