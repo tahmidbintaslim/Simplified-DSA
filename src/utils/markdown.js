@@ -81,7 +81,6 @@ function renderQuiz(lines) {
     .join('');
   return `
     <div class="quiz">
-      <p class="quiz-label">Check yourself</p>
       <p class="quiz-question">${inlineMarkdown(question)}</p>
       <div class="quiz-options">${options}</div>
       <p class="quiz-feedback" aria-live="polite"></p>

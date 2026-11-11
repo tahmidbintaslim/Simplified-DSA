@@ -323,7 +323,14 @@ export class App {
     article = opening.test(article)
       ? article.replace(opening, (_, title, lead) => `${title}<p class="lead">${lead}${header}`)
       : header + article;
-    const panel = this.renderDemoPanel();
+    // The paragraph written just before a ```demo block explains how to use the
+    // demo, so it moves inside the panel, under its heading.
+    let intro;
+    article = article.replace(/<p>((?:(?!<p>)[\s\S])*?)<\/p>(?=<div data-demo-here><\/div>)/, (_, text) => {
+      intro = text;
+      return '';
+    });
+    const panel = this.renderDemoPanel(intro);
     const inline = article.includes(DEMO_MARKER);
 
     return `
@@ -425,15 +432,17 @@ export class App {
    * Lessons with a `demo` id get an interactive panel after the text.
    * The panel only holds an empty slot; attachDemo fills it.
    */
-  renderDemoPanel() {
+  renderDemoPanel(introHtml) {
     const demo = demos[this.activeLesson.demo];
     if (!demo) return '';
 
+    // `introHtml` is the lesson's own "how to use it" paragraph (already rendered
+    // and escaped by MarkdownRenderer); otherwise the demo's generic intro.
     return `
       <section class="demo-panel" aria-labelledby="demo-title">
         <div class="language-panel-header">
           <h2 id="demo-title">Try it: ${escapeHtml(demo.title)}</h2>
-          <p>${escapeHtml(demo.intro)}</p>
+          <p>${introHtml ?? escapeHtml(demo.intro)}</p>
         </div>
         <div data-demo-slot></div>
       </section>

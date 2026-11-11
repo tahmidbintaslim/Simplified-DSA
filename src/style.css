@@ -2035,3 +2035,117 @@ pre,
 .lesson-content .lesson-header {
   max-width: none;
 }
+
+/* ---------- Finish-review fixes ---------- */
+
+/* One state, one look. "Looking at" is a gold fill wherever it appears
+   (worked figures and demos alike); "found" is a done state, so it is teal. */
+.is-mid > .array-value,
+.is-hit > .array-value {
+  border-color: var(--look-line);
+  background: var(--look-fill);
+  color: var(--on-look);
+}
+
+.is-found > .array-value {
+  border-color: var(--done);
+  background: var(--done);
+  color: var(--on-done);
+}
+
+.swatch-mid,
+.swatch-hit {
+  border-color: var(--look-line);
+  background: var(--look-fill);
+}
+
+.swatch-found {
+  border-color: var(--done);
+  background: var(--done);
+}
+
+/* Callout labels are small tags in the callout's own tone, in sentence case. */
+.callout-label {
+  display: inline-block;
+  margin-bottom: 6px;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--tone) 16%, transparent);
+  padding: 2px 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* Demo toolbars wrap on purpose: inputs first, then "Your list" with its button. */
+.demo-list-row {
+  display: flex;
+  flex: 1 1 100%;
+  align-items: center;
+  gap: 8px;
+}
+
+.demo-list-row label {
+  flex: 1 1 auto;
+}
+
+.demo-list-row .demo-input {
+  flex: 1 1 auto;
+  width: auto;
+  min-width: 0;
+}
+
+.player-buttons {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 8px;
+}
+
+/* No empty arithmetic box before the first key is hashed. */
+.hash-math:empty {
+  display: none;
+}
+
+@media (max-width: 480px) {
+  /* Worked figures fit a phone: seven cells sit inside the card. */
+  .array-row {
+    gap: 4px;
+  }
+
+  .array-cell {
+    min-width: 38px;
+  }
+
+  .array-value {
+    padding: 8px 2px;
+    font-size: 0.92rem;
+  }
+
+  .cells-figure {
+    padding: 12px 10px 10px;
+  }
+
+  /* Speed gets its own row under the transport buttons. */
+  .demo-speed {
+    flex: 1 1 100%;
+  }
+}
+
+/* The list row shrinks to the phone: label and input may narrow, and the
+   button wraps under them only when even that is not enough. */
+.demo-list-row {
+  flex-wrap: wrap;
+}
+
+.demo-list-row label {
+  flex: 1 1 200px;
+  min-width: 0;
+}
+
+.demo-list-row .demo-input {
+  width: 100%;
+}
+
+.demo-list-row label {
+  white-space: nowrap;
+}
