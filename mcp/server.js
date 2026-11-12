@@ -20,15 +20,20 @@ import {
   bstInOrder,
   bstInsert,
   bstSearchPath,
+  bruteForcePairChecks,
+  bruteForceWindowAdds,
   gridTraversalFrames,
+  pairSumFrames,
   simpleHash,
   sortingAlgorithms,
+  windowSumFrames,
 } from '../src/demos/algorithms.js';
 
 // In the repo, lessons are in src/content; in the plugin bundle they sit beside the server.
 const here = dirname(fileURLToPath(import.meta.url));
 const contentDir = [join(here, 'content'), join(here, '..', 'src', 'content')].find(existsSync);
-const SECTIONS = ['data-structures', 'algorithms'];
+// Lesson folders under src/content, in course order. The plugin build copies the same list.
+export const SECTIONS = ['data-structures', 'algorithms', 'patterns'];
 const MAX_FRAMES = 300;
 const SITE = 'https://dsa.tahmid.space';
 
@@ -220,6 +225,42 @@ export function createServer() {
         lines.push(`Search ${search}: ${path.join(' → ')} → ${found ? 'found' : 'not found'} (${path.length} comparisons)`);
       }
       return text(lines.join('\n'));
+    },
+  );
+
+  server.registerTool(
+    'trace_two_pointers',
+    {
+      title: 'Trace two pointers (pair sum)',
+      description:
+        'Sort the values, then find two that add up to target by moving left and right pointers inward. Returns every step and the brute-force pair count for comparison.',
+      inputSchema: { values, target: z.number().int() },
+      annotations: { readOnlyHint: true },
+    },
+    ({ values: input, target }) => {
+      const sorted = [...input].sort((a, b) => a - b);
+      const frames = pairSumFrames(sorted, target);
+      const state = (f) => (f.left < f.right ? `  (left=${f.left}, right=${f.right})` : '');
+      return text(
+        `Sorted list: [${sorted.join(', ')}]\n${numbered(frames, state)}\n\nBrute force would check ${bruteForcePairChecks(sorted, target)} pairs.`,
+      );
+    },
+  );
+
+  server.registerTool(
+    'trace_sliding_window',
+    {
+      title: 'Trace a sliding window (max sum of k in a row)',
+      description:
+        'Slide a window of size k across the values, adding the value that enters and subtracting the one that leaves. Returns every step, the best window, and the brute-force addition count.',
+      inputSchema: { values, k: z.number().int().min(1).max(30) },
+      annotations: { readOnlyHint: true },
+    },
+    ({ values: input, k }) => {
+      const frames = windowSumFrames(input, k);
+      const state = (f) => (f.end >= f.start ? `  window [${input.slice(f.start, f.end + 1).join(', ')}]` : '');
+      const brute = k <= input.length ? `\n\nRecomputing every window would make ${bruteForceWindowAdds(input.length, k)} additions.` : '';
+      return text(`${numbered(frames, state)}${brute}`);
     },
   );
 

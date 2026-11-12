@@ -68,8 +68,8 @@ test('cells blocks draw values, pointers and states, escaped', () => {
 test('quiz blocks mark the right option and keep the explanation hidden', () => {
   const html = render('```quiz\nQ: Pick <one>\n- wrong\n* right\nWhy: Because.\n```');
   assert.match(html, /Pick &lt;one&gt;/);
-  assert.match(html, /data-quiz-option="false">wrong/);
-  assert.match(html, /data-quiz-option="true">right/);
+  assert.match(html, /data-quiz-option="false"><span class="quiz-letter" aria-hidden="true">A<\/span><span>wrong/);
+  assert.match(html, /data-quiz-option="true"><span class="quiz-letter" aria-hidden="true">B<\/span><span>right/);
   assert.match(html, /<p class="quiz-why" hidden>Because\.<\/p>/);
 });
 

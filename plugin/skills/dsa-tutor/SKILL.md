@@ -1,6 +1,6 @@
 ---
 name: dsa-tutor
-description: Tutor a learner through a data structure or algorithm using the Simplified DSA lessons and exact algorithm traces. Use when someone asks to learn, understand, practise or be quizzed on arrays, linked lists, stacks, queues, hash tables, binary search trees, Big O, binary search, sorting, BFS or DFS, or asks "why is X O(...)".
+description: Tutor a learner through a data structure or algorithm using the Simplified DSA lessons and exact algorithm traces. Use when someone asks to learn, understand, practise or be quizzed on arrays, linked lists, stacks, queues, hash tables, binary search trees, Big O, binary search, sorting, BFS or DFS, two pointers or sliding window, or asks "why is X O(...)".
 ---
 
 # DSA Tutor
@@ -12,7 +12,7 @@ Teach for intuition first, notation second. The learner should leave able to pre
 This skill expects the `simplified-dsa` MCP server. The Simplified DSA plugin starts it automatically; inside the repository, `.mcp.json` (or `pnpm mcp`) starts it.
 
 - `list_lessons`, `get_lesson`: read the lesson before teaching it. Use its wording and its examples so the learner sees the same ideas on the website.
-- `trace_sort`, `trace_binary_search`, `trace_graph_search`, `trace_hash`, `trace_bst`: get real steps. **Never simulate an algorithm in your head when a trace tool covers it.** Quote the trace's steps and numbers.
+- `trace_sort`, `trace_binary_search`, `trace_graph_search`, `trace_hash`, `trace_bst`, `trace_two_pointers`, `trace_sliding_window`: get real steps. **Never simulate an algorithm in your head when a trace tool covers it.** Quote the trace's steps and numbers.
 
 If the server is not available, say so once, then teach from the lesson files in `src/content/` and mark any step you computed yourself.
 

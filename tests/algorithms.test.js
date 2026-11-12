@@ -2,6 +2,10 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   binarySearchCode,
+  bruteForcePairChecks,
+  bruteForceWindowAdds,
+  pairSumCode,
+  pairSumFrames,
   binarySearchFrames,
   bstInOrder,
   bstInsert,
@@ -11,6 +15,8 @@ import {
   simpleHash,
   sortingAlgorithms,
   traversalCode,
+  windowSumCode,
+  windowSumFrames,
 } from '../src/demos/algorithms.js';
 
 const inputs = [[], [1], [5, 1, 4, 2, 8], [3, 3, 1, 2, 1], [9, 8, 7, 6, 5, 4, 3, 2, 1], [1, 2, 3, 4]];
@@ -87,4 +93,39 @@ test('every step points at a real pseudocode line', () => {
     const frames = gridTraversalFrames({ rows: 3, cols: 3, walls: new Set(), start: [0, 0], goal: [2, 2], mode });
     assert.ok(inRange(frames, traversalCode(mode)), mode);
   }
+});
+
+test('two pointers finds the pair a brute-force search finds, in at most n - 1 steps', () => {
+  const sorted = [1, 2, 4, 7, 11, 15];
+  for (let target = 0; target <= 30; target++) {
+    const last = pairSumFrames(sorted, target).at(-1);
+    const bruteHasPair = sorted.some((a, i) => sorted.slice(i + 1).some((b) => a + b === target));
+    assert.equal(Boolean(last.found), bruteHasPair, `target ${target}`);
+    if (last.found) assert.equal(sorted[last.found[0]] + sorted[last.found[1]], target);
+    assert.ok(pairSumFrames(sorted, target).length <= sorted.length, `target ${target} step count`);
+  }
+  assert.equal(bruteForcePairChecks([1, 2, 4, 7, 11, 15], 26), 15);
+  assert.equal(pairSumFrames([], 3).at(-1).found, null);
+});
+
+test('sliding window matches recomputing every window from scratch', () => {
+  const values = [2, 1, 5, 1, 3, 2, 9, 4];
+  for (let k = 1; k <= values.length; k++) {
+    let expected = -Infinity;
+    for (let s = 0; s + k <= values.length; s++) {
+      expected = Math.max(expected, values.slice(s, s + k).reduce((a, b) => a + b, 0));
+    }
+    const last = windowSumFrames(values, k).at(-1);
+    assert.equal(last.best, expected, `k = ${k}`);
+    assert.equal(values.slice(last.bestStart, last.bestStart + k).reduce((a, b) => a + b, 0), expected);
+  }
+  assert.equal(windowSumFrames(values, 0).at(-1).best, null);
+  assert.equal(bruteForceWindowAdds(8, 3), 18);
+});
+
+test('pattern frames point at real pseudocode lines', () => {
+  const inRange = (frames, code) => frames.every((f) => f.line === -1 || (f.line >= 0 && f.line < code.length));
+  assert.ok(inRange(pairSumFrames([1, 3, 5, 9], 8), pairSumCode));
+  assert.ok(inRange(pairSumFrames([1, 3, 5, 9], 100), pairSumCode));
+  assert.ok(inRange(windowSumFrames([4, 2, 7, 1, 8], 2), windowSumCode));
 });

@@ -1,7 +1,11 @@
 import { curriculum } from '../content/curriculum.js';
 import { demos } from '../demos/index.js';
 import { DEMO_MARKER, escapeHtml, MarkdownRenderer } from '../utils/markdown.js';
+import { icon } from '../utils/icons.js';
 import { loadCompleted, saveCompleted } from './progress.js';
+
+// Matches the 760px layout breakpoint in style.css.
+const WIDE_SCREEN = '(min-width: 761px)';
 import { lessonPath, resolvePath } from './router.js';
 
 /**
@@ -52,19 +56,28 @@ export class App {
     const hadFocus = focused !== this.root && this.root.contains(focused);
     const restoreId = focusId ?? (hadFocus ? focused.id : '');
 
+    // On wide screens the lesson list is always open. On phones it folds into a
+    // "Lessons" bar so the lesson itself starts on the first screen.
+    const wide = window.matchMedia(WIDE_SCREEN).matches;
+    const current = this.notFound ? 'Choose a lesson' : `${this.activeSection.title} · ${this.activeLesson.title}`;
+
     this.root.innerHTML = `
+      <a class="skip-link" href="#main">Skip to the lesson</a>
       <div class="app-shell">
         <aside class="lesson-sidebar" aria-label="Course navigation">
           <div class="sidebar-header">
-            <h1>Simplified DSA</h1>
-            <p>Learn the shape of data first, then the steps that act on it.</p>
+            <p class="site-title">Simplified DSA</p>
+            <p class="site-tagline">Learn the shape of data first, then the steps that act on it.</p>
           </div>
-          <nav aria-label="Lessons">
-            ${this.renderSectionMenu()}
-          </nav>
-          <p class="sidebar-footer"><a href="/privacy.html">Privacy</a></p>
+          <details class="nav-drawer" ${wide ? 'open' : ''}>
+            <summary><span>Lessons</span><span class="nav-current">${escapeHtml(current)}</span></summary>
+            <nav aria-label="Lessons">
+              ${this.renderSectionMenu()}
+            </nav>
+            <p class="sidebar-footer"><a href="/privacy.html">Privacy</a></p>
+          </details>
         </aside>
-        <main class="lesson-main">
+        <main id="main" class="lesson-main" tabindex="-1">
           ${this.notFound ? this.renderNotFound() : this.renderLesson()}
         </main>
       </div>
@@ -144,6 +157,9 @@ export class App {
       this.selectLanguage(tabs[nextIndex].dataset.languageId, { moveFocus: true });
     });
 
+    // Crossing the phone/desktop breakpoint opens or folds the lesson list.
+    window.matchMedia(WIDE_SCREEN).addEventListener('change', () => this.render());
+
     // Back and forward buttons change the URL; show the lesson it names.
     window.addEventListener('popstate', () => {
       this.applyRoute(window.location.pathname);
@@ -187,6 +203,11 @@ export class App {
     this.render();
     // A new lesson starts at its title, even when opened from the footer's Next link.
     window.scrollTo(0, 0);
+    // On phones the clicked link is now inside the folded drawer, so focus would
+    // be lost; send it to the lesson instead.
+    if (!this.root.contains(document.activeElement) || !document.activeElement.offsetParent) {
+      document.getElementById('main')?.focus({ preventScroll: true });
+    }
   }
 
   /**
@@ -254,8 +275,9 @@ export class App {
                 data-lesson-id="${lesson.id}"
                 ${isActive ? 'aria-current="page"' : ''}
               >
-                <strong>${isDone ? '<span class="lesson-done" aria-label="Completed">✓</span> ' : ''}${escapeHtml(lesson.title)}</strong>
-                <span>${escapeHtml(lesson.summary)}</span>
+                <span class="lesson-status ${isDone ? 'is-done' : ''}">${isDone ? `${icon('check')}<span class="sr-only">Completed: </span>` : ''}</span>
+                <strong>${escapeHtml(lesson.title)}</strong>
+                <span class="lesson-summary">${escapeHtml(lesson.summary)}</span>
               </a>
             `;
           })
@@ -289,16 +311,29 @@ export class App {
   }
 
   /**
-   * A lesson can place its demo with a ```demo block, so learners try the idea
-   * right after reading it. Without one, the demo follows the text.
+   * A lesson opens on its title and the one-paragraph promise under it; where
+   * it sits, how long it takes and the goals follow, so the page never opens on
+   * admin text. A lesson can place its demo with a ```demo block, so learners
+   * try the idea right after reading it. Without one, the demo follows the text.
    */
   renderLesson() {
-    const article = this.markdownRenderer.render(this.activeLesson.markdown);
-    const panel = this.renderDemoPanel();
+    const header = this.renderLessonHeader();
+    let article = this.markdownRenderer.render(this.activeLesson.markdown);
+    const opening = /(<h1>[\s\S]*?<\/h1>)<p>([\s\S]*?<\/p>)/;
+    article = opening.test(article)
+      ? article.replace(opening, (_, title, lead) => `${title}<p class="lead">${lead}${header}`)
+      : header + article;
+    // The paragraph written just before a ```demo block explains how to use the
+    // demo, so it moves inside the panel, under its heading.
+    let intro;
+    article = article.replace(/<p>((?:(?!<p>)[\s\S])*?)<\/p>(?=<div data-demo-here><\/div>)/, (_, text) => {
+      intro = text;
+      return '';
+    });
+    const panel = this.renderDemoPanel(intro);
     const inline = article.includes(DEMO_MARKER);
 
     return `
-      ${this.renderLessonHeader()}
       <article class="lesson-content">
         ${inline ? article.replace(DEMO_MARKER, () => panel) : article}
       </article>
@@ -323,11 +358,11 @@ export class App {
     return `
       <footer class="lesson-footer">
         <button id="complete-button" type="button" class="demo-button ${done ? 'is-done' : 'is-primary'}" data-complete aria-pressed="${done}">
-          ${done ? '✓ Completed' : 'Mark as complete'}
+          ${done ? `${icon('check')} Completed` : 'Mark as complete'}
         </button>
         <nav class="lesson-steps" aria-label="Previous and next lesson">
-          ${link(all[index - 1], '← Previous')}
-          ${link(all[index + 1], 'Next →')}
+          ${link(all[index - 1], `${icon('arrowLeft')} Previous`)}
+          ${link(all[index + 1], `Next ${icon('arrowRight')}`)}
         </nav>
       </footer>
     `;
@@ -357,9 +392,15 @@ export class App {
     quiz.dataset.misses = misses;
     option.classList.add(correct ? 'is-right' : 'is-wrong');
     option.setAttribute('aria-pressed', 'true');
+    // A written mark as well as the colour, so the state never depends on colour alone.
+    option.dataset.mark = correct ? 'Correct' : 'Not this one';
 
     const reveal = correct || misses >= 2;
-    if (reveal) quiz.querySelector('[data-quiz-option="true"]').classList.add('is-right');
+    if (reveal) {
+      const right = quiz.querySelector('[data-quiz-option="true"]');
+      right.classList.add('is-right');
+      right.dataset.mark = 'Correct';
+    }
     const why = quiz.querySelector('.quiz-why').textContent;
     quiz.querySelector('.quiz-feedback').textContent = correct
       ? `Correct. ${why}`
@@ -391,15 +432,17 @@ export class App {
    * Lessons with a `demo` id get an interactive panel after the text.
    * The panel only holds an empty slot; attachDemo fills it.
    */
-  renderDemoPanel() {
+  renderDemoPanel(introHtml) {
     const demo = demos[this.activeLesson.demo];
     if (!demo) return '';
 
+    // `introHtml` is the lesson's own "how to use it" paragraph (already rendered
+    // and escaped by MarkdownRenderer); otherwise the demo's generic intro.
     return `
       <section class="demo-panel" aria-labelledby="demo-title">
         <div class="language-panel-header">
           <h2 id="demo-title">Try it: ${escapeHtml(demo.title)}</h2>
-          <p>${escapeHtml(demo.intro)}</p>
+          <p>${introHtml ?? escapeHtml(demo.intro)}</p>
         </div>
         <div data-demo-slot></div>
       </section>

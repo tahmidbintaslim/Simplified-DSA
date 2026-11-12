@@ -36,7 +36,7 @@ note: Check 2: lo=4, hi=6, so mid=5. The value 42 is larger than 30, so drop ind
 ```cells
 values: 3 9 14 21 30 42 57
 pointers: lo=4 hi=4 mid=4
-highlight: 4
+done: 4
 dim: 0 1 2 3 5 6
 note: Check 3: lo=4, hi=4, so mid=4. The value is 30. Found it in 3 checks out of 7 values.
 ```
@@ -49,7 +49,7 @@ Q: Same list. You search for 10, which is not in it. After checking 21 (go left)
 Why: With lo=2 and hi=2, mid is 2 (value 14). 14 > 10, so hi = mid - 1 = 1. Now lo (2) is greater than hi (1), so nothing is left to check.
 ```
 
-Step through a search and watch the code on the left and the variables on the right change together. Try a target that is missing, or type your own list.
+Step through a search and watch the code and the variables change together. Try a target that is missing, or type your own list.
 
 ```demo
 ```

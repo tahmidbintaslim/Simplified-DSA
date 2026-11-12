@@ -127,3 +127,89 @@ test('the site still works when the browser blocks site data', async () => {
   assert.deepEqual(errors, []);
   await page.close();
 });
+
+test('pattern demos compare against brute force and trace their pseudocode', async () => {
+  const { page } = await open('/patterns/two-pointers');
+  assert.match(await page.textContent('.tp-compare'), /Two pointers: 7 steps\. Brute force would check 23 pairs\./);
+  await page.click('[data-player="next"]');
+  assert.match(await page.textContent('.trace-lines li.is-current'), /right = right - 1/);
+  await page.close();
+
+  const window = await open('/patterns/sliding-window');
+  assert.match(await window.page.textContent('.sw-compare'), /\(13 in total\)\. Recomputing every window would make 18\./);
+  await window.page.click('[data-player="next"]');
+  assert.match(await window.page.textContent('.demo-caption'), /add 1, drop 2\. Sum = 7/);
+  await window.page.close();
+});
+
+test('critique fixes: list markers, one h1, skip link, written quiz marks', async () => {
+  const { page } = await open('/data-structures/arrays-and-strings');
+  const markers = await page.evaluate(() => ({
+    ul: getComputedStyle(document.querySelector('.lesson-content > ul')).listStyleType,
+    goals: getComputedStyle(document.querySelector('.lesson-goals ul')).listStyleType,
+    h1s: document.querySelectorAll('h1').length,
+  }));
+  assert.deepEqual(markers, { ul: 'disc', goals: 'disc', h1s: 1 });
+
+  await page.keyboard.press('Tab');
+  assert.equal(await page.evaluate(() => document.activeElement.className), 'skip-link');
+  await page.keyboard.press('Enter');
+  assert.equal(await page.evaluate(() => document.activeElement.id), 'main');
+
+  const quiz = page.locator('.quiz').first();
+  await quiz.locator('[data-quiz-option="true"]').click();
+  assert.equal(await quiz.locator('[data-quiz-option="true"]').getAttribute('data-mark'), 'Correct');
+  await page.close();
+});
+
+test('on a phone the lesson starts on the first screen and the list folds into a drawer', async () => {
+  const { page } = await open('/algorithms/binary-search', { width: 390 });
+  const titleTop = await page.evaluate(() => document.querySelector('main h1').getBoundingClientRect().top);
+  assert.ok(titleTop < 844, `lesson title starts at ${titleTop}px`);
+  assert.equal(await page.isVisible('#lesson-link-algorithms-binary-search'), false);
+  await page.click('.nav-drawer > summary');
+  assert.equal(await page.isVisible('#lesson-link-algorithms-binary-search'), true);
+  await page.click('#lesson-link-algorithms-sorting');
+  assert.equal(new URL(page.url()).pathname, '/algorithms/sorting');
+  assert.equal(await page.isVisible('#lesson-link-algorithms-sorting'), false);
+  await page.close();
+});
+
+test('the demo keeps the cell its caption talks about in view, and bad input reads as an error', async () => {
+  const { page } = await open('/algorithms/binary-search', { width: 390 });
+  await page.fill('[data-field="list"]', '1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16');
+  await page.fill('[data-field="target"]', '16');
+  await page.click('[data-op="use"]');
+  for (let i = 0; i < 3; i++) {
+    const visible = await page.evaluate(() => {
+      const stage = document.querySelector('.demo-stage');
+      const cell = stage.querySelector('.array-cell.is-found, .array-cell.is-mid, .array-cell.is-hit');
+      const a = stage.getBoundingClientRect();
+      const b = cell.getBoundingClientRect();
+      return b.left >= a.left && b.right <= a.right;
+    });
+    assert.ok(visible, `active cell visible at step ${i + 1}`);
+    await page.click('[data-player="next"]');
+  }
+  await page.fill('[data-field="list"]', 'banana');
+  await page.click('[data-op="use"]');
+  assert.equal(await page.getAttribute('.bs-compare', 'class'), 'bs-compare is-error');
+  await page.close();
+});
+
+test('design: the first demo frame centres its active cell on a phone, and the demo intro sits inside the panel', async () => {
+  const { page } = await open('/algorithms/binary-search', { width: 390 });
+  await page.waitForTimeout(100); // one animation frame after mount
+  const visible = await page.evaluate(() => {
+    const stage = document.querySelector('.demo-stage');
+    const cell = stage.querySelector('.array-cell.is-mid');
+    const a = stage.getBoundingClientRect();
+    const b = cell.getBoundingClientRect();
+    return b.left >= a.left && b.right <= a.right;
+  });
+  assert.ok(visible, 'first-frame mid cell is visible');
+  const intro = await page.textContent('.demo-panel .language-panel-header p');
+  assert.match(intro, /watch the code and the variables change together/);
+  assert.equal(await page.locator('.quiz-label').count(), 0);
+  await page.close();
+});

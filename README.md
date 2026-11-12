@@ -17,7 +17,7 @@ Beginner lessons on data structures and algorithms, with one array example compa
 
 Beginner lessons on data structures and algorithms, written in Markdown, with one array example compared across 10 programming languages. Built with Vite and plain JavaScript.
 
-**Live demo:** [dsa.tahmid.space](https://dsa.tahmid.space). It is an early learning project with 9 lessons, each with an interactive demo.
+**Live demo:** [dsa.tahmid.space](https://dsa.tahmid.space). It is an early learning project with 11 lessons, each with an interactive demo.
 
 ![The Arrays and Strings lesson on a desktop screen, with the lesson list in a sidebar on the left](docs/images/arrays-lesson.png)
 
@@ -57,7 +57,7 @@ pnpm test:e2e   # browser tests: builds, then drives the site in Chromium
 
 ## Features
 
-- **9 lessons:** Arrays and Strings, Linked Lists, Stacks and Queues, Hash Tables and Binary Search Trees (Data Structures); Big O, Binary Search, Sorting and Graph Traversal (Algorithms).
+- **11 lessons:** Arrays and Strings, Linked Lists, Stacks and Queues, Hash Tables and Binary Search Trees (Data Structures); Big O, Binary Search, Sorting and Graph Traversal (Algorithms); Two Pointers and Sliding Window (Interview Patterns).
 - **Lessons built for complete beginners:** each one opens with an everyday analogy, traces a small example step by step with drawn arrays and pointer labels, asks quick quizzes with instant feedback, and ends with when-to-use signals, a cost table and common mistakes. A header lists the level, the time and what you will be able to do; you can mark lessons complete (stored only in your browser) and move to the previous or next one.
 - **An interactive demo on every lesson** (`src/demos/`), placed right after the idea it shows: shift values in an array, walk a linked list, push and pop, hash keys into buckets, build and search a tree, compare growth rates, and step through binary search, four sorting algorithms and BFS versus DFS on a grid you can draw walls on. Algorithm demos have Back, Play, Step, a speed control and arrow-key stepping, a caption for every step, the pseudocode with the running line highlighted, a live variables panel, and your own input.
 - **Language comparison tabs** on the Arrays lesson: the same array in JavaScript, Python, C, C++, Java, Go, Rust, C#, Kotlin and Swift. Each tab has a runtime note, a memory note and a link to the source checked. The tabs follow the ARIA tabs pattern, so arrow keys, Home and End move between them.
@@ -234,12 +234,13 @@ vercel.json                Vercel build settings and the SPA rewrite
 
 ## Status and roadmap
 
-This is an early learning project. The shell, 9 lessons with interactive demos, the language tabs and lesson URLs work. Everything else below is planned, not built.
+This is an early learning project. The shell, 11 lessons with interactive demos, the language tabs and lesson URLs work. Everything else below is planned, not built.
 
 Next, from the [Project Plan](./PLAN.md) and [`CURRICULUM.md`](./src/content/CURRICULUM.md):
 
 - More Data Structures lessons: Heaps, Tries, Graph representations.
-- More Algorithms lessons: Recursion, Quicksort, Two Pointers, Sliding Window, Dijkstra.
+- More Algorithms lessons: Recursion, Quicksort, Dijkstra.
+- More Interview Patterns: Fast and Slow Pointers, Prefix Sums, Backtracking, Dynamic Programming.
 - Quizzes and progress tracking. See [Strategy](./docs/STRATEGY.md) for the product plan.
 - The [practice companion browser extension](./docs/LEETCODE_COMPANION.md).
 - A browser code editor, after safe execution and language support are defined.
