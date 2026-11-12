@@ -75,13 +75,12 @@ function renderQuiz(lines) {
   const options = lines
     .filter((line) => /^[-*] /.test(line))
     .map(
-      (line) =>
-        `<button type="button" class="quiz-option" data-quiz-option="${line.startsWith('*')}">${inlineMarkdown(line.slice(2))}</button>`,
+      (line, i) =>
+        `<button type="button" class="quiz-option" data-quiz-option="${line.startsWith('*')}"><span class="quiz-letter" aria-hidden="true">${'ABCDEFGH'[i]}</span><span>${inlineMarkdown(line.slice(2))}</span></button>`,
     )
     .join('');
   return `
     <div class="quiz">
-      <p class="quiz-label">Check yourself</p>
       <p class="quiz-question">${inlineMarkdown(question)}</p>
       <div class="quiz-options">${options}</div>
       <p class="quiz-feedback" aria-live="polite"></p>

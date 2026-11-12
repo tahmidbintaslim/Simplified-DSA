@@ -183,7 +183,7 @@ test('the demo keeps the cell its caption talks about in view, and bad input rea
   for (let i = 0; i < 3; i++) {
     const visible = await page.evaluate(() => {
       const stage = document.querySelector('.demo-stage');
-      const cell = stage.querySelector('.array-cell.is-mid, .array-cell.is-hit');
+      const cell = stage.querySelector('.array-cell.is-found, .array-cell.is-mid, .array-cell.is-hit');
       const a = stage.getBoundingClientRect();
       const b = cell.getBoundingClientRect();
       return b.left >= a.left && b.right <= a.right;
@@ -194,5 +194,22 @@ test('the demo keeps the cell its caption talks about in view, and bad input rea
   await page.fill('[data-field="list"]', 'banana');
   await page.click('[data-op="use"]');
   assert.equal(await page.getAttribute('.bs-compare', 'class'), 'bs-compare is-error');
+  await page.close();
+});
+
+test('design: the first demo frame centres its active cell on a phone, and the demo intro sits inside the panel', async () => {
+  const { page } = await open('/algorithms/binary-search', { width: 390 });
+  await page.waitForTimeout(100); // one animation frame after mount
+  const visible = await page.evaluate(() => {
+    const stage = document.querySelector('.demo-stage');
+    const cell = stage.querySelector('.array-cell.is-mid');
+    const a = stage.getBoundingClientRect();
+    const b = cell.getBoundingClientRect();
+    return b.left >= a.left && b.right <= a.right;
+  });
+  assert.ok(visible, 'first-frame mid cell is visible');
+  const intro = await page.textContent('.demo-panel .language-panel-header p');
+  assert.match(intro, /watch the code and the variables change together/);
+  assert.equal(await page.locator('.quiz-label').count(), 0);
   await page.close();
 });

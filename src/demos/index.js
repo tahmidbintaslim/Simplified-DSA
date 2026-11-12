@@ -510,11 +510,13 @@ function mountBinarySearch(root) {
       <label>Target <input class="demo-input" type="number" value="0" data-field="target" /></label>
       <button type="button" class="demo-button" data-op="search">Search</button>
       <button type="button" class="demo-button" data-op="shuffle">New list</button>
-      <label>Your list <input class="demo-input demo-input-wide" type="text" placeholder="e.g. 4 8 15 16 23 42" data-field="list" /></label>
-      <button type="button" class="demo-button" data-op="use">Use list</button>
+      <div class="demo-list-row">
+  <label>Your list <input class="demo-input demo-input-wide" type="text" placeholder="e.g. 4 8 15 16 23 42" data-field="list" /></label>
+  <button type="button" class="demo-button" data-op="use">Use list</button>
+      </div>
     </div>
     <div class="demo-stage"><div class="array-row bs-row"></div></div>
-    ${legend([['mid', 'checking (mid)'], ['hit', 'found'], ['out', 'ruled out']])}
+    ${legend([['mid', 'checking (mid)'], ['found', 'found'], ['out', 'ruled out']])}
     <p class="bs-compare" aria-live="polite"></p>
   `;
 
@@ -527,7 +529,7 @@ function mountBinarySearch(root) {
   const player = createPlayer(root, ({ lo, hi, mid, found }) => {
     row.innerHTML = values
       .map((value, i) => {
-        const state = i === found ? 'is-hit' : i === mid ? 'is-mid' : i < lo || i > hi ? 'is-out' : '';
+        const state = i === found ? 'is-found' : i === mid ? 'is-mid' : i < lo || i > hi ? 'is-out' : '';
         const tags = [i === lo && 'lo', i === mid && 'mid', i === hi && 'hi'].filter(Boolean).join(' ');
         const pointer = tags ? `<span class="cell-pointer">${tags}</span>` : '';
         return `<div class="array-cell ${state}"><span class="array-value">${value}</span><span class="array-index">${i}</span>${pointer}</div>`;
@@ -588,8 +590,10 @@ function mountSorting(root) {
       <button type="button" class="demo-button" data-op="shuffle">Shuffle</button>
       <button type="button" class="demo-button" data-op="nearly">Nearly sorted</button>
       <button type="button" class="demo-button" data-op="reversed">Reversed</button>
-      <label>Your values <input class="demo-input demo-input-wide" type="text" placeholder="e.g. 5 2 9 1" data-field="list" /></label>
-      <button type="button" class="demo-button" data-op="use">Use values</button>
+      <div class="demo-list-row">
+  <label>Your values <input class="demo-input demo-input-wide" type="text" placeholder="e.g. 5 2 9 1" data-field="list" /></label>
+  <button type="button" class="demo-button" data-op="use">Use values</button>
+      </div>
     </div>
     <div class="demo-stage"><div class="sort-bars"></div></div>
     ${legend([['active', 'being compared or moved'], ['sorted', 'in its final place']])}
@@ -745,11 +749,13 @@ function mountTwoPointers(root) {
     <div class="demo-controls">
       <label>Target sum <input class="demo-input" type="number" value="19" data-field="target" /></label>
       <button type="button" class="demo-button" data-op="run">Find pair</button>
-      <label>Your sorted list <input class="demo-input demo-input-wide" type="text" placeholder="e.g. 2 5 9 12 20" data-field="list" /></label>
-      <button type="button" class="demo-button" data-op="use">Use list</button>
+      <div class="demo-list-row">
+  <label>Your sorted list <input class="demo-input demo-input-wide" type="text" placeholder="e.g. 2 5 9 12 20" data-field="list" /></label>
+  <button type="button" class="demo-button" data-op="use">Use list</button>
+      </div>
     </div>
     <div class="demo-stage"><div class="array-row tp-row"></div></div>
-    ${legend([['mid', 'L and R, being added'], ['hit', 'the pair'], ['out', 'ruled out for good']])}
+    ${legend([['mid', 'L and R, being added'], ['found', 'the pair'], ['out', 'ruled out for good']])}
     <p class="bs-compare tp-compare" aria-live="polite"></p>
   `;
 
@@ -762,7 +768,7 @@ function mountTwoPointers(root) {
   const player = createPlayer(root, ({ left, right, found }) => {
     row.innerHTML = values
       .map((value, i) => {
-        const state = found?.includes(i) ? 'is-hit' : i === left || i === right ? 'is-mid' : i < left || i > right ? 'is-out' : '';
+        const state = found?.includes(i) ? 'is-found' : i === left || i === right ? 'is-mid' : i < left || i > right ? 'is-out' : '';
         const tags = [i === left && 'L', i === right && 'R'].filter(Boolean).join(' ');
         const pointer = tags ? `<span class="cell-pointer">${tags}</span>` : '';
         return `<div class="array-cell ${state}"><span class="array-value">${value}</span><span class="array-index">${i}</span>${pointer}</div>`;
@@ -806,8 +812,10 @@ function mountSlidingWindow(root) {
     <div class="demo-controls">
       <label>Window size k <input class="demo-input" type="number" value="3" min="1" max="20" data-field="k" /></label>
       <button type="button" class="demo-button" data-op="run">Slide</button>
-      <label>Your list <input class="demo-input demo-input-wide" type="text" placeholder="e.g. 4 2 7 1 8 3" data-field="list" /></label>
-      <button type="button" class="demo-button" data-op="use">Use list</button>
+      <div class="demo-list-row">
+  <label>Your list <input class="demo-input demo-input-wide" type="text" placeholder="e.g. 4 2 7 1 8 3" data-field="list" /></label>
+  <button type="button" class="demo-button" data-op="use">Use list</button>
+      </div>
     </div>
     <div class="demo-stage"><div class="array-row sw-row"></div></div>
     ${legend([['moved', 'inside the window'], ['hit', 'just entered']])}

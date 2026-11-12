@@ -7,21 +7,25 @@
     <link rel="icon" type="image/png" href="/icon.png" />
     <title>Privacy | Simplified DSA</title>
     <style>
-      :root { color-scheme: dark; }
+      /* Same paper/night palette as the lessons (src/style.css tokens). */
+      :root { color-scheme: light dark; --page: #f6f1e7; --ink: #2c261f; --head: #1d1813; --link: #8a5600; --look: #8a5e04; --muted: #645a4a; }
+      @media (prefers-color-scheme: dark) {
+        :root { --page: #11110f; --ink: #ddd5c6; --head: #f5f0e6; --link: #d9b36a; --look: #f1cd86; --muted: #a99f8d; }
+      }
       body {
         margin: 0;
-        background: #11110f;
-        color: #ddd5c6;
-        font: 1.03rem/1.68 "Aptos", "Avenir Next", "Gill Sans", "Helvetica Neue", sans-serif;
+        background: var(--page);
+        color: var(--ink);
+        font: 1.03rem/1.68 Georgia, "Times New Roman", serif;
       }
       main { max-width: 72ch; margin: 0 auto; padding: 48px 16px 64px; }
-      h1, h2 { color: #f5f0e6; line-height: 1.15; }
+      h1, h2 { color: var(--head); line-height: 1.15; }
       h1 { font-size: clamp(2rem, 5vw, 2.8rem); margin: 0 0 8px; }
       h2 { font-size: 1.3rem; margin: 34px 0 10px; }
-      a { color: #d9b36a; text-underline-offset: 3px; }
-      a:focus-visible { outline: 2px solid #f1cd86; outline-offset: 2px; }
-      code { color: #f1cd86; }
-      .updated { color: #a99f8d; margin: 0 0 28px; }
+      a { color: var(--link); text-underline-offset: 3px; }
+      a:focus-visible { outline: 2px solid var(--look); outline-offset: 2px; }
+      code { color: var(--look); }
+      .updated { color: var(--muted); margin: 0 0 28px; }
     </style>
   </head>
   <body>
