@@ -706,10 +706,6 @@ button:focus-visible,
   background: var(--look-soft);
 }
 
-.is-out > .array-value {
-  opacity: 0.32;
-}
-
 .list-node {
   position: relative;
   display: flex;
@@ -972,8 +968,8 @@ button:focus-visible,
 .grid-cell.is-wall { background: var(--neutral-fill); border-color: var(--neutral-fill); }
 .grid-cell.is-visited { background: var(--visited); color: var(--on-done-fill); }
 .grid-cell.is-frontier { background: var(--look-soft); border-color: var(--look-line); }
-.grid-cell.is-current { background: var(--look); color: var(--on-solid); }
-.grid-cell.is-path { background: var(--done); color: var(--on-solid); font-weight: 700; }
+.grid-cell.is-current { border-color: var(--look-line); background: var(--look-fill); color: var(--on-look); }
+.grid-cell.is-path { background: var(--done); color: var(--on-done); font-weight: 700; }
 
 /* Motion only for people who have not asked the system to reduce it. */
 @media (prefers-reduced-motion: no-preference) {
@@ -1096,14 +1092,6 @@ button:focus-visible,
   padding: 16px;
 }
 
-.quiz-label {
-  margin: 0 0 4px !important;
-  color: var(--look);
-  font-size: 0.8rem !important;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
 .quiz-question {
   margin: 0 0 12px !important;
   color: var(--ink-strong);
@@ -1162,9 +1150,9 @@ button:focus-visible,
 .trace-title {
   margin: 0 0 8px;
   color: var(--subtle);
-  font-size: 0.78rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  font-family: var(--font-ui);
+  font-size: 0.86rem;
+  font-weight: 600;
 }
 
 .trace-lines {
@@ -1358,9 +1346,9 @@ button:focus-visible,
   left: 8px;
   z-index: 10;
   border-radius: 8px;
-  background: var(--look);
+  background: var(--look-fill);
   padding: 10px 14px;
-  color: var(--on-solid);
+  color: var(--on-look);
   font-weight: 700;
   transform: translateY(-160%);
 }
@@ -1449,7 +1437,7 @@ input[type="range"] {
 .swatch-moved { border-color: var(--done); background: var(--done-fill); }
 .swatch-active { border-color: var(--look); background: var(--look); }
 .swatch-sorted { border-color: var(--done); background: var(--done); }
-.swatch-current { border-color: var(--look); background: var(--look); }
+.swatch-current { border-color: var(--look-line); background: var(--look-fill); }
 .swatch-frontier { border-color: var(--look-line); background: var(--look-soft); }
 .swatch-visited { border-color: var(--line-soft); background: var(--visited); }
 .swatch-path { border-color: var(--done); background: var(--done); }
@@ -1913,10 +1901,6 @@ a {
   background: var(--sunken);
   padding: 18px;
   box-shadow: var(--shadow-paper);
-}
-
-.quiz-label {
-  font-family: var(--font-ui);
 }
 
 .quiz-question {
