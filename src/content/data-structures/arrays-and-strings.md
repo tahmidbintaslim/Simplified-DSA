@@ -125,6 +125,17 @@ The language tabs below show how 10 popular languages create array-like structur
 
 Given `[3, 6, 9, 12, 15]`, delete the value at index 1. Write the array after each shift. How many values moved?
 
+```answer
+Deleting index 1 removes the 6. Every later value shifts one slot left:
+
+1. Copy 9 left: `[3, 9, 9, 12, 15]`
+2. Copy 12 left: `[3, 9, 12, 12, 15]`
+3. Copy 15 left: `[3, 9, 12, 15, 15]`
+4. Drop the last slot: `[3, 9, 12, 15]`
+
+3 values moved.
+```
+
 ## Sources Checked
 
 - [OpenDSA: Array-Based List Implementation](https://opendsa.cs.vt.edu/OpenDSA/Books/Catalog/html/ListArray.html)

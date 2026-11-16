@@ -83,3 +83,11 @@ test('blocks keep their written order even without blank lines between them', ()
   assert.ok(order.every((at) => at >= 0), html);
   assert.deepEqual([...order].sort((a, b) => a - b), order);
 });
+
+test('an answer block folds its own Markdown behind "Show the answer"', () => {
+  const html = render('```answer\nIt moves **3** values: `<b>`.\n```');
+  assert.equal(
+    html,
+    '<details class="answer"><summary>Show the answer</summary><p>It moves <strong>3</strong> values: <code>&lt;b&gt;</code>.</p></details>',
+  );
+});

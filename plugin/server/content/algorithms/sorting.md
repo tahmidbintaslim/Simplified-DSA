@@ -111,6 +111,15 @@ A sort is **stable** if equal values keep their original order. That matters whe
 
 Sort `[6, 3, 8, 1]` by hand with insertion sort. Write the list after each value is placed. How many single moves did it take in total?
 
+```answer
+1. Start: `[6, 3, 8, 1]`; the first value, 6, is already a sorted hand.
+2. Place 3: it moves left past 6, giving `[3, 6, 8, 1]` (1 move).
+3. Place 8: it is larger than 6, so it stays: `[3, 6, 8, 1]` (0 moves).
+4. Place 1: it moves left past 8, 6 and 3, giving `[1, 3, 6, 8]` (3 moves).
+
+That is 4 single moves in total.
+```
+
 ## Sources Checked
 
 - [Open Data Structures: Sorting Algorithms](https://opendatastructures.org/ods-java/11_Sorting_Algorithms.html)

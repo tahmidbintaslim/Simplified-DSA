@@ -103,6 +103,15 @@ For 10,000 numbers that is about 100,000,000 comparisons versus 10,000 lookups.
 
 With 7 buckets and the letter-sum hash, find two other three-letter words that collide with "cat". What would happen to lookups if every stored word collided?
 
+```answer
+"act" has the same letters, so the same sum (312) and the same bucket, 4. Two words with different letters also land in bucket 4:
+
+- "ear": e(101) + a(97) + r(114) = 312, and 312 % 7 = 4.
+- "fox": f(102) + o(111) + x(120) = 333, and 333 % 7 = 4.
+
+If every stored word collided, they would all sit in one bucket's chain. Every lookup would walk that chain one key at a time, so the table would behave like a plain list: `O(n)` instead of `O(1)`.
+```
+
 ## Sources Checked
 
 - [Open Data Structures: Hash Tables](https://opendatastructures.org/ods-java/5_Hash_Tables.html)

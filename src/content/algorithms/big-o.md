@@ -103,6 +103,14 @@ Big O describes memory too. Making a copy of the input costs `O(n)` extra space;
 
 You have 100 names. How many checks does it take to print each name once? To compare every name with every other name? What about 1,000 names?
 
+```answer
+Printing each name once is 100 checks, one per name: `O(n)`.
+
+Comparing every name with every other name with a loop inside a loop is 100 × 100 = 10,000 checks (4,950 if each pair is compared only once): `O(n²)`.
+
+With 1,000 names, printing takes 1,000 checks, but comparing takes 1,000,000 (499,500 unique pairs). Ten times the names means ten times the printing work, and a hundred times the comparing work.
+```
+
 ## Sources Checked
 
 - [OpenDSA: Introduction to Data Structures and Algorithms](https://opendsa.cs.vt.edu/ODSA/StandaloneModules/20221201150129/html/IntroDSA.html)

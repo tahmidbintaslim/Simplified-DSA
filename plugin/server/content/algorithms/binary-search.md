@@ -103,6 +103,23 @@ def binary_search(values, target):
 
 In `[2, 5, 8, 12, 16, 23, 38, 56, 72, 91]`, write `lo`, `mid` and `hi` for each step of a search for `23`. Then do it for `60`, which is missing.
 
+```answer
+Indexes run from 0 to 9.
+
+Search for `23`:
+
+1. `lo=0`, `hi=9`, `mid=4`: 16 is smaller than 23, so `lo=5`.
+2. `lo=5`, `hi=9`, `mid=7`: 56 is larger than 23, so `hi=6`.
+3. `lo=5`, `hi=6`, `mid=5`: 23. Found at index 5 in 3 checks.
+
+Search for `60`:
+
+1. `lo=0`, `hi=9`, `mid=4`: 16 is smaller, so `lo=5`.
+2. `lo=5`, `hi=9`, `mid=7`: 56 is smaller, so `lo=8`.
+3. `lo=8`, `hi=9`, `mid=8`: 72 is larger, so `hi=7`.
+4. Now `lo` (8) is greater than `hi` (7): not found, after 3 checks.
+```
+
 ## Sources Checked
 
 - [CP-Algorithms: Binary Search](https://cp-algorithms.com/num_methods/binary_search.html)

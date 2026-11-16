@@ -4,6 +4,12 @@ import { DEMO_MARKER, escapeHtml, MarkdownRenderer } from '../utils/markdown.js'
 import { icon } from '../utils/icons.js';
 import { loadCompleted, saveCompleted } from './progress.js';
 
+const HOME_DESCRIPTION =
+  'Free, beginner-first lessons on data structures and algorithms: plain words, every step traced, a demo on every lesson.';
+
+// <details> folds whose open state survives a re-render of the same lesson.
+const FOLDS = ['answer', 'sources', 'language-details'];
+
 // Matches the 760px layout breakpoint in style.css.
 const WIDE_SCREEN = '(min-width: 761px)';
 import { lessonPath, resolvePath } from './router.js';
@@ -23,6 +29,8 @@ export class App {
     this.markdownRenderer = new MarkdownRenderer();
     // Lessons marked complete, as "section/lesson" keys. Stored in this browser only.
     this.completed = loadCompleted();
+    // Folded parts of the open lesson the learner has expanded (see FOLDS).
+    this.openFolds = new Set();
     this.activeSectionId = this.sections[0].id;
     this.activeLessonId = this.sections[0].lessons[0].id;
     this.activeLanguageId = this.activeLesson.languageExamples?.[0]?.id ?? null;
@@ -59,7 +67,8 @@ export class App {
     // On wide screens the lesson list is always open. On phones it folds into a
     // "Lessons" bar so the lesson itself starts on the first screen.
     const wide = window.matchMedia(WIDE_SCREEN).matches;
-    const current = this.notFound ? 'Choose a lesson' : `${this.activeSection.title} · ${this.activeLesson.title}`;
+    const onLesson = !this.notFound && !this.home;
+    const current = onLesson ? `${this.activeSection.title} · ${this.activeLesson.title}` : 'Choose a lesson';
 
     this.root.innerHTML = `
       <a class="skip-link" href="#main">Skip to the lesson</a>
@@ -78,17 +87,21 @@ export class App {
           </details>
         </aside>
         <main id="main" class="lesson-main" tabindex="-1">
-          ${this.notFound ? this.renderNotFound() : this.renderLesson()}
+          ${this.notFound ? this.renderNotFound() : this.home ? this.renderHome() : this.renderLesson()}
         </main>
       </div>
     `;
-    const title = this.notFound ? 'Page not found' : this.activeLesson.title;
-    document.title = `${title} | Simplified DSA`;
-    // Search engines and link previews read the description of the open lesson.
+    document.title = this.home
+      ? 'Simplified DSA | Data Structures and Algorithms'
+      : `${this.notFound ? 'Page not found' : this.activeLesson.title} | Simplified DSA`;
+    // Search engines and link previews read the description of the open page.
     document
       .querySelector('meta[name="description"]')
-      ?.setAttribute('content', this.notFound ? 'This page does not exist.' : this.activeLesson.summary);
-    if (!this.notFound) this.attachDemo();
+      ?.setAttribute(
+        'content',
+        this.notFound ? 'This page does not exist.' : this.home ? HOME_DESCRIPTION : this.activeLesson.summary,
+      );
+    if (onLesson) this.attachDemo();
 
     if (restoreId || hadFocus) {
       // If that element no longer exists, the current lesson link takes focus.
@@ -157,6 +170,19 @@ export class App {
       this.selectLanguage(tabs[nextIndex].dataset.languageId, { moveFocus: true });
     });
 
+    // Remember which folds (answer, sources, languages) are open, so a re-render
+    // (a tab click, Mark as complete) keeps them open. "toggle" does not bubble.
+    this.root.addEventListener(
+      'toggle',
+      (event) => {
+        const fold = FOLDS.find((name) => event.target.classList?.contains(name));
+        if (!fold) return;
+        if (event.target.open) this.openFolds.add(fold);
+        else this.openFolds.delete(fold);
+      },
+      true,
+    );
+
     // Crossing the phone/desktop breakpoint opens or folds the lesson list.
     window.matchMedia(WIDE_SCREEN).addEventListener('change', () => this.render());
 
@@ -175,10 +201,12 @@ export class App {
   applyRoute(pathname) {
     const route = resolvePath(this.sections, pathname);
     this.notFound = Boolean(route.notFound);
+    this.home = Boolean(route.home);
     const lessonChanged =
       route.sectionId !== this.activeSectionId || route.lessonId !== this.activeLessonId;
 
     if (lessonChanged) {
+      this.openFolds.clear();
       this.activeSectionId = route.sectionId;
       this.activeLessonId = route.lessonId;
       this.activeLanguageId = this.activeLesson.languageExamples?.[0]?.id ?? null;
@@ -195,7 +223,7 @@ export class App {
     // Opening the lesson that is already open adds no history entry. On "/"
     // the first lesson is open, so a click there must not push its path.
     // From the not-found page every lesson link must navigate, even the open one.
-    if (!this.notFound && sectionId === this.activeSectionId && lessonId === this.activeLessonId) return;
+    if (!this.notFound && !this.home && sectionId === this.activeSectionId && lessonId === this.activeLessonId) return;
 
     const path = lessonPath(sectionId, lessonId);
     window.history.pushState(null, '', path);
@@ -263,7 +291,7 @@ export class App {
       <div class="lesson-list">
         ${section.lessons
           .map((lesson) => {
-            const isActive = !this.notFound && lesson.id === this.activeLessonId;
+            const isActive = !this.notFound && !this.home && lesson.id === this.activeLessonId;
             const isDone = this.completed.has(`${section.id}/${lesson.id}`);
 
             return `
@@ -318,6 +346,8 @@ export class App {
    */
   renderLesson() {
     const header = this.renderLessonHeader();
+    const reopen = (html) =>
+      FOLDS.reduce((out, fold) => (this.openFolds.has(fold) ? out.replace(`<details class="${fold}">`, `<details class="${fold}" open>`) : out), html);
     let article = this.markdownRenderer.render(this.activeLesson.markdown);
     const opening = /(<h1>[\s\S]*?<\/h1>)<p>([\s\S]*?<\/p>)/;
     article = opening.test(article)
@@ -330,17 +360,22 @@ export class App {
       intro = text;
       return '';
     });
+    // Sources matter, but they are reference, not the lesson's last word.
+    article = article.replace(
+      /<h2>Sources Checked<\/h2>(<ul>[\s\S]*?<\/ul>)/,
+      '<details class="sources"><summary>Sources checked</summary>$1</details>',
+    );
     const panel = this.renderDemoPanel(intro);
     const inline = article.includes(DEMO_MARKER);
 
-    return `
+    return reopen(`
       <article class="lesson-content">
         ${inline ? article.replace(DEMO_MARKER, () => panel) : article}
       </article>
       ${inline ? '' : panel}
       ${this.renderLanguageComparison()}
       ${this.renderLessonFooter()}
-    `;
+    `);
   }
 
   /** Mark-as-complete plus previous and next lessons, across sections. */
@@ -354,9 +389,17 @@ export class App {
           </a>`
         : '<span></span>';
     const done = this.completed.has(this.activeKey);
+    const next = all[index + 1];
+    // A lesson ends on what was achieved and what comes next, not on a reference list.
+    const note = done
+      ? `Lesson done. You have finished ${this.completed.size} of ${all.length} lessons.${
+          next ? ` Up next: <strong>${escapeHtml(next.lesson.title)}</strong>.` : ' That is the whole course so far.'
+        }`
+      : 'Tried the practice prompt? Mark the lesson complete to track your progress.';
 
     return `
-      <footer class="lesson-footer">
+      <footer class="lesson-footer ${done ? 'is-done' : ''}">
+        <p class="completion-note" role="status">${note}</p>
         <button id="complete-button" type="button" class="demo-button ${done ? 'is-done' : 'is-primary'}" data-complete aria-pressed="${done}">
           ${done ? `${icon('check')} Completed` : 'Mark as complete'}
         </button>
@@ -407,6 +450,48 @@ export class App {
       : reveal
         ? `Not quite. The answer is highlighted. ${why}`
         : 'Not quite. Have another think and try again.';
+  }
+
+  /**
+   * The home page: what this is, where to start (or continue), and the whole
+   * course as a map, so a first-time visitor never lands mid-curriculum.
+   */
+  renderHome() {
+    const all = this.sections.flatMap((section) => section.lessons.map((lesson) => ({ section, lesson })));
+    const isDone = ({ section, lesson }) => this.completed.has(`${section.id}/${lesson.id}`);
+    const doneCount = all.filter(isDone).length;
+    const nextUp = all.find((entry) => !isDone(entry)) ?? all[0];
+    const startLabel = doneCount ? `Continue: ${nextUp.lesson.title}` : `Start with ${nextUp.lesson.title}`;
+    const lessonLink = (entry) => `
+      <li>
+        <a class="course-lesson" href="${lessonPath(entry.section.id, entry.lesson.id)}" data-section-id="${entry.section.id}" data-lesson-id="${entry.lesson.id}">
+          <span class="lesson-status ${isDone(entry) ? 'is-done' : ''}">${isDone(entry) ? `${icon('check')}<span class="sr-only">Completed: </span>` : ''}</span>
+          <strong>${escapeHtml(entry.lesson.title)}</strong>
+          <span class="lesson-summary">${escapeHtml(entry.lesson.summary)}</span>
+          <span class="course-meta">${[entry.lesson.minutes && `${entry.lesson.minutes} min`, entry.lesson.level].filter(Boolean).map(escapeHtml).join(' · ')}</span>
+        </a>
+      </li>`;
+
+    return `
+      <article class="lesson-content home">
+        <h1>See every step of data structures and algorithms</h1>
+        <p class="lead">Free lessons for complete beginners: plain words, a small example traced by hand, and a demo you drive yourself, one step at a time. No account, no tracking.</p>
+        <p class="home-actions">
+          <a class="demo-button is-primary" href="${lessonPath(nextUp.section.id, nextUp.lesson.id)}" data-section-id="${nextUp.section.id}" data-lesson-id="${nextUp.lesson.id}">${escapeHtml(startLabel)} ${icon('arrowRight')}</a>
+          <span class="home-progress">${doneCount} of ${all.length} lessons done</span>
+        </p>
+        ${this.sections
+          .map(
+            (section) => `
+          <section class="course-section" aria-labelledby="course-${section.id}">
+            <h2 id="course-${section.id}">${escapeHtml(section.title)}</h2>
+            <p>${escapeHtml(section.description)}</p>
+            <ol class="course-list">${section.lessons.map((lesson) => lessonLink({ section, lesson })).join('')}</ol>
+          </section>`,
+          )
+          .join('')}
+      </article>
+    `;
   }
 
   /**
@@ -481,6 +566,8 @@ export class App {
       examples.find((example) => example.id === this.activeLanguageId) ?? examples[0];
 
     return `
+      <details class="language-details">
+      <summary>Compare this in ${examples.length} programming languages</summary>
       <section class="language-panel" aria-label="Language comparison">
         <div class="language-panel-header">
           <h2>Language comparison</h2>
@@ -523,6 +610,7 @@ export class App {
           </dl>
         </div>
       </section>
+      </details>
     `;
   }
 

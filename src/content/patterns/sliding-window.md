@@ -115,6 +115,19 @@ Why: "A run of days" means consecutive values, and the rule ("total under 50") c
 
 For `[3, 8, 1, 9, 2, 7]` and `k = 2`, write every window sum using the slide rule. Then find the longest run of values that add up to at most 12.
 
+```answer
+The first window is 3 + 8 = 11. Then each slide adds the value that enters and subtracts the one that leaves:
+
+- 11 + 1 − 3 = 9 for `[8, 1]`
+- 9 + 9 − 8 = 10 for `[1, 9]`
+- 10 + 2 − 1 = 11 for `[9, 2]`
+- 11 + 7 − 9 = 9 for `[2, 7]`
+
+The sums are 11, 9, 10, 11 and 9.
+
+The longest run that adds up to at most 12 has 3 values: `[3, 8, 1]` (12) or `[1, 9, 2]` (12). Adding any neighbour to either goes over 12.
+```
+
 ## Sources Checked
 
 - [USACO Guide: Two Pointers (includes sliding windows)](https://usaco.guide/silver/two-pointers)

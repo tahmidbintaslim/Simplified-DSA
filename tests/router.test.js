@@ -24,6 +24,7 @@ test('the root path opens the first lesson and stays "/"', () => {
     sectionId: 'data-structures',
     lessonId: 'arrays-and-strings',
     path: '/',
+    home: true,
   });
 });
 

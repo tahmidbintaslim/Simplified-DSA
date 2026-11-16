@@ -118,6 +118,12 @@ Why: On a sorted list, moving L right can only raise the sum and moving R left c
 
 Check whether `racecar` and `rocket` are palindromes with two pointers. Write the two letters you compare at each step, and the step where `rocket` fails.
 
+```answer
+`racecar` has 7 letters. Compare r with r, a with a, then c with c. The middle `e` is left alone, so it is a palindrome.
+
+`rocket` fails on the very first comparison: `r` at the start against `t` at the end.
+```
+
 ## Sources Checked
 
 - [USACO Guide: Two Pointers](https://usaco.guide/silver/two-pointers)
