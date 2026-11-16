@@ -204,12 +204,19 @@ test('design: the first demo frame centres its active cell on a phone, and the d
   await page.waitForTimeout(100); // one animation frame after mount
   const visible = await page.evaluate(() => {
     const stage = document.querySelector('.demo-stage');
-    const cell = stage.querySelector('.array-cell.is-mid');
+    // The random target can sit at the first middle, which is then "found".
+    const cell = stage.querySelector('.array-cell.is-mid, .array-cell.is-found');
     const a = stage.getBoundingClientRect();
     const b = cell.getBoundingClientRect();
     return b.left >= a.left && b.right <= a.right;
   });
   assert.ok(visible, 'first-frame mid cell is visible');
+  // A phone gets 7 cells, so lo and hi stay on screen with mid.
+  const fits = await page.evaluate(() => {
+    const stage = document.querySelector('.demo-stage');
+    return { cells: stage.querySelectorAll('.array-cell').length, fits: stage.scrollWidth <= stage.clientWidth };
+  });
+  assert.deepEqual(fits, { cells: 7, fits: true });
   const intro = await page.textContent('.demo-panel .language-panel-header p');
   assert.match(intro, /watch the code and the variables change together/);
   assert.equal(await page.locator('.quiz-label').count(), 0);
@@ -240,4 +247,40 @@ test('home shows the course map and a start button; lessons end with a folded an
   assert.notEqual(await page.locator('details.answer').getAttribute('open'), null);
   assert.deepEqual(errors, []);
   await page.close();
+});
+
+test('critique 2: home links, jump list, stepped array insert, settled quiz', async () => {
+  const { page, errors } = await open('/data-structures/arrays-and-strings');
+  // The jump list scrolls without re-rendering (the demo keeps its state).
+  await page.click('.lesson-jumps a[href="#cost"]');
+  assert.equal(await page.evaluate(() => document.activeElement.id), 'cost');
+  assert.equal(new URL(page.url()).hash, '');
+
+  // Insert shifts one value per step, with the gap travelling.
+  await page.click('[data-op="insert"]');
+  assert.match(await page.textContent('.arr-status'), /^3 values moved/);
+  await page.click('[data-player="next"]');
+  assert.equal(await page.locator('.demo-stage .array-cell.is-gap').count(), 1);
+  await page.fill('[data-field="index"]', '99');
+  await page.click('[data-op="delete"]');
+  assert.equal(await page.getAttribute('.arr-status', 'class'), 'bs-compare arr-status is-error');
+
+  // A solved quiz ignores more clicks.
+  const quiz = page.locator('.quiz').first();
+  await quiz.locator('[data-quiz-option="true"]').click();
+  await quiz.locator('[data-quiz-option="false"]').first().click({ force: true }); // aria-disabled now
+  assert.equal(await quiz.locator('.is-wrong').count(), 0);
+
+  // The site title goes home; home shows the drawn step and only section links.
+  await page.click('.site-title');
+  assert.equal(new URL(page.url()).pathname, '/');
+  assert.equal(await page.locator('.home .cells-figure .array-cell').count(), 7);
+  assert.equal(await page.locator('.lesson-sidebar .lesson-link').count(), 0);
+  assert.deepEqual(errors, []);
+  await page.close();
+
+  const missing = await open('/nope/nothing');
+  await missing.page.click('.home-actions [data-home]');
+  assert.equal(new URL(missing.page.url()).pathname, '/');
+  await missing.page.close();
 });

@@ -8,6 +8,17 @@ const HOME_DESCRIPTION =
   'Free, beginner-first lessons on data structures and algorithms: plain words, every step traced, a demo on every lesson.';
 
 // <details> folds whose open state survives a re-render of the same lesson.
+// The home page shows the product's promise: one real step of a binary search.
+const HOME_FIGURE = [
+  '```cells',
+  'values: 3 9 14 21 30 42 57',
+  'pointers: lo=4 mid=5 hi=6',
+  'highlight: 5',
+  'dim: 0 1 2 3',
+  'note: Step 2 of a binary search for 42. The middle value, 21, was too small, so it and everything left of it are ruled out. Now check the middle of what is left.',
+  '```',
+].join('\n');
+
 const FOLDS = ['answer', 'sources', 'language-details'];
 
 // Matches the 760px layout breakpoint in style.css.
@@ -75,7 +86,7 @@ export class App {
       <div class="app-shell">
         <aside class="lesson-sidebar" aria-label="Course navigation">
           <div class="sidebar-header">
-            <p class="site-title">Simplified DSA</p>
+            <a class="site-title" href="/" data-home>Simplified DSA</a>
             <p class="site-tagline">Learn the shape of data first, then the steps that act on it.</p>
           </div>
           <details class="nav-drawer" ${wide ? 'open' : ''}>
@@ -120,6 +131,8 @@ export class App {
   bindEvents() {
     this.root.addEventListener('click', (event) => {
       const lessonLink = event.target.closest('a[data-lesson-id]');
+      const homeLink = event.target.closest('a[data-home]');
+      const jumpLink = event.target.closest('a[href^="#"]');
       const languageButton = event.target.closest('[data-language-id]');
       const quizOption = event.target.closest('[data-quiz-option]');
       const completeButton = event.target.closest('[data-complete]');
@@ -131,6 +144,26 @@ export class App {
 
       if (completeButton) {
         this.toggleComplete();
+        return;
+      }
+
+      const plainClick = event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey;
+
+      if (homeLink && plainClick) {
+        event.preventDefault();
+        this.openHome();
+        return;
+      }
+
+      // In-page links (skip link, jump list) scroll and move focus without a
+      // hash change, which would otherwise fire popstate and re-render the page.
+      if (jumpLink) {
+        const target = document.getElementById(jumpLink.getAttribute('href').slice(1));
+        if (!target) return;
+        event.preventDefault();
+        if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
+        target.scrollIntoView({ block: 'start' });
+        target.focus({ preventScroll: true });
         return;
       }
 
@@ -238,6 +271,18 @@ export class App {
     }
   }
 
+  /** Back to the course map, from the site title, a lesson ending or the 404. */
+  openHome() {
+    if (this.home) return;
+    window.history.pushState(null, '', '/');
+    this.applyRoute('/');
+    this.render();
+    window.scrollTo(0, 0);
+    if (!this.root.contains(document.activeElement) || !document.activeElement.offsetParent) {
+      document.getElementById('main')?.focus({ preventScroll: true });
+    }
+  }
+
   /**
    * Language tabs let learners compare syntax without leaving the concept.
    */
@@ -256,8 +301,8 @@ export class App {
   renderSectionMenu() {
     return this.sections
       .map((section) => {
-        const isActive = section.id === this.activeSectionId;
-        const lessons = isActive ? this.renderLessonMenu(section) : '';
+        const isActive = !this.home && section.id === this.activeSectionId;
+        const lessons = isActive && !this.home ? this.renderLessonMenu(section) : '';
         const firstLesson = section.lessons[0];
 
         // aria-current="true" marks the current section in the list of
@@ -319,7 +364,7 @@ export class App {
    * learner will be able to do afterwards. The lesson title itself comes from
    * the Markdown file as the article h1.
    */
-  renderLessonHeader() {
+  renderLessonHeader(jumps = []) {
     const lesson = this.activeLesson;
     const position = this.activeSection.lessons.indexOf(lesson) + 1;
     const goals = lesson.goals?.length
@@ -334,6 +379,11 @@ export class App {
           ${lesson.level ? `<span class="lesson-level">${escapeHtml(lesson.level)}</span>` : ''}
         </p>
         ${goals}
+        ${
+          jumps.length
+            ? `<nav class="lesson-jumps" aria-label="Jump to"><span>Jump to</span>${jumps.map(([id, label]) => `<a href="#${id}">${label}</a>`).join('')}</nav>`
+            : ''
+        }
       </header>
     `;
   }
@@ -345,10 +395,23 @@ export class App {
    * try the idea right after reading it. Without one, the demo follows the text.
    */
   renderLesson() {
-    const header = this.renderLessonHeader();
+    // Shortcuts for interview preppers: the parts they scan for, in page order.
+    const markdown = this.activeLesson.markdown;
+    const jumps = [
+      this.activeLesson.demo && ['demo-title', 'Demo'],
+      /\*\*When to use it:\*\*/.test(markdown) && ['when-to-use', 'When to use it'],
+      /^## Cost Cheat Sheet$/m.test(markdown) && ['cost', 'Cost'],
+      /^## What To Remember$/m.test(markdown) && ['remember', 'Key points'],
+      /^## Practice Prompt$/m.test(markdown) && ['practice', 'Practice'],
+    ].filter(Boolean);
+    const header = this.renderLessonHeader(jumps);
     const reopen = (html) =>
       FOLDS.reduce((out, fold) => (this.openFolds.has(fold) ? out.replace(`<details class="${fold}">`, `<details class="${fold}" open>`) : out), html);
-    let article = this.markdownRenderer.render(this.activeLesson.markdown);
+    let article = this.markdownRenderer.render(markdown)
+      .replace('<h2>Cost Cheat Sheet</h2>', '<h2 id="cost">Cost Cheat Sheet</h2>')
+      .replace('<h2>What To Remember</h2>', '<h2 id="remember">What To Remember</h2>')
+      .replace('<h2>Practice Prompt</h2>', '<h2 id="practice">Practice Prompt</h2>')
+      .replace('<aside class="callout callout-when-to-use-it">', '<aside class="callout callout-when-to-use-it" id="when-to-use">');
     const opening = /(<h1>[\s\S]*?<\/h1>)<p>([\s\S]*?<\/p>)/;
     article = opening.test(article)
       ? article.replace(opening, (_, title, lead) => `${title}<p class="lead">${lead}${header}`)
@@ -394,7 +457,7 @@ export class App {
     const note = done
       ? `Lesson done. You have finished ${this.completed.size} of ${all.length} lessons.${
           next ? ` Up next: <strong>${escapeHtml(next.lesson.title)}</strong>.` : ' That is the whole course so far.'
-        }`
+        } <a href="/" data-home>See your course map</a>`
       : 'Tried the practice prompt? Mark the lesson complete to track your progress.';
 
     return `
@@ -430,6 +493,8 @@ export class App {
    */
   answerQuiz(option) {
     const quiz = option.closest('.quiz');
+    // Once the answer is shown, more clicks would only stack marks and announcements.
+    if (quiz.dataset.solved) return;
     const correct = option.dataset.quizOption === 'true';
     const misses = Number(quiz.dataset.misses ?? 0) + (correct ? 0 : 1);
     quiz.dataset.misses = misses;
@@ -440,6 +505,8 @@ export class App {
 
     const reveal = correct || misses >= 2;
     if (reveal) {
+      quiz.dataset.solved = 'true';
+      quiz.querySelectorAll('[data-quiz-option]').forEach((button) => button.setAttribute('aria-disabled', 'true'));
       const right = quiz.querySelector('[data-quiz-option="true"]');
       right.classList.add('is-right');
       right.dataset.mark = 'Correct';
@@ -476,6 +543,7 @@ export class App {
       <article class="lesson-content home">
         <h1>See every step of data structures and algorithms</h1>
         <p class="lead">Free lessons for complete beginners: plain words, a small example traced by hand, and a demo you drive yourself, one step at a time. No account, no tracking.</p>
+        ${this.markdownRenderer.render(HOME_FIGURE)}
         <p class="home-actions">
           <a class="demo-button is-primary" href="${lessonPath(nextUp.section.id, nextUp.lesson.id)}" data-section-id="${nextUp.section.id}" data-lesson-id="${nextUp.lesson.id}">${escapeHtml(startLabel)} ${icon('arrowRight')}</a>
           <span class="home-progress">${doneCount} of ${all.length} lessons done</span>
@@ -504,10 +572,9 @@ export class App {
       <article class="lesson-content">
         <h1>Page not found</h1>
         <p>There is no lesson at <code>${escapeHtml(window.location.pathname)}</code>. Pick one from the list, or start from the beginning.</p>
-        <p>
-          <a href="/" data-section-id="${first.id}" data-lesson-id="${first.lessons[0].id}">
-            Start with ${escapeHtml(first.lessons[0].title)}
-          </a>
+        <p class="home-actions">
+          <a class="demo-button is-primary" href="/" data-home>See the course map</a>
+          <a href="${lessonPath(first.id, first.lessons[0].id)}" data-section-id="${first.id}" data-lesson-id="${first.lessons[0].id}">Start with ${escapeHtml(first.lessons[0].title)}</a>
         </p>
       </article>
     `;

@@ -129,3 +129,22 @@ test('pattern frames point at real pseudocode lines', () => {
   assert.ok(inRange(pairSumFrames([1, 3, 5, 9], 100), pairSumCode));
   assert.ok(inRange(windowSumFrames([4, 2, 7, 1, 8], 2), windowSumCode));
 });
+
+test('array insert shifts one value per step and ends with the value in place', async () => {
+  const { arrayInsertFrames } = await import('../src/demos/algorithms.js');
+  const frames = arrayInsertFrames([4, 8, 15, 16, 42], 2, 23);
+  assert.deepEqual(frames.at(-1).values, [4, 8, 23, 15, 16, 42]);
+  assert.equal(frames.length, 1 + 3 + 1); // make room, three shifts, write
+  assert.match(frames.at(-1).caption, /3 values shifted right/);
+  // Never a duplicated value mid-shift: the gap travels instead.
+  for (const f of frames) assert.equal(f.values.filter((v) => v === 15).length, 1);
+  assert.equal(arrayInsertFrames([1, 2], 2, 9).at(-1).caption.includes('0 values'), true);
+});
+
+test('array delete closes the gap one step at a time', async () => {
+  const { arrayDeleteFrames } = await import('../src/demos/algorithms.js');
+  const frames = arrayDeleteFrames([4, 8, 15, 16, 42], 1);
+  assert.deepEqual(frames.at(-1).values, [4, 15, 16, 42]);
+  assert.match(frames.at(-1).caption, /3 values shifted left/);
+  assert.match(arrayDeleteFrames([7], 0).at(-1).caption, /0 values/);
+});

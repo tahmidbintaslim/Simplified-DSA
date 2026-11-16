@@ -1,5 +1,8 @@
 import { escapeHtml } from '../utils/markdown.js';
 import {
+  arrayCode,
+  arrayDeleteFrames,
+  arrayInsertFrames,
   binarySearchCode,
   binarySearchFrames,
   bruteForcePairChecks,
@@ -73,67 +76,64 @@ function mountArray(root) {
       <button type="button" class="demo-button" data-op="read">Read [i]</button>
       <button type="button" class="demo-button" data-op="insert">Insert at i</button>
       <button type="button" class="demo-button" data-op="delete">Delete at i</button>
-      <button type="button" class="demo-button" data-op="push">Append</button>
+      <button type="button" class="demo-button" data-op="append">Append</button>
     </div>
     <div class="demo-stage"><div class="array-row"></div></div>
-    <p class="demo-caption" aria-live="polite">Pick an operation. Watch how many values have to move.</p>
+    ${legend([['hit', 'the value you asked for'], ['moved', 'shifted to make room or close the gap'], ['gap', 'empty slot']])}
+    <p class="bs-compare arr-status" aria-live="polite"></p>
   `;
 
   const row = root.querySelector('.array-row');
-  const caption = root.querySelector('.demo-caption');
+  const status = root.querySelector('.arr-status');
   const valueInput = root.querySelector('[data-field="value"]');
   const indexInput = root.querySelector('[data-field="index"]');
 
-  // `marks` maps an index to a CSS state: "hit" for the touched cell, "moved" for shifted ones.
-  const draw = (marks = {}) => {
-    row.innerHTML = values
-      .map(
-        (value, i) => `
-        <div class="array-cell ${marks[i] ?? ''}">
-          <span class="array-value">${value}</span>
-          <span class="array-index">${i}</span>
-        </div>`,
-      )
+  const player = createPlayer(root, ({ values: shown, hit, moved }) => {
+    row.innerHTML = shown
+      .map((value, i) => {
+        const state = value === null ? 'is-gap' : i === hit ? 'is-hit' : moved.includes(i) ? 'is-moved' : '';
+        return `<div class="array-cell ${state}"><span class="array-value">${value ?? ''}</span><span class="array-index">${i}</span></div>`;
+      })
       .join('');
-  };
+  });
+
+  // One-step operations still go through the player, so every demo reads the same way.
+  const single = (caption, hit, line = 0) => [{ values: [...values], hit, moved: [], line, vars: { n: values.length }, caption }];
 
   root.addEventListener('click', (event) => {
     const op = event.target.closest('[data-op]')?.dataset.op;
     if (!op) return;
     const value = readInt(valueInput) ?? 0;
     const index = readInt(indexInput);
-    const marks = {};
-    const range = (from, to) => {
-      for (let i = from; i < to; i++) marks[i] = 'is-moved';
-    };
+    const last = values.length - (op === 'insert' ? 0 : 1);
 
-    if (op === 'push') {
-      if (values.length >= MAX) return (caption.textContent = `The demo holds at most ${MAX} values. Delete one first.`);
-      values.push(value);
-      marks[values.length - 1] = 'is-hit';
-      caption.textContent = `Appended ${value} at index ${values.length - 1}. Nothing moved: O(1).`;
-    } else if (index === null || index < 0 || index > values.length - (op === 'insert' ? 0 : 1)) {
-      caption.textContent = `Index must be between 0 and ${values.length - (op === 'insert' ? 0 : 1)}.`;
-    } else if (op === 'read') {
-      marks[index] = 'is-hit';
-      caption.textContent = `array[${index}] is ${values[index]}. One address calculation, no scan: O(1).`;
-    } else if (op === 'insert') {
-      if (values.length >= MAX) return (caption.textContent = `The demo holds at most ${MAX} values. Delete one first.`);
-      values.splice(index, 0, value);
-      range(index + 1, values.length);
-      marks[index] = 'is-hit';
-      const moved = values.length - 1 - index;
-      caption.textContent = `Inserted ${value} at index ${index}. ${moved} value${moved === 1 ? '' : 's'} shifted right: O(n).`;
-    } else {
-      const [removed] = values.splice(index, 1);
-      range(index, values.length);
-      const moved = values.length - index;
-      caption.textContent = `Deleted ${removed}. ${moved} value${moved === 1 ? '' : 's'} shifted left to close the gap: O(n).`;
+    if ((op === 'insert' || op === 'append') && values.length >= MAX) {
+      return setStatus(status, `The demo holds at most ${MAX} values. Delete one first.`, { error: true });
     }
-    draw(marks);
+    if (op !== 'append' && (index === null || index < 0 || index > last)) {
+      return setStatus(status, `Index must be a whole number from 0 to ${last}.`, { error: true });
+    }
+
+    let frames;
+    if (op === 'read') {
+      frames = single(`array[${index}] is ${values[index]}. One address calculation, no scan: O(1).`, index);
+    } else if (op === 'append') {
+      values.push(value);
+      frames = single(`Appended ${value} at index ${values.length - 1}. Nothing moved: O(1).`, values.length - 1);
+    } else if (op === 'insert') {
+      frames = arrayInsertFrames(values, index, value);
+      values.splice(index, 0, value);
+    } else {
+      frames = arrayDeleteFrames(values, index);
+      values.splice(index, 1);
+    }
+    const moved = frames.at(-1).moved.length;
+    setStatus(status, `${moved} value${moved === 1 ? '' : 's'} moved. Step through to watch each one.`);
+    player.load(frames, arrayCode[op]);
   });
 
-  draw();
+  player.load(single('Pick an operation. Watch how many values have to move.', -1), arrayCode.read);
+  setStatus(status, 'Read and Append move nothing. Insert and Delete shift every value after i.');
 }
 
 /* ---------- Linked lists: walk the pointers ---------- */
@@ -547,7 +547,9 @@ function mountBinarySearch(root) {
 
   const shuffle = () => {
     // Distinct sorted values: binary search needs sorted input.
-    values = [...new Set(randomValues(40, 1, 99))].slice(0, 16).sort((a, b) => a - b);
+    // A 390px phone fits 7 cells at once; more would push lo and hi off-screen.
+    const count = window.matchMedia('(max-width: 480px)').matches ? 7 : 16;
+    values = [...new Set(randomValues(40, 1, 99))].slice(0, count).sort((a, b) => a - b);
     input.value = values[randomInt(0, values.length - 1)];
     run();
   };

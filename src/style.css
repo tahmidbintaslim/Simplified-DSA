@@ -2340,3 +2340,119 @@ pre,
   font-family: var(--font-ui);
   font-size: 0.82rem;
 }
+
+/* ---------- Critique 2 fixes ---------- */
+
+/* The site title is the way home. */
+a.site-title {
+  display: inline-block;
+  text-decoration: none;
+}
+
+a.site-title:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+
+/* An empty slot while values shift: the gap travels, nothing is drawn twice. */
+.is-gap > .array-value {
+  border-style: dashed;
+  border-color: var(--line-strong);
+  background: transparent;
+}
+
+.swatch-gap {
+  border-style: dashed;
+  background: transparent;
+}
+
+/* Placeholders keep AA contrast instead of the browser's pale grey. */
+::placeholder {
+  color: var(--faint);
+  opacity: 1;
+}
+
+/* The speed slider is a 44px-tall target, like every other control. */
+.demo-speed input[type='range'] {
+  min-height: 44px;
+  accent-color: var(--look);
+}
+
+/* Callout labels: the tone's ink, darkened toward the page ink so small bold
+   text clears 4.5:1 on its tinted tag. */
+.callout-label {
+  color: color-mix(in srgb, var(--tone) 72%, var(--ink-strong));
+}
+
+/* A solved quiz is settled: options stop looking pressable. */
+.quiz[data-solved] .quiz-option {
+  cursor: default;
+}
+
+.quiz[data-solved] .quiz-option:not(.is-right):not(.is-wrong) {
+  opacity: 0.62;
+}
+
+/* Jump list: the parts interview preppers scan for. */
+.lesson-jumps {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 6px;
+  margin-top: 16px;
+  font-family: var(--font-ui);
+  font-size: 0.92rem;
+}
+
+.lesson-jumps > span {
+  margin-right: 4px;
+  color: var(--subtle);
+}
+
+.lesson-jumps a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0 14px;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.lesson-jumps a:hover {
+  border-color: var(--look-line);
+}
+
+.lesson-content h2[id],
+.callout[id],
+#demo-title {
+  scroll-margin-top: 20px;
+}
+
+/* The home page draws one real step instead of only promising it. */
+.home .cells-figure {
+  margin: 4px 0 26px;
+}
+
+/* The 404 offers the map as the primary way out. */
+.lesson-content .home-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 18px;
+}
+
+/* The answer fold keeps its numbered list inside the panel. */
+.answer ol,
+.answer ul {
+  padding-left: 1.4em;
+}
+
+@media (max-width: 480px) {
+  /* Room for all 7 binary-search cells on a 390px phone. */
+  .demo-stage {
+    padding-inline: 10px;
+  }
+}
