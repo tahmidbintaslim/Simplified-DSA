@@ -415,8 +415,8 @@ export function pairSumFrames(sorted, target) {
       line: tooSmall ? 4 : 5,
       vars,
       caption: tooSmall
-        ? `${sorted[left]} + ${sorted[right]} = ${sum} is too small. Every pair with ${sorted[left]} is too small too, so move left right.`
-        : `${sorted[left]} + ${sorted[right]} = ${sum} is too big. Every pair with ${sorted[right]} is too big too, so move right left.`,
+        ? `${sorted[left]} + ${sorted[right]} = ${sum} is too small. Every pair with ${sorted[left]} is too small too, so move the left pointer right.`
+        : `${sorted[left]} + ${sorted[right]} = ${sum} is too big. Every pair with ${sorted[right]} is too big too, so move the right pointer left.`,
     });
     if (tooSmall) left++;
     else right--;
@@ -510,3 +510,56 @@ export function windowSumFrames(values, k) {
 
 // Additions a brute-force version makes: k for every window.
 export const bruteForceWindowAdds = (n, k) => (k >= 1 && k <= n ? (n - k + 1) * k : 0);
+
+/* ---------- Arrays: insert and delete shift values one at a time ---------- */
+
+/**
+ * Every array frame: { values, hit, moved: [indexes], line, vars, caption }.
+ * `null` in `values` is an empty slot, drawn as a gap, so the learner sees the
+ * gap travel instead of a value appearing twice mid-shift.
+ */
+export const arrayCode = {
+  read: ['return a[i]        // address = start + i × size'],
+  append: ['a[n] = x           // the next free slot'],
+  insert: ['add a slot at the end', 'for j from n down to i + 1:', '  a[j] = a[j - 1]   // shift right', 'a[i] = x'],
+  delete: ['x = a[i]', 'for j from i to n - 2:', '  a[j] = a[j + 1]   // shift left', 'drop the last slot'],
+};
+
+export function arrayInsertFrames(values, i, x) {
+  const a = [...values, null];
+  const n = values.length;
+  const moved = [];
+  const snap = (line, vars, caption, hit = -1) => ({ values: [...a], hit, moved: [...moved], line, vars, caption });
+  const frames = [snap(0, { n, i, x }, `Make room: add an empty slot at the end (index ${n}).`)];
+  for (let j = n; j > i; j--) {
+    a[j] = a[j - 1];
+    a[j - 1] = null;
+    moved.push(j);
+    frames.push(snap(2, { n, i, x, j }, `Shift ${a[j]} right, from index ${j - 1} to ${j}.`));
+  }
+  a[i] = x;
+  const count = moved.length;
+  frames.push(snap(3, { n: n + 1, i, x }, `Put ${x} into the gap at index ${i}. ${count} value${count === 1 ? '' : 's'} shifted right: O(n).`, i));
+  return frames;
+}
+
+export function arrayDeleteFrames(values, i) {
+  const a = [...values];
+  const n = values.length;
+  const x = a[i];
+  const moved = [];
+  const snap = (line, vars, caption, hit = -1) => ({ values: [...a], hit, moved: [...moved], line, vars, caption });
+  const frames = [snap(0, { n, i, x }, `Remove ${x} from index ${i}.`, i)];
+  a[i] = null;
+  frames.push(snap(0, { n, i, x }, `That leaves a gap at index ${i}.`));
+  for (let j = i; j < n - 1; j++) {
+    a[j] = a[j + 1];
+    a[j + 1] = null;
+    moved.push(j);
+    frames.push(snap(2, { n, i, x, j }, `Shift ${a[j]} left, from index ${j + 1} to ${j}.`));
+  }
+  a.pop();
+  const count = moved.length;
+  frames.push(snap(3, { n: n - 1, i }, `Drop the empty last slot. ${count} value${count === 1 ? '' : 's'} shifted left to close the gap: O(n).`));
+  return frames;
+}
