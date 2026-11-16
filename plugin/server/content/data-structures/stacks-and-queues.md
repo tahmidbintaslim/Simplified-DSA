@@ -97,6 +97,21 @@ A stack fits a dynamic array perfectly: push and pop both happen at the end, so 
 
 Check `( [ ] ( ) )` with a stack: write the stack after each character. Then try `( ]` and find the exact character where it fails.
 
+```answer
+For `( [ ] ( ) )`, the stack after each character is:
+
+1. `(` → `(`
+2. `[` → `( [`
+3. `]` matches the top `[`, pop → `(`
+4. `(` → `( (`
+5. `)` matches the top `(`, pop → `(`
+6. `)` matches the top `(`, pop → empty
+
+The stack ends empty, so the brackets match.
+
+For `( ]`, the stack holds `(` after the first character. The second character, `]`, does not match the `(` on top, so the check fails right there.
+```
+
 ## Sources Checked
 
 - [Open Data Structures: Array-Based Lists (stacks, queues and deques)](https://opendatastructures.org/ods-java/2_Array_Based_Lists.html)

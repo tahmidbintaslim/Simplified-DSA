@@ -101,6 +101,12 @@ Visit the left branch, then the node, then the right branch. This "in-order walk
 
 Insert `40, 20, 60, 10, 30, 50, 70` and draw the tree. Then insert the same values in sorted order and draw that one. How many comparisons does it take to find `70` in each?
 
+```answer
+In the given order, 40 is the root, 20 and 60 are its children, and 10, 30, 50 and 70 are the leaves: a balanced tree of height 3. Finding 70 takes 3 comparisons: 40, then 60, then 70.
+
+In sorted order (10, 20, 30, 40, 50, 60, 70), every value goes right of the last one, so the tree is a straight line of height 7. Finding 70 takes 7 comparisons, one per node.
+```
+
 ## Sources Checked
 
 - [Open Data Structures: Binary Trees](https://opendatastructures.org/ods-java/6_Binary_Trees.html)

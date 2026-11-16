@@ -20,7 +20,8 @@ const decodeSegment = (segment) => {
 /**
  * Turn a pathname into a section and lesson that exist in the curriculum.
  *
- * - "/" opens the first lesson of the first section.
+ * - "/" is the home page (`home: true`); it still names the first lesson so
+ *   the sidebar has a section open.
  * - "/:section" opens the first lesson of that section.
  * - "/:section/:lesson" opens that lesson.
  * - Anything else (unknown section or lesson, extra segments, bad escapes)
@@ -32,9 +33,9 @@ const decodeSegment = (segment) => {
  */
 export function resolvePath(sections, pathname) {
   const segments = pathname.split('/').filter(Boolean).map(decodeSegment);
-  const home = { sectionId: sections[0].id, lessonId: sections[0].lessons[0].id, path: '/' };
-
-  const notFound = { ...home, path: pathname, notFound: true };
+  const first = { sectionId: sections[0].id, lessonId: sections[0].lessons[0].id };
+  const home = { ...first, path: '/', home: true };
+  const notFound = { ...first, path: pathname, notFound: true };
 
   if (segments.length === 0) return home;
   if (segments.length > 2) return notFound;

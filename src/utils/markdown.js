@@ -121,8 +121,8 @@ function renderCallout(lines) {
  *
  * Standard parts: #, ## and ### headings, paragraphs, "- " and "1. " lists,
  * tables, fenced code, inline code, bold and http(s) links.
- * Lesson parts: callouts (> **Label:** text) and fenced ```cells, ```quiz
- * and ```demo blocks (see the functions above).
+ * Lesson parts: callouts (> **Label:** text) and fenced ```cells, ```quiz,
+ * ```demo and ```answer blocks (see the functions above).
  *
  * Everything is escaped before formatting, so lesson text cannot inject HTML.
  */
@@ -170,6 +170,8 @@ export class MarkdownRenderer {
           if (kind === 'cells') html.push(renderCells(body));
           else if (kind === 'quiz') html.push(renderQuiz(body));
           else if (kind === 'demo') html.push(DEMO_MARKER);
+          // An answer to a practice prompt stays folded until the learner has tried.
+          else if (kind === 'answer') html.push(`<details class="answer"><summary>Show the answer</summary>${this.render(body.join('\n'))}</details>`);
           else if (body.length) html.push(`<pre><code>${escapeHtml(body.join('\n'))}</code></pre>`);
           fence = null;
         } else {

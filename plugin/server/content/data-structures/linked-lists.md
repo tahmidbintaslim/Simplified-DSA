@@ -107,6 +107,12 @@ Why: The head is already known, so inserting there is O(1). Reaching the tail me
 
 Draw the list `2 → 4 → 6`. Insert `1` at the head and `8` at the tail. How many pointers changed for each insert, and how many nodes did you walk past?
 
+```answer
+Insert 1 at the head: make the node, point it at 2, and make it the head. 2 pointers change and you walk past 0 nodes: `1 → 2 → 4 → 6`.
+
+Insert 8 at the tail: walk 1, 2, 4 and 6 to find the last node (4 nodes), then point 6 at the new node. Only 1 pointer changes, but the walk makes it `O(n)`: `1 → 2 → 4 → 6 → 8`.
+```
+
 ## Sources Checked
 
 - [Open Data Structures: Linked Lists](https://opendatastructures.org/ods-java/3_Linked_Lists.html)

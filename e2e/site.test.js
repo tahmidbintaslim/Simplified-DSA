@@ -19,7 +19,9 @@ let base;
 before(async () => {
   server = await preview({ logLevel: 'silent', preview: { port: 4180, strictPort: false } });
   base = server.resolvedUrls.local[0].replace(/\/$/, '');
-  browser = await chromium.launch();
+  // CHROMIUM_PATH lets a machine with a preinstalled Chromium run the suite
+  // when its Playwright version expects a different browser build.
+  browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
 });
 
 after(async () => {
@@ -211,5 +213,31 @@ test('design: the first demo frame centres its active cell on a phone, and the d
   const intro = await page.textContent('.demo-panel .language-panel-header p');
   assert.match(intro, /watch the code and the variables change together/);
   assert.equal(await page.locator('.quiz-label').count(), 0);
+  await page.close();
+});
+
+test('home shows the course map and a start button; lessons end with a folded answer and a completion note', async () => {
+  const { page, errors } = await open('/');
+  assert.match(await page.textContent('main h1'), /See every step/);
+  assert.equal(await page.locator('.course-lesson').count(), lessons.length);
+  await page.click('.home-actions .demo-button');
+  assert.equal(new URL(page.url()).pathname, '/data-structures/arrays-and-strings');
+
+  // The practice answer and the sources start folded.
+  assert.equal(await page.locator('details.answer').getAttribute('open'), null);
+  assert.equal(await page.locator('details.sources').getAttribute('open'), null);
+  await page.click('details.answer > summary');
+  assert.match(await page.textContent('details.answer'), /3 values moved/);
+
+  // The language comparison stays open when a tab re-renders the page.
+  await page.click('details.language-details > summary');
+  await page.click('#language-tab-python');
+  assert.notEqual(await page.locator('details.language-details').getAttribute('open'), null);
+
+  await page.click('#complete-button');
+  assert.match(await page.textContent('.completion-note'), /Lesson done\. You have finished 1 of \d+ lessons\. Up next: Linked Lists\./);
+  // Marking complete re-renders the page; the answer the learner opened stays open.
+  assert.notEqual(await page.locator('details.answer').getAttribute('open'), null);
+  assert.deepEqual(errors, []);
   await page.close();
 });

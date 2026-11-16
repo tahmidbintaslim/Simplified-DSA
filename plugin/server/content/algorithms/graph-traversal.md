@@ -122,6 +122,12 @@ To draw the route, record where each node was discovered from (its parent). When
 
 In the demo, build a wall with a single gap. Run BFS and DFS. Do they find the same path? Which one visited more cells before reaching the goal?
 
+```answer
+BFS always finds a shortest path through the gap, because it reaches every cell in order of distance. DFS also finds a path, but it is often longer and winding, because it follows one direction as far as it can before backing up.
+
+Which one visits more cells depends on your walls. On an open grid BFS usually visits more, since it spreads out in rings; in a narrow corridor they visit about the same. Watch the visit numbers in the cells to compare.
+```
+
 ## Sources Checked
 
 - [Open Data Structures: Graphs](https://opendatastructures.org/ods-java/12_Graphs.html)
