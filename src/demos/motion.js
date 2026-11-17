@@ -1,111 +1,148 @@
+import { animate, inView, stagger } from 'motion';
+
 /**
- * Motion for the step demos: things that move on screen move, instead of
- * being redrawn in their new place.
+ * Motion for the step demos, built on Motion (motion.dev, formerly Framer
+ * Motion): things that move on screen move, instead of being redrawn in
+ * their new place.
  *
- * - patchRow keeps one element per key (a value, a slot) across steps, so a
- *   swapped value slides to its new position (FLIP), a state change cross-fades
- *   (CSS transitions on the reused element), and new cells grow in.
+ * - patchRow keeps one element per key (a value, a slot, a node) across
+ *   steps, so a swapped value slides to its new position (FLIP), a changed
+ *   value pops, new things enter and removed things leave with a motion you
+ *   choose (a pop flies up, a dequeue leaves to the left).
  * - glidePointers keeps one token per pointer name (lo, mid, hi, L, R, slow,
- *   fast…) under the row and glides it to the cell it points at.
+ *   fast…) and glides it to the cell it points at.
  * - setRange draws one bracket around the live range (lo..hi, a window) that
  *   stretches and shrinks with the algorithm.
+ * - ripple plays a step-by-step walk (a list walk, a tree path) in order.
  *
- * Timing comes from a real spring (stiffness/damping), sampled into CSS
- * `linear()`. With prefers-reduced-motion everything still updates, only
- * without movement.
+ * Springs (not fixed durations) drive all movement, so an animation that is
+ * interrupted by the next step keeps its velocity and never jumps. Colours
+ * and opacity cross-fade in CSS: springs are for position. With
+ * prefers-reduced-motion, every update still happens, without movement.
  */
 
-const reduceMotion = () => typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+export const reduceMotion = () => typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-/** Simulate a damped spring from 0 to 1 and sample it as a CSS linear() easing. */
-export function springEasing({ stiffness = 210, damping = 24, mass = 1 } = {}) {
-  const dt = 1 / 240;
-  const samples = [];
-  let x = 0;
-  let v = 0;
-  let t = 0;
-  // Integrate until the spring has settled (or 1.5s, whichever comes first).
-  while (t < 1.5) {
-    const a = (-stiffness * (x - 1) - damping * v) / mass;
-    v += a * dt;
-    x += v * dt;
-    t += dt;
-    samples.push(x);
-    if (Math.abs(x - 1) < 0.002 && Math.abs(v) < 0.02) break;
-  }
-  const points = 36;
-  const stops = Array.from({ length: points + 1 }, (_, i) => {
-    const value = i === points ? 1 : samples[Math.round((i / points) * (samples.length - 1))];
-    return value.toFixed(4);
-  });
-  return { easing: `linear(${stops.join(', ')})`, duration: Math.round(t * 1000) };
-}
+// One spring for the whole site: settles in about 0.45s with a little bounce.
+export const SPRING = { type: 'spring', visualDuration: 0.45, bounce: 0.2 };
+const INSTANT = { duration: 0 };
 
-const supportsLinear = typeof CSS !== 'undefined' && CSS.supports?.('transition-timing-function', 'linear(0, 1)');
-const SPRING = supportsLinear ? springEasing() : { easing: 'cubic-bezier(0.22, 1, 0.36, 1)', duration: 420 };
-
-// CSS transitions (pointer tokens, brackets, colours) share the same spring.
-if (typeof document !== 'undefined') {
-  document.documentElement.style.setProperty('--spring', SPRING.easing);
-  document.documentElement.style.setProperty('--spring-ms', `${SPRING.duration}ms`);
-}
+const move = (el, keyframes, options = SPRING) => animate(el, keyframes, reduceMotion() ? INSTANT : options);
 
 /**
- * Update `row` so its keyed children match `items` ([{ key, className, html }]),
- * reusing elements by key. Children without data-key are left alone.
+ * Update `row` so its keyed children match `items`
+ * ([{ key, className, html, style?, attrs?, pop? }]), reusing elements by key.
+ * Children without data-key (labels, a trailing "null") are left in place.
+ *
+ * `enter` / `exit` are Motion keyframes for things that appear or leave,
+ * e.g. { y: -30 } for a value dropping onto a stack.
  */
-export function patchRow(row, items, { tag = 'div' } = {}) {
+export function patchRow(row, items, { tag = 'div', enter = { scale: 0.6 }, exit = { scale: 0.6 } } = {}) {
   const existing = new Map();
   for (const el of row.children) if (el.dataset.key) existing.set(el.dataset.key, el);
   // The first fill (page load, a new lesson) appears in place; only changes move.
-  const animate = !reduceMotion() && row.isConnected && existing.size > 0;
-  // First: where everything is now (including any in-flight motion).
+  const animated = !reduceMotion() && row.isConnected && existing.size > 0;
+  // First: where everything is now (mid-flight positions included).
   const before = new Map();
-  if (animate) existing.forEach((el, key) => before.set(key, el.getBoundingClientRect()));
+  if (animated) existing.forEach((el, key) => before.set(key, el.getBoundingClientRect()));
 
-  const nodes = items.map(({ key, className, html, style = '' }) => {
+  const popped = new Set();
+  const nodes = items.map(({ key, className, html, style = '', attrs = {}, pop = false }) => {
     let el = existing.get(key);
     if (el) existing.delete(key);
     else {
       el = document.createElement(tag);
       el.dataset.key = key;
     }
+    for (const [name, value] of Object.entries(attrs)) if (el.getAttribute(name) !== String(value)) el.setAttribute(name, value);
     if (el.className !== className) el.className = className;
-    if ((el.getAttribute('style') ?? '') !== style) el.setAttribute('style', style);
+    if (el.dataset.style !== style) {
+      // Our own inline style (a bar height); Motion's transform is kept.
+      const transform = el.style.transform;
+      el.setAttribute('style', style);
+      if (transform) el.style.transform = transform;
+      el.dataset.style = style;
+    }
     if (el.dataset.html !== html) {
-      const changedValue = el.dataset.html !== undefined;
+      if (el.dataset.html !== undefined) popped.add(el);
       el.innerHTML = html;
       el.dataset.html = html;
-      if (changedValue && animate) el.dataset.changed = '1';
     }
+    if (pop) popped.add(el);
     return el;
   });
 
+  // Leaving: a copy flies off from where it was, so the layout can close at once.
+  if (animated) existing.forEach((el, key) => leave(el, before.get(key), exit));
+  existing.forEach((el) => el.remove());
+
   // Last: put them in order (moving an element keeps it, so FLIP can follow it).
   const anchor = [...row.children].find((child) => !child.dataset.key) ?? null;
-  nodes.forEach((el) => row.insertBefore(el, anchor));
-  existing.forEach((el) => el.remove());
-  if (!animate) return;
+  nodes.forEach((el) => {
+    if (el.nextSibling !== anchor || el.parentNode !== row) row.insertBefore(el, anchor);
+  });
+  if (!animated) return;
 
-  // Invert and play.
+  // Invert and play on a spring.
   for (const el of nodes) {
     const first = before.get(el.dataset.key);
     if (!first) {
-      el.animate([{ opacity: 0, transform: 'scale(0.6)' }, { opacity: 1, transform: 'none' }], SPRING);
+      animate(el, { opacity: [0, 1], ...from(enter) }, SPRING);
       continue;
     }
     const last = el.getBoundingClientRect();
     const dx = first.left - last.left;
     const dy = first.top - last.top;
-    if (dx || dy) {
-      el.getAnimations().forEach((a) => a.cancel());
-      el.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: 'none' }], SPRING);
-    } else if (el.dataset.changed) {
-      // Same place, new value: a small pop so the eye catches it.
-      el.animate([{ transform: 'scale(1.14)' }, { transform: 'none' }], SPRING);
-    }
-    delete el.dataset.changed;
+    if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5) animate(el, { x: [dx, 0], y: [dy, 0] }, SPRING);
+    else if (popped.has(el)) animate(el, { scale: [1.16, 1] }, SPRING);
   }
+}
+
+// { y: -30 } → { y: [-30, 0] }: from that offset back to rest.
+const from = (keyframes) =>
+  Object.fromEntries(Object.entries(keyframes).map(([name, value]) => [name, [value, name === 'scale' ? 1 : 0]]));
+
+// Animate a fixed-position copy of a removed element away, then drop it.
+function leave(el, rect, exit) {
+  if (!rect) return;
+  const ghost = el.cloneNode(true);
+  ghost.removeAttribute('data-key');
+  ghost.removeAttribute('id');
+  ghost.setAttribute('aria-hidden', 'true');
+  ghost.classList.add('motion-ghost');
+  Object.assign(ghost.style, {
+    position: 'fixed',
+    left: `${rect.left}px`,
+    top: `${rect.top}px`,
+    width: `${rect.width}px`,
+    height: `${rect.height}px`,
+    margin: '0',
+    pointerEvents: 'none',
+    zIndex: '30',
+    transform: 'none',
+  });
+  document.body.append(ghost);
+  animate(ghost, { opacity: 0, ...exit }, { ...SPRING, visualDuration: 0.35 }).then(() => ghost.remove());
+}
+
+/** Send an element that is about to be redrawn away with `exit` keyframes. */
+export function flyAway(el, exit = { scale: 0.6 }) {
+  if (reduceMotion() || !el?.isConnected) return;
+  leave(el, el.getBoundingClientRect(), exit);
+}
+
+/** Play a walk: pulse `elements` one after another, in order. */
+export function ripple(elements, { gap = 0.14, scale = 1.16 } = {}) {
+  if (reduceMotion() || !elements.length) return;
+  animate(elements, { scale: [1, scale, 1] }, { duration: 0.42, delay: stagger(gap), ease: 'easeOut' });
+}
+
+/** Fly an element in from another element's position (e.g. a key from the input box). */
+export function flyFrom(el, source) {
+  if (reduceMotion() || !el || !source) return;
+  const a = source.getBoundingClientRect();
+  const b = el.getBoundingClientRect();
+  animate(el, { x: [a.left - b.left, 0], y: [a.top - b.top, 0], scale: [0.8, 1] }, { ...SPRING, visualDuration: 0.6 });
 }
 
 /**
@@ -125,7 +162,8 @@ export function identityKeys() {
       used.add(i);
       return prevKeys[i];
     });
-    prevValues = values;
+    // A copy: callers may mutate their array in place (unshift, splice).
+    prevValues = [...values];
     prevKeys = keys;
     return keys;
   };
@@ -136,7 +174,7 @@ export function identityKeys() {
   return keyer;
 }
 
-// Centre of child i of `row`, relative to the row's offset parent.
+// Centre of keyed child i of `row`, relative to the row's offset parent.
 const cellCentre = (row, i) => {
   const cell = row.querySelectorAll(':scope > [data-key]')[i];
   return cell ? cell.offsetLeft + cell.offsetWidth / 2 : null;
@@ -146,12 +184,13 @@ const cellCentre = (row, i) => {
  * Glide named pointer tokens under the cells they point at. `pointers` maps a
  * name to a cell index (or null/-1 to hide it). Names on the same cell stack.
  */
-export function glidePointers(track, row, pointers) {
+export function glidePointers(track, row, pointers, { instant = false } = {}) {
   const tokens = new Map([...track.children].map((el) => [el.dataset.name, el]));
   const stacked = new Map();
   for (const [name, index] of Object.entries(pointers)) {
     let el = tokens.get(name);
-    if (!el) {
+    const fresh = !el;
+    if (fresh) {
       el = document.createElement('span');
       el.className = 'pointer-token';
       el.dataset.name = name;
@@ -164,22 +203,26 @@ export function glidePointers(track, row, pointers) {
     if (x === null) continue;
     const level = stacked.get(index) ?? 0;
     stacked.set(index, level + 1);
-    el.style.setProperty('--x', `${x}px`);
-    el.style.setProperty('--level', level);
+    el.dataset.x = String(x);
+    const target = { x: x - el.offsetWidth / 2, y: level * 15 };
+    if (instant || fresh) animate(el, target, INSTANT);
+    else move(el, target);
   }
   tokens.forEach((el) => el.classList.add('is-hidden'));
 }
 
 /** Frame cells from..to with one bracket that stretches and shrinks; hide it when from > to. */
-export function setRange(bracket, row, from, to) {
+export function setRange(bracket, row, from, to, { instant = false } = {}) {
   const cells = row.querySelectorAll(':scope > [data-key]');
   const a = cells[from];
   const b = cells[to];
   const show = Boolean(a && b && from <= to);
+  const wasHidden = bracket.classList.contains('is-hidden');
   bracket.classList.toggle('is-hidden', !show);
   if (!show) return;
-  bracket.style.setProperty('--left', `${a.offsetLeft - 4}px`);
-  bracket.style.setProperty('--width', `${b.offsetLeft + b.offsetWidth - a.offsetLeft + 8}px`);
+  const target = { x: a.offsetLeft - 4, width: b.offsetLeft + b.offsetWidth - a.offsetLeft + 8 };
+  if (instant || wasHidden) animate(bracket, target, INSTANT);
+  else move(bracket, target);
 }
 
 /** The HTML for one array cell's content. */
@@ -199,9 +242,9 @@ export const motionStageHtml = (rowClass = '') => `<div class="demo-stage">${mot
 
 /**
  * Drive one motion stage. update() patches the cells, then places pointers
- * and the bracket once layout is known: right away, on the next frame (the
- * demo may not be attached yet) and whenever the row resizes. The first
- * placement happens without transitions, so tokens never fly in from the left.
+ * and the bracket once layout is known: right away, and whenever the row
+ * resizes (which also covers the demo being attached to the page). Placement
+ * on attach or resize is instant, so tokens never fly in from the left.
  */
 export function motionRow(container) {
   const row = container.querySelector('.array-row');
@@ -209,19 +252,16 @@ export function motionRow(container) {
   const bracket = container.querySelector('.range-bracket');
   let state = { pointers: {}, range: null };
 
-  const place = () => {
+  const place = ({ instant = false } = {}) => {
     if (!row.offsetWidth) return;
     const first = !container.dataset.placed;
-    if (first) container.classList.add('is-settling');
-    glidePointers(track, row, state.pointers);
-    if (state.range) setRange(bracket, row, state.range[0], state.range[1]);
+    container.dataset.placed = '1';
+    const now = instant || first;
+    glidePointers(track, row, state.pointers, { instant: now });
+    if (state.range) setRange(bracket, row, state.range[0], state.range[1], { instant: now });
     else bracket.classList.add('is-hidden');
-    if (first) {
-      container.dataset.placed = '1';
-      requestAnimationFrame(() => requestAnimationFrame(() => container.classList.remove('is-settling')));
-    }
   };
-  if (typeof ResizeObserver === 'function') new ResizeObserver(place).observe(row);
+  if (typeof ResizeObserver === 'function') new ResizeObserver(() => place({ instant: true })).observe(row);
 
   return {
     row,
@@ -229,7 +269,32 @@ export function motionRow(container) {
       patchRow(row, items);
       state = { pointers, range };
       place();
-      requestAnimationFrame(place);
     },
   };
+}
+
+/**
+ * Figures in the reading reveal themselves: the first time a figure scrolls
+ * into view, its cells cascade in. `seen` (a Set) remembers revealed figures
+ * across re-renders of the same lesson, so nothing replays on a tab click.
+ */
+export function revealOnScroll(root, seen) {
+  if (reduceMotion() || typeof IntersectionObserver !== 'function') return;
+  root.querySelectorAll('.cells-figure:not(.cells-step)').forEach((figure, i) => {
+    if (seen.has(i)) return;
+    const cells = [...figure.querySelectorAll('.array-row > *')];
+    const extras = [...figure.querySelectorAll('figcaption, .pointer-track, .cell-pointer')];
+    cells.forEach((cell) => (cell.style.opacity = '0'));
+    extras.forEach((el) => (el.style.opacity = '0'));
+    const stop = inView(
+      figure,
+      () => {
+        seen.add(i);
+        stop();
+        animate(cells, { opacity: [0, 1], y: [14, 0] }, { ...SPRING, delay: stagger(0.045) });
+        animate(extras, { opacity: [0, 1] }, { duration: 0.35, delay: 0.12 + cells.length * 0.045 });
+      },
+      { amount: 0.35 },
+    );
+  });
 }

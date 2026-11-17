@@ -3986,10 +3986,8 @@ input:focus-visible,
   font-weight: 700;
   line-height: 1.2;
   white-space: nowrap;
-  transform: translate(calc(var(--x, 0px) - 50%), calc(var(--level, 0) * 15px));
-  transition:
-    transform var(--spring-ms, 420ms) var(--spring, ease),
-    opacity 180ms ease;
+  /* Motion (src/demos/motion.js) sets the transform; only fades are CSS. */
+  transition: opacity 180ms ease;
 }
 
 /* A small caret above each token points at its cell. */
@@ -4014,15 +4012,12 @@ input:focus-visible,
   bottom: 34px;
   left: 0;
   z-index: 0;
-  width: var(--width, 0px);
+  width: 0;
   border: 1.5px solid color-mix(in srgb, var(--accent) 55%, transparent);
   border-radius: 12px;
   background: color-mix(in srgb, var(--accent) 7%, transparent);
-  transform: translateX(var(--left, 0px));
-  transition:
-    transform var(--spring-ms, 420ms) var(--spring, ease),
-    width var(--spring-ms, 420ms) var(--spring, ease),
-    opacity 180ms ease;
+  /* Motion sets x and width; only the fade is CSS. */
+  transition: opacity 180ms ease;
 }
 
 .range-bracket.is-hidden {
@@ -4135,4 +4130,48 @@ input:focus-visible,
 /* Inside the live figure, pointer labels are gliding tokens, not cell text. */
 .cells-live .motion-row {
   margin-bottom: -6px;
+}
+
+/* Linked list: a node and its outgoing arrow move as one unit. */
+.list-unit {
+  display: flex;
+  align-items: center;
+  gap: inherit;
+}
+
+.list-unit.is-hit > .list-node {
+  border-color: var(--look);
+  background: var(--look-fill);
+}
+
+.list-unit.is-walked > .list-node {
+  border-color: var(--done);
+  background: var(--done-fill);
+}
+
+/* Growth bars grow and shrink as n changes (the slider fires many updates). */
+.growth-bar {
+  transition: width 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* BST: nodes are positioned by transform (Motion) and scale from their centre. */
+.bst-node {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.bst-node text {
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+.grid-cell {
+  transition: background-color 200ms ease, border-color 200ms ease, color 200ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .growth-bar,
+  .grid-cell {
+    transition: none;
+  }
 }

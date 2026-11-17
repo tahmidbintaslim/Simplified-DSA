@@ -25,7 +25,8 @@ import {
   windowSumCode,
   windowSumFrames,
 } from './algorithms.js';
-import { cellHtml, identityKeys, motionRow, motionRowHtml, motionStageHtml, patchRow } from './motion.js';
+import { animate } from 'motion';
+import { cellHtml, flyAway, flyFrom, identityKeys, motionRow, motionRowHtml, motionStageHtml, patchRow, reduceMotion, ripple, SPRING } from './motion.js';
 import { createPlayer } from './player.js';
 
 /**
@@ -165,22 +166,32 @@ function mountLinkedList(root) {
   `;
 
   const row = root.querySelector('.list-row');
+  row.innerHTML = '<span class="list-null">null</span>';
   const caption = root.querySelector('.demo-caption');
   const input = root.querySelector('[data-field="value"]');
+  const keys = identityKeys();
 
-  // `walked` is how many nodes were visited; `hit` is the index the operation landed on.
-  const draw = ({ walked = 0, hit = -1 } = {}) => {
-    const nodes = values.map((value, i) => {
-      const state = i === hit ? 'is-hit' : i < walked ? 'is-walked' : '';
-      return `
-        <div class="list-node ${state}">
-          ${i === 0 ? '<span class="list-label">head</span>' : ''}
-          <span class="list-value">${value}</span>
-          <span class="list-next" aria-hidden="true">next</span>
-        </div>
-        <span class="list-arrow" aria-hidden="true">→</span>`;
-    });
-    row.innerHTML = `${nodes.join('')}<span class="list-null">null</span>`;
+  // `walked` is how many nodes were visited; `hit` is the index the operation
+  // landed on. A node and its outgoing arrow move as one unit, so inserting at
+  // the head slides the whole list right, and the walk plays node by node.
+  const draw = ({ walked = 0, hit = -1, enter = { x: -40 } } = {}) => {
+    const ids = keys(values);
+    patchRow(
+      row,
+      values.map((value, i) => ({
+        key: ids[i],
+        className: `list-unit ${i === hit ? 'is-hit' : i < walked ? 'is-walked' : ''}`,
+        html: `
+          <div class="list-node">
+            ${i === 0 ? '<span class="list-label">head</span>' : ''}
+            <span class="list-value">${value}</span>
+            <span class="list-next" aria-hidden="true">next</span>
+          </div>
+          <span class="list-arrow" aria-hidden="true">→</span>`,
+      })),
+      { enter, exit: { y: 34 } },
+    );
+    ripple([...row.querySelectorAll('.list-unit')].slice(0, Math.max(walked, hit + 1)).map((unit) => unit.firstElementChild));
   };
 
   root.addEventListener('click', (event) => {
@@ -197,7 +208,7 @@ function mountLinkedList(root) {
     } else if (op === 'tail') {
       const walked = values.length;
       values.push(value);
-      draw({ walked, hit: values.length - 1 });
+      draw({ walked, hit: values.length - 1, enter: { x: 40 } });
       caption.textContent = `Walked ${walked} node${walked === 1 ? '' : 's'} to find the end, then linked ${value}: O(n). (Keeping a tail pointer makes this O(1).)`;
     } else {
       const index = values.indexOf(value);
@@ -254,20 +265,34 @@ function mountStackQueue(root) {
   const queueView = root.querySelector('.queue-view');
   const caption = root.querySelector('.demo-caption');
 
+  // Values keep their element: a push drops onto the top, a pop flies off it;
+  // an enqueue slides in at the back, a dequeue leaves at the front and the
+  // rest of the line moves up.
+  const empty = (view, isEmpty) => {
+    const note = view.querySelector('.demo-empty');
+    if (isEmpty && !note) view.insertAdjacentHTML('beforeend', '<p class="demo-empty">empty</p>');
+    if (!isEmpty) note?.remove();
+  };
   const draw = (hit = {}) => {
     // Draw the stack top-first so the top sits at the top of the picture.
-    stackView.innerHTML =
+    patchRow(
+      stackView,
       stack
-        .map((value, i) => `<div class="stack-item ${hit.stack === i ? 'is-hit' : ''}">${value}${i === stack.length - 1 ? '<small>top</small>' : ''}</div>`)
-        .reverse()
-        .join('') || '<p class="demo-empty">empty</p>';
-    queueView.innerHTML =
-      queue
-        .map(
-          (value, i) =>
-            `<div class="queue-item ${hit.queue === i ? 'is-hit' : ''}">${value}${i === 0 ? '<small>front</small>' : ''}${i === queue.length - 1 ? '<small>back</small>' : ''}</div>`,
-        )
-        .join('') || '<p class="demo-empty">empty</p>';
+        .map((value, i) => ({ key: `s${value}`, className: `stack-item ${hit.stack === i ? 'is-hit' : ''}`, html: `${value}${i === stack.length - 1 ? '<small>top</small>' : ''}` }))
+        .reverse(),
+      { enter: { y: -40 }, exit: { y: -56 } },
+    );
+    patchRow(
+      queueView,
+      queue.map((value, i) => ({
+        key: `q${value}`,
+        className: `queue-item ${hit.queue === i ? 'is-hit' : ''}`,
+        html: `${value}${i === 0 ? '<small>front</small>' : ''}${i === queue.length - 1 ? '<small>back</small>' : ''}`,
+      })),
+      { enter: { x: 44 }, exit: { x: -56 } },
+    );
+    empty(stackView, !stack.length);
+    empty(queueView, !queue.length);
   };
 
   root.addEventListener('click', (event) => {
@@ -365,10 +390,18 @@ function mountHashTable(root) {
     } else if (position === -1) {
       caption.textContent = `${safeKey} is not in bucket ${index}. Nothing to remove.`;
     } else {
+      // The key leaves its chain before the redraw closes the gap.
+      flyAway(view.querySelectorAll('.hash-bucket')[index]?.querySelectorAll('.hash-key')[position], { y: 30 });
       chain.splice(position, 1);
       caption.textContent = `Removed ${safeKey} from bucket ${index}.`;
     }
+    const isNew = op === 'insert' && position === -1 && chain.at(-1) === key;
     draw(index, op === 'remove' ? null : key);
+    const bucket = view.querySelectorAll('.hash-bucket')[index];
+    // The arithmetic picks the bucket: the key flies there from where it was typed.
+    if (isNew) flyFrom(bucket.querySelector('.hash-key:last-child'), input);
+    else if (op === 'find') ripple([...bucket.querySelectorAll('.hash-key')].slice(0, position === -1 ? undefined : position + 1));
+    ripple([bucket.querySelector('.hash-index')], { scale: 1.3 });
   });
 
   draw();
@@ -402,6 +435,14 @@ function mountBst(root) {
   const caption = root.querySelector('.demo-caption');
   const input = root.querySelector('[data-field="value"]');
 
+  svg.innerHTML = '<g class="bst-edges"></g><g class="bst-nodes"></g>';
+  const edgeLayer = svg.querySelector('.bst-edges');
+  const nodeLayer = svg.querySelector('.bst-nodes');
+  const SVG = 'http://www.w3.org/2000/svg';
+
+  // Nodes and edges keep their elements across draws: when an insert reshapes
+  // the tree, every node glides to its new place and the edges follow; a new
+  // node grows in; the search path then lights up one comparison at a time.
   const draw = (path = [], hit = null) => {
     const { nodes, edges } = bstLayout(tree);
     const gapX = 46;
@@ -410,20 +451,56 @@ function mountBst(root) {
     const width = Math.max(1, nodes.length) * gapX + 20;
     const height = (depth + 1) * gapY + 10;
     const at = Object.fromEntries(nodes.map((node) => [node.value, { x: node.x * gapX + 33, y: node.y * gapY + 30 }]));
+    const instant = { duration: 0 };
+    const spring = reduceMotion() ? instant : SPRING;
 
     svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
     svg.style.maxWidth = `${width}px`;
-    svg.innerHTML = [
-      ...edges.map(([a, b]) => {
-        const onPath = path.includes(a) && path.includes(b);
-        return `<line class="bst-edge ${onPath ? 'is-path' : ''}" x1="${at[a].x}" y1="${at[a].y}" x2="${at[b].x}" y2="${at[b].y}" />`;
-      }),
-      ...nodes.map((node) => {
-        const state = node.value === hit ? 'is-hit' : path.includes(node.value) ? 'is-path' : '';
-        const { x, y } = at[node.value];
-        return `<g class="bst-node ${state}"><circle cx="${x}" cy="${y}" r="18" /><text x="${x}" y="${y}">${node.value}</text></g>`;
-      }),
-    ].join('');
+
+    const oldEdges = new Map([...edgeLayer.children].map((line) => [line.dataset.key, line]));
+    for (const [a, b] of edges) {
+      const key = `${a}-${b}`;
+      let line = oldEdges.get(key);
+      const target = { x1: at[a].x, y1: at[a].y, x2: at[b].x, y2: at[b].y };
+      if (line) {
+        oldEdges.delete(key);
+        animate(line, target, spring);
+      } else {
+        line = document.createElementNS(SVG, 'line');
+        line.dataset.key = key;
+        for (const [name, value] of Object.entries(target)) line.setAttribute(name, value);
+        edgeLayer.append(line);
+        if (!reduceMotion()) animate(line, { opacity: [0, 1] }, { duration: 0.3, delay: 0.15 });
+      }
+      line.setAttribute('class', `bst-edge ${path.includes(a) && path.includes(b) ? 'is-path' : ''}`);
+    }
+    oldEdges.forEach((line) => line.remove());
+
+    const oldNodes = new Map([...nodeLayer.children].map((g) => [g.dataset.key, g]));
+    for (const node of nodes) {
+      const key = String(node.value);
+      let g = oldNodes.get(key);
+      const { x, y } = at[node.value];
+      if (g) {
+        oldNodes.delete(key);
+        animate(g, { x, y }, spring);
+      } else {
+        g = document.createElementNS(SVG, 'g');
+        g.dataset.key = key;
+        g.innerHTML = `<circle r="18" /><text>${node.value}</text>`;
+        nodeLayer.append(g);
+        animate(g, { x, y }, instant);
+        if (!reduceMotion() && oldNodes.size + nodeLayer.children.length > 1) animate(g, { scale: [0, 1] }, SPRING);
+      }
+      g.setAttribute('class', `bst-node ${node.value === hit ? 'is-hit' : path.includes(node.value) ? 'is-path' : ''}`);
+    }
+    oldNodes.forEach((g) => g.remove());
+
+    // The comparisons, in the order they happened.
+    ripple(
+      path.map((value) => nodeLayer.querySelector(`[data-key="${value}"] circle`)).filter(Boolean),
+      { gap: 0.2, scale: 1.25 },
+    );
     inorder.textContent = `In-order walk (left, node, right): ${bstInOrder(tree).join(', ') || 'empty'}. Height: ${nodes.length ? depth + 1 : 0}.`;
   };
 
@@ -487,24 +564,33 @@ function mountGrowth(root) {
   const output = root.querySelector('[data-field="n-out"]');
   const bars = root.querySelector('.growth-bars');
 
+  // Rows are built once; dragging the slider only changes widths and numbers,
+  // so the bars grow and shrink smoothly instead of being redrawn.
+  bars.innerHTML = growthRates
+    .map(
+      (rate) => `
+        <div class="growth-row">
+          <span class="growth-label">${rate.label}</span>
+          <div class="growth-track"><div class="growth-bar growth-${rate.id}"></div></div>
+          <span class="growth-value"></span>
+        </div>`,
+    )
+    .join('');
+  const barEls = [...bars.querySelectorAll('.growth-bar')];
+  const valueEls = [...bars.querySelectorAll('.growth-value')];
+
   const draw = () => {
     const n = Number(slider.value);
     output.textContent = n;
     const rows = growthRates.map((rate) => ({ ...rate, value: rate.ops(n) }));
     const max = Math.max(...rows.map((row) => row.value));
-    bars.innerHTML = rows
-      .map((row) => {
-        // At 1 µs per step, how long would this take?
-        const ms = row.value / 1000;
-        const time = ms < 1 ? `${formatNumber(row.value)} µs` : ms < 1000 ? `${ms.toFixed(1)} ms` : `${(ms / 1000).toFixed(2)} s`;
-        return `
-          <div class="growth-row">
-            <span class="growth-label">${row.label}</span>
-            <div class="growth-track"><div class="growth-bar growth-${row.id}" style="width: ${Math.max(0.6, (row.value / max) * 100)}%"></div></div>
-            <span class="growth-value">${formatNumber(row.value)} steps · ${time}</span>
-          </div>`;
-      })
-      .join('');
+    rows.forEach((row, i) => {
+      // At 1 µs per step, how long would this take?
+      const ms = row.value / 1000;
+      const time = ms < 1 ? `${formatNumber(row.value)} µs` : ms < 1000 ? `${ms.toFixed(1)} ms` : `${(ms / 1000).toFixed(2)} s`;
+      barEls[i].style.width = `${Math.max(0.6, (row.value / max) * 100)}%`;
+      valueEls[i].textContent = `${formatNumber(row.value)} steps · ${time}`;
+    });
   };
 
   slider.addEventListener('input', draw);
@@ -716,7 +802,7 @@ function mountGridTraversal(root) {
     const visited = new Set(frame?.visited);
     const frontier = new Set(frame?.frontier);
     const path = new Set(frame?.path);
-    let html = '';
+    const items = [];
     for (let r = 0; r < ROWS; r++) {
       for (let c = 0; c < COLS; c++) {
         const key = `${r},${c}`;
@@ -733,11 +819,18 @@ function mountGridTraversal(root) {
                   : '';
         const label = key === startKey ? 'S' : key === goalKey ? 'G' : '';
         const order = visited.has(key) && !label ? frame.visited.indexOf(key) + 1 : '';
-        html += `<button type="button" class="grid-cell ${state}" data-cell="${key}" aria-label="Row ${r + 1}, column ${c + 1}${walls.has(key) ? ', wall' : ''}">${label || order}</button>`;
+        items.push({
+          key,
+          className: `grid-cell ${state}`,
+          html: String(label || order),
+          attrs: { type: 'button', 'data-cell': key, 'aria-label': `Row ${r + 1}, column ${c + 1}${walls.has(key) ? ', wall' : ''}` },
+          pop: state === 'is-current',
+        });
       }
     }
-    grid.innerHTML = html;
-    if (focusedCell) grid.querySelector(`[data-cell="${focusedCell}"]`)?.focus();
+    // Buttons are reused, so focus stays put and new visits pop in order.
+    patchRow(grid, items, { tag: 'button' });
+    if (focusedCell && !grid.contains(document.activeElement)) grid.querySelector(`[data-cell="${focusedCell}"]`)?.focus();
   };
 
   const player = createPlayer(root, draw);

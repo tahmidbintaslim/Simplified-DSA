@@ -364,7 +364,7 @@ test('motion: worked examples scrub with pointers that glide; reduced motion sti
   const figure = page.locator('.cells-live').first();
   await figure.scrollIntoViewIfNeeded();
   assert.match(await figure.locator('figcaption').textContent(), /^Check 1/);
-  const loX = () => figure.locator('.pointer-token[data-name="lo"]').evaluate((el) => el.style.getPropertyValue('--x'));
+  const loX = () => figure.locator('.pointer-token[data-name="lo"]').evaluate((el) => el.dataset.x);
   const before = await loX();
   await figure.locator('[data-stepper="next"]').click();
   assert.match(await figure.locator('figcaption').textContent(), /^Check 2/);
@@ -386,4 +386,26 @@ test('motion: worked examples scrub with pointers that glide; reduced motion sti
   assert.match(await calm.page.textContent('.demo-count'), /^Step 3 \//);
   assert.deepEqual([...errors, ...calm.errors], []);
   await calm.page.close();
+});
+
+test('motion: stack, queue and list keep their elements, so values move instead of being redrawn', async () => {
+  const { page, errors } = await open('/data-structures/stacks-and-queues');
+  const firstQueueItem = await page.locator('.queue-item').first().elementHandle();
+  await page.click('[data-op="enqueue"]');
+  // The old front is the same element after an enqueue (it was moved, not rebuilt).
+  assert.equal(await firstQueueItem.evaluate((el) => el.isConnected), true);
+  await page.click('[data-op="push"]');
+  await page.click('[data-op="pop"]');
+  assert.match(await page.textContent('.demo-caption'), /Popped 13/);
+  assert.equal(await page.locator('.stack-view .stack-item').count(), 2);
+  await page.close();
+
+  const list = await open('/data-structures/linked-lists');
+  const seven = await list.page.locator('.list-unit').first().elementHandle();
+  await list.page.click('[data-op="head"]');
+  assert.equal(await seven.evaluate((el) => el.isConnected && el.textContent.includes('7')), true);
+  assert.equal(await list.page.locator('.list-unit').count(), 4);
+  assert.match(await list.page.textContent('.list-row'), /null$/);
+  assert.deepEqual([...errors, ...list.errors], []);
+  await list.page.close();
 });

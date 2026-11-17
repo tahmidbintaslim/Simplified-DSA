@@ -183,3 +183,18 @@ test('prefix sums answer any range with one subtraction', async () => {
   assert.deepEqual(frames.at(-2).prefix, [0, 3, 2, 6, 7, 12, 21, 23]);
   assert.equal(prefixSumFrames(values, 4, 2).at(-1).query, null);
 });
+
+test('identity keys follow values, even when the caller mutates its array in place', async () => {
+  const { identityKeys } = await import('../src/demos/motion.js');
+  const keys = identityKeys();
+  const values = [7, 3, 9];
+  const [k7, k3, k9] = keys(values);
+  values.unshift(5); // the linked list inserts at the head in place
+  const next = keys(values);
+  assert.deepEqual(next.slice(1), [k7, k3, k9]);
+  assert.ok(next[0] && !next.slice(1).includes(next[0]));
+  // Duplicates are matched left to right; a swap trades keys.
+  const swap = identityKeys();
+  const [a, b] = swap([4, 4, 1]);
+  assert.deepEqual(swap([1, 4, 4]).slice(1), [a, b]);
+});

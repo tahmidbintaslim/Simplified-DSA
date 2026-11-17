@@ -27,6 +27,7 @@
     "@fontsource-variable/geist": "^5.3.0",
     "@fontsource-variable/geist-mono": "^5.3.0",
     "@modelcontextprotocol/sdk": "1.32.2",
+    "motion": "^14.14.0",
     "zod": "4.6.7"
   }
 }
