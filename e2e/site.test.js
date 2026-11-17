@@ -278,7 +278,7 @@ test('critique 2: home links, jump list, stepped array insert, settled quiz', as
   // The site title goes home; home shows the drawn step and only section links.
   await page.click('.topbar .brand');
   assert.equal(new URL(page.url()).pathname, '/');
-  assert.equal(await page.locator('.home .cells-figure .array-cell').count(), 7);
+  assert.equal(await page.locator('.hero-figure .array-cell').count(), 7);
   assert.equal(await page.locator('.lesson-sidebar .lesson-link').count(), 0);
   assert.deepEqual(errors, []);
   await page.close();
@@ -339,4 +339,22 @@ test('new patterns: fast and slow pointers meet on the loop; prefix sums answer 
   assert.equal(await prefix.page.locator('.ps-values .array-cell.is-moved').count(), 3);
   assert.deepEqual([...errors, ...prefix.errors], []);
   await prefix.page.close();
+});
+
+test('critique 3: the hero search is drivable and the beam follows the middle cell', async () => {
+  const { page, errors } = await open('/');
+  const left = () => page.evaluate(() => document.querySelector('.beam').getBoundingClientRect().left);
+  const start = await left();
+  await page.click('#hero-next');
+  assert.match(await page.textContent('.hero-figure figcaption'), /Step 2 of 3/);
+  assert.ok((await left()) > start, 'beam moved right, to the new middle');
+  await page.click('#hero-next');
+  assert.equal(await page.locator('.hero-figure .array-cell.is-found').count(), 1);
+  assert.equal(await page.isDisabled('#hero-next'), true);
+  // Focus stays on a button that still works.
+  assert.equal(await page.evaluate(() => document.activeElement.id), 'hero-reset');
+  await page.click('#hero-reset');
+  assert.match(await page.textContent('.hero-figure figcaption'), /Step 1 of 3/);
+  assert.deepEqual(errors, []);
+  await page.close();
 });

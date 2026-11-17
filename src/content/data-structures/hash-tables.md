@@ -35,7 +35,9 @@ note: Seven buckets, numbered 0 to 6. "cat" lives in bucket 4, "dog" in 6 and "o
 ```quiz
 Q: Using the same hash and 7 buckets, which bucket does "act" go to?
 - 0
+  Why not: Bucket 0 would mean the sum divides evenly by 7. Add up the codes for a, c and t and check the remainder again.
 - 2
+  Why not: Bucket 2 is where "owl" lands, with a sum of 338. "act" has different letters from "owl", so its sum is different too.
 * 4
 Why: "act" has the same letters as "cat", so the sum is the same 312, and 312 % 7 = 4.
 ```
@@ -66,8 +68,10 @@ Load factor = keys ÷ buckets. As it rises, chains get longer and lookups slow d
 ```quiz
 Q: A table has 8 buckets and 6 keys. What is its load factor?
 - 1.33
+  Why not: That is 8 ÷ 6, buckets divided by keys. The division is the other way round.
 * 0.75
 - 6
+  Why not: That is just the number of keys. Load factor compares the keys to the 8 buckets they share.
 Why: Load factor is keys divided by buckets: 6 ÷ 8 = 0.75.
 ```
 

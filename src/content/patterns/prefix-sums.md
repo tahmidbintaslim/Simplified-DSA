@@ -44,7 +44,9 @@ Building took 6 additions once. After that, every question is a single subtracti
 Q: With prefix = [0, 3, 2, 6, 7, 12, 21], what is the sum of a[0..1]?
 * 2
 - 3
+  Why not: That is a[0] alone, which is prefix[1]. The range 0..1 also includes a[1], which is -1.
 - 6
+  Why not: That is prefix[3], the sum of a[0..2]. It also counts a[2] = 4, which is outside the range.
 Why: sum(0..1) = prefix[2] - prefix[0] = 2 - 0 = 2. Check: 3 + (-1) = 2.
 ```
 
@@ -64,8 +66,10 @@ Step through the build, one running total at a time. Then change `l` and `r` and
 ```quiz
 Q: Why does `prefix` have n + 1 entries instead of n?
 - To leave room for the answer
+  Why not: Answers are not stored in `prefix`. Each one is worked out by a subtraction when you ask.
 * So prefix[0] = 0 lets ranges that start at index 0 use the same formula
 - Because arrays start at 1
+  Why not: Arrays in this lesson start at index 0, like a[0] = 3. The extra slot is about the formula, not about where counting starts.
 Why: sum(0..r) = prefix[r+1] - prefix[0] = prefix[r+1] - 0. Without the leading 0 you would need a special case for every range that starts at the beginning.
 ```
 

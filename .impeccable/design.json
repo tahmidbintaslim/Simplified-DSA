@@ -749,11 +749,6 @@
         "purpose": "Section cards on hover only."
       },
       {
-        "name": "banner-mark",
-        "value": "0 10px 24px -12px rgb(0 0 0 / 35%)",
-        "purpose": "Frosted icon tile on section card banners."
-      },
-      {
         "name": "shadow-paper",
         "value": "0 1px 2px rgb(9 9 11 / 4%), 0 6px 20px -10px rgb(9 9 11 / 12%)",
         "dark": "0 1px 2px rgb(0 0 0 / 40%), 0 8px 24px -12px rgb(0 0 0 / 70%)",

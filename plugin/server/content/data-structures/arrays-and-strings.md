@@ -18,8 +18,10 @@ note: Four values. The small numbers underneath are the indexes: the first value
 ```quiz
 Q: In the array `[10, 20, 30, 40]`, what is at index 2?
 - 20
+  Why not: That is index 1. Counting starts at 0, so 10 sits at index 0 and 20 at index 1.
 * 30
 - 40
+  Why not: That is index 3, the last slot. Four values use indexes 0 to 3, so count again from 0.
 Why: Indexes start at 0, so index 0 is 10, index 1 is 20 and index 2 is 30.
 ```
 
@@ -70,7 +72,9 @@ In a list of a million values, inserting at the front would move a million value
 ```quiz
 Q: You delete the first value of a 1,000-item array. About how many values have to move?
 - 1
+  Why not: Arrays keep their values side by side with no gaps, so more than the deleted slot is affected. Think about every value after it.
 - 500
+  Why not: That would be half the array. Deleting at the very front leaves every remaining value one slot out of place, not just half of them.
 * 999
 Why: Every value after the deleted one shifts one slot left to close the gap, so 999 values move.
 ```

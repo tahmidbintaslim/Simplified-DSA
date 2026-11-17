@@ -32,7 +32,9 @@ note: After pass 2: 4 is in place. Pass 3 makes no swaps, so the list is sorted 
 Q: After one full pass of bubble sort on `[3, 1, 2]`, what is the list?
 * [1, 2, 3]
 - [1, 3, 2]
+  Why not: That is the list after only the first comparison. A full pass keeps going and also compares 3 with 2.
 - [3, 1, 2]
+  Why not: That is the starting list, unchanged. 3 is bigger than 1, so the very first comparison already swaps them.
 Why: Compare 3 and 1, swap: [1, 3, 2]. Compare 3 and 2, swap: [1, 2, 3]. The largest value, 3, bubbled to the end.
 ```
 
@@ -76,8 +78,10 @@ Splitting gives about `log₂ n` levels, and merging each level touches all `n` 
 ```quiz
 Q: Merge the sorted halves `[2, 7]` and `[3, 4]`. Which value is taken second?
 - 2
+  Why not: 2 is taken first, because 2 is smaller than 3. The question asks what comes next, once 2 is gone.
 * 3
 - 7
+  Why not: 7 is the largest of the four values, so it waits until the end. Both 3 and 4 are smaller.
 Why: Compare the fronts: 2 vs 3, take 2. Then 7 vs 3, take 3. Then 7 vs 4, take 4, and finally 7.
 ```
 

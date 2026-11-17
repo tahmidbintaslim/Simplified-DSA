@@ -36,7 +36,7 @@ note: Check 2: lo=4, hi=6, so mid=5. The value 42 is larger than 30, so drop ind
 ```cells
 values: 3 9 14 21 30 42 57
 pointers: lo=4 hi=4 mid=4
-done: 4
+found: 4
 dim: 0 1 2 3 5 6
 note: Check 3: lo=4, hi=4, so mid=4. The value is 30. Found it in 3 checks out of 7 values.
 ```
@@ -44,8 +44,10 @@ note: Check 3: lo=4, hi=4, so mid=4. The value is 30. Found it in 3 checks out o
 ```quiz
 Q: Same list. You search for 10, which is not in it. After checking 21 (go left) and 9 (go right), lo=2 and hi=2. What happens next?
 - Return index 1, because 9 is close to 10
+  Why not: Binary search only reports an exact match. 9 is not 10, and index 1 was already ruled out when lo moved to 2.
 * Check 14: it is larger than 10, so hi becomes 1, lo passes hi, and the answer is "not found"
 - The loop runs forever
+  Why not: Every check shrinks the range by at least one index. Once lo passes hi, the loop has nothing left and stops.
 Why: With lo=2 and hi=2, mid is 2 (value 14). 14 > 10, so hi = mid - 1 = 1. Now lo (2) is greater than hi (1), so nothing is left to check.
 ```
 
@@ -68,7 +70,9 @@ Step through a search and watch the code and the variables change together. Try 
 ```quiz
 Q: About how many checks does binary search need for a sorted list of 1,000,000 values?
 - 1,000
+  Why not: That is far too many. Each check halves the range, and halving a million just 10 times already leaves fewer than 1,000 values.
 - 500,000
+  Why not: That is half the list, about what a plain scan needs. Binary search throws away half of what is left with every check.
 * 20
 Why: Each check halves the range. 2 to the power 20 is just over a million, so about 20 halvings leave one value.
 ```

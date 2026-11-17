@@ -25,8 +25,10 @@ note: After pop. 12 left first, even though 3 has waited longest.
 ```quiz
 Q: You push A, then B, then C onto an empty stack, then pop once. What is on top now?
 - A
+  Why not: A was pushed first, so it sits at the bottom. One pop removes only the top item.
 * B
 - C
+  Why not: C was pushed last, so C is exactly what the pop removes. Think about what is left underneath it.
 Why: C was pushed last, so pop removes C. That leaves B on top.
 ```
 
@@ -63,8 +65,10 @@ Push and enqueue the same values, then remove one from each. Same input, differe
 ```quiz
 Q: A printer gets three jobs in this order: report, photo, letter. Which structure prints them fairly?
 - A stack, so the letter prints first
+  Why not: A stack hands back the newest job first. The report arrived first but would wait longest, which is not fair.
 * A queue, so the report prints first
 - Either one prints in the same order
+  Why not: A stack reverses the order: letter, photo, then report. The two structures give back jobs in opposite orders.
 Why: Fair means first come, first served. A queue releases the oldest job first; a stack would print the newest first.
 ```
 

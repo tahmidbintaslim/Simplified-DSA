@@ -57,8 +57,10 @@ Every slide is 2 operations, no matter how big `k` is, so the whole scan is `O(n
 ```quiz
 Q: In `[4, 2, 7, 1]` with `k = 2`, the first window `[4, 2]` sums to 6. What is the sum after one slide?
 - 8
+  Why not: The new window holds 2 and 7, which do not add up to 8. Try adding the entering value and subtracting the leaving one.
 * 9
 - 13
+  Why not: That is 6 + 7, which adds the entering 7 but forgets to remove the leaving 4.
 Why: The window becomes [2, 7]. Add the entering 7 and subtract the leaving 4: 6 + 7 - 4 = 9.
 ```
 
@@ -87,7 +89,9 @@ Each letter enters once and leaves at most once, so this is still `O(n)`.
 Q: Which problem is a sliding-window problem?
 * The longest run of days whose total rainfall stays under 50 mm
 - Two numbers anywhere in a list that add up to a target
+  Why not: The two numbers can be far apart, with other values between them. A window only covers values that sit next to each other.
 - The shortest path through a maze
+  Why not: A maze is a graph of paths, not a row of consecutive values. There is no window that slides along it.
 Why: "A run of days" means consecutive values, and the rule ("total under 50") can be kept up to date as days enter and leave. Pairs from anywhere suit a hash set or two pointers; mazes suit BFS.
 ```
 

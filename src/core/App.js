@@ -1,5 +1,6 @@
 import { curriculum } from '../content/curriculum.js';
 import { demos } from '../demos/index.js';
+import { binarySearchFrames } from '../demos/algorithms.js';
 import { DEMO_MARKER, escapeHtml, MarkdownRenderer } from '../utils/markdown.js';
 import { icon } from '../utils/icons.js';
 import { loadCompleted, saveCompleted } from './progress.js';
@@ -18,33 +19,28 @@ const slugify = (html) =>
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '');
 
-// <details> folds whose open state survives a re-render of the same lesson.
-// The home page shows the product's promise: one real step of a binary search.
-const HOME_FIGURE = [
-  '```cells',
-  'values: 3 9 14 21 30 42 57',
-  'pointers: lo=0 mid=3 hi=6',
-  'highlight: 3',
-  'note: Step 1 of a binary search for 30: look at the middle value, 21. It is too small, so 21 and everything left of it can be ruled out.',
-  '```',
-].join('\n');
+// The home hero is the product's promise, drivable: a real binary search for 30.
+const HERO_VALUES = [3, 9, 14, 21, 30, 42, 57];
+const HERO_TARGET = 30;
+const HERO_FRAMES = binarySearchFrames(HERO_VALUES, HERO_TARGET);
 
-// Banner colours for the home section cards (decorative art, not step states).
-const SECTION_ART = [
-  { a: '#bcd3ff', b: '#6d9bff', c: '#2f5fe0', icon: 'cells' },
-  { a: '#ffd9cc', b: '#ff9b7d', c: '#d9532f', icon: 'halve' },
-  { a: '#d9d0ff', b: '#9d86f5', c: '#5b3fd0', icon: 'pointers' },
+// Section cards show one real step in the step vocabulary, not decoration:
+// gold = looking at, pale teal = done or in place, crossed out = ruled out.
+const SECTION_FIGURES = [
+  { values: [7, 3, 9, 1, 5], states: { 2: 'is-hit' }, labels: { 2: 'a[2]' }, caption: 'Read a[2]: one jump, no scan.' },
+  { values: [1, 3, 9, 7, 5], states: { 0: 'is-moved', 1: 'is-moved', 2: 'is-hit', 3: 'is-hit' }, labels: { 2: 'i', 3: 'i+1' }, caption: 'Compare 9 and 7, then swap.' },
+  { values: [1, 3, 4, 6, 8, 11], states: { 0: 'is-out', 1: 'is-hit', 4: 'is-hit', 5: 'is-out' }, labels: { 1: 'L', 4: 'R' }, caption: '3 + 8 = 11, too big: move R.' },
 ];
 
-// Three layered wave bands, coloured by the card's --art-* custom properties.
-const waves = () => `
-  <svg viewBox="0 0 400 160" preserveAspectRatio="none" focusable="false">
-    <rect width="400" height="160" fill="var(--art-a)"/>
-    <path d="M0 70 C70 40 130 95 200 70 S330 40 400 64 V160 H0Z" fill="var(--art-b)" opacity="0.75"/>
-    <path d="M0 104 C80 78 150 128 230 102 S350 80 400 98 V160 H0Z" fill="var(--art-b)"/>
-    <path d="M0 134 C90 112 170 150 260 128 S360 118 400 128 V160 H0Z" fill="var(--art-c)"/>
-  </svg>`;
+const miniFigure = ({ values, states, labels, caption }) => `
+  <span class="mini-figure">
+    <span class="array-row">${values
+      .map((value, i) => `<span class="array-cell ${states[i] ?? ''}"><span class="array-value">${value}</span>${labels[i] ? `<span class="cell-pointer">${labels[i]}</span>` : '<span class="cell-pointer">&nbsp;</span>'}</span>`)
+      .join('')}</span>
+    <span class="mini-caption">${caption}</span>
+  </span>`;
 
+// <details> folds whose open state survives a re-render of the same lesson.
 const FOLDS = ['answer', 'sources', 'language-details'];
 
 // Matches the 760px layout breakpoint in style.css.
@@ -71,6 +67,8 @@ export class App {
     // Sidebar sections the learner opened or closed by hand, and the search text.
     this.openSections = new Map();
     this.navQuery = '';
+    // Which step of the home hero's binary search is showing.
+    this.heroStep = 0;
     this.activeSectionId = this.sections[0].id;
     this.activeLessonId = this.sections[0].lessons[0].id;
     this.activeLanguageId = this.activeLesson.languageExamples?.[0]?.id ?? null;
@@ -204,6 +202,15 @@ export class App {
       const languageButton = event.target.closest('[data-language-id]');
       const quizOption = event.target.closest('[data-quiz-option]');
       const completeButton = event.target.closest('[data-complete]');
+
+      const heroButton = event.target.closest('[data-hero]');
+      if (heroButton) {
+        const last = HERO_FRAMES.length - 1;
+        this.heroStep = heroButton.dataset.hero === 'next' ? Math.min(last, this.heroStep + 1) : 0;
+        // Keep focus on a button that still works: Next until the end, then Start over.
+        this.render({ focusId: this.heroStep === last ? 'hero-reset' : this.heroStep === 0 ? 'hero-next' : heroButton.id });
+        return;
+      }
 
       if (event.target.closest('[data-theme-toggle]')) {
         this.toggleTheme();
@@ -671,11 +678,47 @@ export class App {
       right.dataset.mark = 'Correct';
     }
     const why = quiz.querySelector('.quiz-why').textContent;
+    // A wrong pick explains what that choice gets wrong, so the retry is informed.
+    const whyNot = correct ? '' : option.querySelector('.quiz-why-not')?.textContent ?? '';
+    const notQuite = `Not quite.${whyNot ? ` ${whyNot}` : ''}`;
     quiz.querySelector('.quiz-feedback').textContent = correct
       ? `Correct. ${why}`
       : reveal
-        ? `Not quite. The answer is highlighted. ${why}`
-        : 'Not quite. Have another think and try again.';
+        ? `${notQuite} The answer is highlighted. ${why}`
+        : `${notQuite} Have another think and try again.`;
+  }
+
+  /**
+   * One step of a real binary search, drawn with the lesson figures and moved
+   * by the learner: the beam follows the middle cell being checked.
+   */
+  renderHeroStep() {
+    const frame = HERO_FRAMES[this.heroStep];
+    const last = HERO_FRAMES.length - 1;
+    // found is null until the value is found (and -1 if it is missing); null >= 0 is true in JS.
+    const isFound = Number.isInteger(frame.found) && frame.found >= 0;
+    const mid = isFound ? frame.found : frame.mid;
+    const outside = HERO_VALUES.map((_, i) => i).filter((i) => i < frame.lo || i > frame.hi);
+    const figure = [
+      '```cells',
+      `values: ${HERO_VALUES.join(' ')}`,
+      `pointers: lo=${frame.lo} mid=${mid} hi=${frame.hi}`,
+      isFound ? `found: ${frame.found}` : `highlight: ${mid}`,
+      outside.length ? `dim: ${outside.join(' ')}` : '',
+      `note: Step ${this.heroStep + 1} of ${HERO_FRAMES.length}, searching for ${HERO_TARGET}. ${frame.caption}`,
+      '```',
+    ]
+      .filter(Boolean)
+      .join('\n');
+    return `
+      <div class="hero-figure" style="--mid-offset:${mid - 3}">
+        <span class="beam" aria-hidden="true"></span>
+        ${this.markdownRenderer.render(figure)}
+        <p class="hero-steps">
+          <button id="hero-next" type="button" class="demo-button is-primary" data-hero="next" ${this.heroStep === last ? 'disabled' : ''}>Next step ${icon('next')}</button>
+          <button id="hero-reset" type="button" class="demo-button" data-hero="reset" ${this.heroStep === 0 ? 'disabled' : ''}>Start over</button>
+        </p>
+      </div>`;
   }
 
   /**
@@ -703,14 +746,10 @@ export class App {
       const entries = section.lessons.map((lesson) => ({ section, lesson }));
       const done = entries.filter(isDone).length;
       const target = entries.find((entry) => !isDone(entry)) ?? entries[0];
-      const art = SECTION_ART[i % SECTION_ART.length];
       return `
         <li>
           <a class="section-card" ${linkTo(target)}>
-            <span class="section-card-art" style="--art-a:${art.a};--art-b:${art.b};--art-c:${art.c}" aria-hidden="true">
-              ${waves()}
-              <span class="section-card-mark">${icon(art.icon)}</span>
-            </span>
+            <span class="section-card-art" aria-hidden="true">${miniFigure(SECTION_FIGURES[i % SECTION_FIGURES.length])}</span>
             <span class="section-card-tab">${section.lessons.length} lessons</span>
             <strong>${escapeHtml(section.title)}</strong>
             <span class="lesson-summary">${escapeHtml(section.description)}</span>
@@ -746,10 +785,7 @@ export class App {
               <li>${icon('check')} No account, no tracking</li>
             </ul>
           </div>
-          <div class="hero-figure">
-            <span class="beam" aria-hidden="true"></span>
-            ${this.markdownRenderer.render(HOME_FIGURE)}
-          </div>
+          ${this.renderHeroStep()}
         </section>
         </div>
 
@@ -786,14 +822,10 @@ export class App {
         </section>
 
         <section class="home-closing" aria-labelledby="closing-title">
-          <span class="closing-tiles" aria-hidden="true">${SECTION_ART.concat(SECTION_ART)
-            .map((art, i) => `<span class="closing-tile t${i}" style="--art-b:${art.b}">${icon(art.icon)}</span>`)
-            .join('')}</span>
           <h2 id="closing-title">Your first lesson takes about ${nextUp.lesson.minutes ?? 12} minutes.</h2>
           <p>Read it, trace it, then drive the demo yourself. Progress stays in this browser.</p>
           <a class="demo-button is-primary" ${linkTo(nextUp)}>${escapeHtml(startLabel)} ${icon('arrowRight')}</a>
         </section>
-        <p class="wordmark" aria-hidden="true">Simplified DSA</p>
       </div>
     `;
   }
