@@ -660,8 +660,11 @@ function mountBinarySearch(root) {
     // more would push lo and hi out of view.
     const count = window.matchMedia('(max-width: 480px)').matches ? 7 : 12;
     values = [...new Set(randomValues(40, 1, 99))].slice(0, count).sort((a, b) => a - b);
-    // Not the first two values: there a plain left-to-right scan would look better.
-    input.value = values[randomInt(2, values.length - 1)];
+    // Not the first two values (a plain scan would look better there) and not
+    // the first middle (the search would end in one step and show nothing).
+    const firstMid = Math.floor((values.length - 1) / 2);
+    const choices = values.map((_, i) => i).filter((i) => i >= 2 && i !== firstMid);
+    input.value = values[choices[randomInt(0, choices.length - 1)]];
     run();
   };
 
