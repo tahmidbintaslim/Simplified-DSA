@@ -11,10 +11,14 @@ import {
   bstInsert,
   bstLayout,
   bstSearchPath,
+  fastSlowCode,
+  fastSlowFrames,
   growthRates,
   gridTraversalFrames,
   pairSumCode,
   pairSumFrames,
+  prefixSumCode,
+  prefixSumFrames,
   simpleHash,
   sortingAlgorithms,
   traversalCode,
@@ -875,6 +879,149 @@ function mountSlidingWindow(root) {
   run();
 }
 
+/* ---------- Pattern: fast and slow pointers on a linked list ---------- */
+
+function mountFastSlow(root) {
+  const names = 'ABCDEFGHIJKL';
+  root.innerHTML = `
+    <div class="demo-controls">
+      <label>Nodes <input class="demo-input" type="number" value="8" min="2" max="12" data-field="n" /></label>
+      <label>Last node points to <select class="demo-input demo-select" data-field="loop"></select></label>
+      <button type="button" class="demo-button" data-op="run">Run</button>
+    </div>
+    <div class="demo-stage"><div class="array-row fs-row"></div></div>
+    ${legend([['hit', 'where slow and fast are'], ['found', 'where they meet'], ['gap', 'the loop back']])}
+    <p class="bs-compare fs-compare" aria-live="polite"></p>
+  `;
+
+  const row = root.querySelector('.fs-row');
+  const compare = root.querySelector('.fs-compare');
+  const nInput = root.querySelector('[data-field="n"]');
+  const loopSelect = root.querySelector('[data-field="loop"]');
+  let n = 8;
+  let loopTo = 3;
+
+  // Options: "nothing" (a plain list) or any node before it, which makes a loop.
+  const fillOptions = () => {
+    loopSelect.innerHTML = ['<option value="-1">nothing (no loop)</option>']
+      .concat(Array.from({ length: n }, (_, i) => `<option value="${i}">node ${i} (${names[i]})</option>`))
+      .join('');
+    loopSelect.value = String(Math.min(loopTo, n - 1));
+  };
+
+  const player = createPlayer(root, ({ slow, fast, met }) => {
+    const cells = Array.from({ length: n }, (_, i) => {
+      const state = met && i === slow ? 'is-found' : i === slow || i === fast ? 'is-hit' : '';
+      const tags = [i === slow && 'slow', i === fast && 'fast'].filter(Boolean).join(' ');
+      const pointer = tags ? `<span class="cell-pointer">${tags}</span>` : '<span class="cell-pointer">&nbsp;</span>';
+      return `<div class="array-cell ${state}"><span class="array-value">${names[i]}</span><span class="array-index">${i}</span>${pointer}</div>`;
+    }).join('');
+    // The loop is drawn as a dashed U from the last node back to its target.
+    const loop = loopTo >= 0 ? `<span class="fs-loop" style="--from:${loopTo};--to:${n - 1}" aria-hidden="true"></span>` : '';
+    row.innerHTML = cells + loop;
+  });
+
+  const run = () => {
+    n = Math.min(12, Math.max(2, readInt(nInput) ?? 8));
+    nInput.value = n;
+    loopTo = Number(loopSelect.value);
+    if (!(loopTo < n)) loopTo = -1;
+    const frames = fastSlowFrames(n, loopTo);
+    const steps = frames.at(-1).vars.steps;
+    setStatus(
+      compare,
+      `${loopTo >= 0 ? `Node ${n - 1} points back to node ${loopTo}. ` : ''}Fast and slow: ${steps} step${steps === 1 ? '' : 's'}, two pointers of memory. A "visited" set would remember up to ${n} nodes.`,
+    );
+    player.load(frames, fastSlowCode);
+  };
+
+  root.addEventListener('click', (event) => {
+    if (event.target.closest('[data-op="run"]')) run();
+  });
+  nInput.addEventListener('change', () => {
+    n = Math.min(12, Math.max(2, readInt(nInput) ?? 8));
+    fillOptions();
+  });
+
+  fillOptions();
+  run();
+}
+
+/* ---------- Pattern: prefix sums ---------- */
+
+function mountPrefixSums(root) {
+  let values = [3, -1, 4, 1, 5, 9, 2, 6];
+  root.innerHTML = `
+    <div class="demo-controls">
+      <label>From l <input class="demo-input" type="number" value="2" min="0" data-field="l" /></label>
+      <label>to r <input class="demo-input" type="number" value="5" min="0" data-field="r" /></label>
+      <button type="button" class="demo-button" data-op="run">Ask</button>
+      <div class="demo-list-row">
+  <label>Your list <input class="demo-input demo-input-wide" type="text" placeholder="e.g. 3 -1 4 1 5" data-field="list" /></label>
+  <button type="button" class="demo-button" data-op="use">Use list</button>
+      </div>
+    </div>
+    <div class="demo-stage">
+      <p class="ps-label">a</p>
+      <div class="array-row ps-values"></div>
+      <p class="ps-label">prefix</p>
+      <div class="array-row ps-prefix"></div>
+    </div>
+    ${legend([['hit', 'being read'], ['moved', 'just written, or the range asked for'], ['gap', 'not built yet']])}
+    <p class="bs-compare ps-compare" aria-live="polite"></p>
+  `;
+
+  const valueRow = root.querySelector('.ps-values');
+  const prefixRow = root.querySelector('.ps-prefix');
+  const compare = root.querySelector('.ps-compare');
+  const lInput = root.querySelector('[data-field="l"]');
+  const rInput = root.querySelector('[data-field="r"]');
+  const listInput = root.querySelector('[data-field="list"]');
+  const cell = (value, i, state) =>
+    `<div class="array-cell ${state}"><span class="array-value">${value}</span><span class="array-index">${i}</span></div>`;
+
+  const player = createPlayer(root, ({ prefix, i, query }) => {
+    valueRow.innerHTML = values
+      .map((value, j) => cell(value, j, query ? (j >= query.l && j <= query.r ? 'is-moved' : '') : j === i ? 'is-hit' : ''))
+      .join('');
+    prefixRow.innerHTML = Array.from({ length: values.length + 1 }, (_, j) => {
+      if (j >= prefix.length) return cell('', j, 'is-gap');
+      const state = query ? (j === query.r + 1 || j === query.l ? 'is-hit' : '') : j === i + 1 ? 'is-moved' : j === i ? 'is-hit' : '';
+      return cell(prefix[j], j, state);
+    }).join('');
+  });
+
+  const run = () => {
+    const l = readInt(lInput);
+    const r = readInt(rInput);
+    const valid = l !== null && r !== null && l >= 0 && l <= r && r < values.length;
+    setStatus(
+      compare,
+      valid
+        ? `Prefix sums: ${values.length} additions once, then 1 subtraction per question. Adding a[${l}..${r}] directly takes ${r - l} addition${r - l === 1 ? '' : 's'} for this question alone.`
+        : `Pick 0 ≤ l ≤ r ≤ ${values.length - 1}.`,
+      { error: !valid, keptPrevious: false },
+    );
+    player.load(prefixSumFrames(values, l, r), prefixSumCode);
+  };
+
+  root.addEventListener('click', (event) => {
+    const op = event.target.closest('[data-op]')?.dataset.op;
+    if (op === 'run') run();
+    if (op === 'use') {
+      const list = readList(listInput, { min: -99, max: 99, count: 12 });
+      if (!list) {
+        setStatus(compare, 'Type 1 to 12 whole numbers between -99 and 99, separated by spaces or commas.', { error: true });
+        return;
+      }
+      values = list;
+      run();
+    }
+  });
+
+  run();
+}
+
 export const demos = {
   'array-ops': {
     title: 'Insert, delete and read',
@@ -930,5 +1077,15 @@ export const demos = {
     title: 'Slide the window',
     intro: 'Each slide adds the value that enters and subtracts the one that leaves.',
     mount: mountSlidingWindow,
+  },
+  'fast-slow': {
+    title: 'Fast and slow pointers',
+    intro: 'Slow steps one node, fast steps two. On a loop they must meet; on a plain list fast falls off the end.',
+    mount: mountFastSlow,
+  },
+  'prefix-sums': {
+    title: 'Build once, ask in O(1)',
+    intro: 'Build the running totals, then answer a range sum with one subtraction.',
+    mount: mountPrefixSums,
   },
 };

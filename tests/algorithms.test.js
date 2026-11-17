@@ -148,3 +148,38 @@ test('array delete closes the gap one step at a time', async () => {
   assert.match(frames.at(-1).caption, /3 values shifted left/);
   assert.match(arrayDeleteFrames([7], 0).at(-1).caption, /0 values/);
 });
+
+test('fast and slow pointers meet on a loop and find the middle without one', async () => {
+  const { fastSlowFrames } = await import('../src/demos/algorithms.js');
+  // Brute-force truth: walk with a visited set.
+  const hasLoop = (n, loopTo) => {
+    const seen = new Set();
+    for (let i = 0; i >= 0; i = i + 1 < n ? i + 1 : loopTo) {
+      if (seen.has(i)) return true;
+      seen.add(i);
+    }
+    return false;
+  };
+  for (let n = 1; n <= 12; n++) {
+    for (let loopTo = -1; loopTo < n; loopTo++) {
+      const last = fastSlowFrames(n, loopTo).at(-1);
+      assert.equal(last.met, hasLoop(n, loopTo), `n=${n} loopTo=${loopTo}`);
+      if (loopTo === -1) assert.equal(last.slow, Math.floor(n / 2), `middle of ${n}`);
+    }
+  }
+  assert.match(fastSlowFrames(6, 2).at(-1).caption, /they meet/);
+});
+
+test('prefix sums answer any range with one subtraction', async () => {
+  const { prefixSumFrames } = await import('../src/demos/algorithms.js');
+  const values = [3, -1, 4, 1, 5, 9, 2];
+  for (let l = 0; l < values.length; l++) {
+    for (let r = l; r < values.length; r++) {
+      const last = prefixSumFrames(values, l, r).at(-1);
+      assert.equal(last.query.sum, values.slice(l, r + 1).reduce((a, b) => a + b, 0));
+    }
+  }
+  const frames = prefixSumFrames(values, 1, 3);
+  assert.deepEqual(frames.at(-2).prefix, [0, 3, 2, 6, 7, 12, 21, 23]);
+  assert.equal(prefixSumFrames(values, 4, 2).at(-1).query, null);
+});

@@ -3820,3 +3820,98 @@ input:focus-visible,
     border-bottom: 1px solid var(--line);
   }
 }
+
+/* How far through the lesson: a hairline of blue under the top bar that grows
+   as the page scrolls. Scroll-driven, so no script; browsers without support
+   simply do not show it. */
+.read-progress {
+  display: none;
+}
+
+@supports (animation-timeline: scroll()) {
+  .read-progress {
+    position: absolute;
+    right: 0;
+    bottom: -1px;
+    left: 0;
+    display: block;
+    height: 2px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    animation: read-progress linear both;
+    animation-timeline: scroll(root block);
+  }
+
+  @keyframes read-progress {
+    to {
+      transform: scaleX(1);
+    }
+  }
+}
+
+/* Fast and slow pointers: fixed cell sizes so the loop can be placed by index. */
+.fs-row {
+  --cell: 46px;
+  --gap: 6px;
+  position: relative;
+  gap: var(--gap);
+  padding-bottom: 26px;
+}
+
+.fs-row .array-cell {
+  width: var(--cell);
+  min-width: var(--cell);
+}
+
+/* A dashed U from the last node back to the node it points at, arrow at the target. */
+.fs-loop {
+  position: absolute;
+  bottom: 4px;
+  left: calc(var(--from) * (var(--cell) + var(--gap)) + var(--cell) / 2);
+  width: calc((var(--to) - var(--from)) * (var(--cell) + var(--gap)));
+  height: 16px;
+  border: 2px dashed var(--edge);
+  border-top: 0;
+  border-radius: 0 0 10px 10px;
+}
+
+.fs-loop::before {
+  content: "";
+  position: absolute;
+  top: -7px;
+  left: -7px;
+  border: 6px solid transparent;
+  border-bottom-color: var(--edge);
+}
+
+/* A loop onto the last node itself is a small self-loop. */
+.fs-loop {
+  min-width: 14px;
+}
+
+/* An empty slot keeps the full cell height. */
+.is-gap > .array-value::before {
+  content: "\00a0";
+}
+
+.demo-select {
+  width: auto;
+  min-width: 9rem;
+}
+
+/* Prefix sums: two labelled rows. */
+.ps-label {
+  margin: 0 0 6px;
+  color: var(--subtle);
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+}
+
+.ps-values {
+  margin-bottom: 14px;
+}
+
+.swatch-gap {
+  border: 1px dashed var(--line-strong);
+}
