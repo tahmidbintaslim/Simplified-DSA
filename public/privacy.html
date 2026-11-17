@@ -2,29 +2,36 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <script>
+      try {
+        const theme = localStorage.getItem('simplified-dsa:theme');
+        if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme;
+      } catch {}
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="What Simplified DSA, its Claude plugin and its MCP connector collect: nothing about you." />
     <link rel="icon" type="image/png" href="/icon.png" />
     <title>Privacy | Simplified DSA</title>
     <style>
-      /* Same paper/night palette as the lessons (src/style.css tokens). */
-      :root { color-scheme: light dark; --page: #f6f1e7; --ink: #2c261f; --head: #1d1813; --link: #8a5600; --look: #8a5e04; --muted: #645a4a; }
+      /* Same white/night palette as the lessons (src/style.css tokens). */
+      :root { color-scheme: light dark; --page: #ffffff; --ink: #27272a; --head: #09090b; --link: #1d4ed8; --muted: #5c5c66; --code: #f4f4f5; }
       @media (prefers-color-scheme: dark) {
-        :root { --page: #11110f; --ink: #ddd5c6; --head: #f5f0e6; --link: #d9b36a; --look: #f1cd86; --muted: #a99f8d; }
+        :root:not([data-theme="light"]) { --page: #0b0b0d; --ink: #d4d4d8; --head: #fafafa; --link: #8ab0ff; --muted: #a1a1aa; --code: #18181b; }
       }
+      :root[data-theme="dark"] { --page: #0b0b0d; --ink: #d4d4d8; --head: #fafafa; --link: #8ab0ff; --muted: #a1a1aa; --code: #18181b; }
       body {
         margin: 0;
         background: var(--page);
         color: var(--ink);
-        font: 1.03rem/1.68 Georgia, "Times New Roman", serif;
+        font: 1.03rem/1.68 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
       }
       main { max-width: 72ch; margin: 0 auto; padding: 48px 16px 64px; }
-      h1, h2 { color: var(--head); line-height: 1.15; }
+      h1, h2 { color: var(--head); line-height: 1.15; font-weight: 600; letter-spacing: -0.02em; }
       h1 { font-size: clamp(2rem, 5vw, 2.8rem); margin: 0 0 8px; }
       h2 { font-size: 1.3rem; margin: 34px 0 10px; }
       a { color: var(--link); text-underline-offset: 3px; }
-      a:focus-visible { outline: 2px solid var(--look); outline-offset: 2px; }
-      code { color: var(--look); }
+      a:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+      code { background: var(--code); border-radius: 4px; padding: 1px 5px; }
       .updated { color: var(--muted); margin: 0 0 28px; }
     </style>
   </head>

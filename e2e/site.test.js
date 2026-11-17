@@ -252,8 +252,8 @@ test('home shows the course map and a start button; lessons end with a folded an
 test('critique 2: home links, jump list, stepped array insert, settled quiz', async () => {
   const { page, errors } = await open('/data-structures/arrays-and-strings');
   // The jump list scrolls without re-rendering (the demo keeps its state).
-  await page.click('.lesson-jumps a[href="#cost"]');
-  assert.equal(await page.evaluate(() => document.activeElement.id), 'cost');
+  await page.click('.toc a[href="#cost-cheat-sheet"]'); // the jump list is the phone version of this
+  assert.equal(await page.evaluate(() => document.activeElement.id), 'cost-cheat-sheet');
   assert.equal(new URL(page.url()).hash, '');
 
   // Insert shifts one value per step, with the gap travelling.
@@ -272,7 +272,7 @@ test('critique 2: home links, jump list, stepped array insert, settled quiz', as
   assert.equal(await quiz.locator('.is-wrong').count(), 0);
 
   // The site title goes home; home shows the drawn step and only section links.
-  await page.click('.site-title');
+  await page.click('.topbar .brand');
   assert.equal(new URL(page.url()).pathname, '/');
   assert.equal(await page.locator('.home .cells-figure .array-cell').count(), 7);
   assert.equal(await page.locator('.lesson-sidebar .lesson-link').count(), 0);
@@ -283,4 +283,34 @@ test('critique 2: home links, jump list, stepped array insert, settled quiz', as
   await missing.page.click('.home-actions [data-home]');
   assert.equal(new URL(missing.page.url()).pathname, '/');
   await missing.page.close();
+});
+
+test('docs shell: search filters the lesson tree, sections expand in place, theme toggle sticks', async () => {
+  const { page, errors } = await open('/algorithms/binary-search');
+  // "/" focuses search; typing filters lessons across sections.
+  await page.keyboard.press('/');
+  assert.equal(await page.evaluate(() => document.activeElement.id), 'lesson-search');
+  await page.keyboard.type('window');
+  assert.equal(await page.isVisible('#lesson-link-patterns-sliding-window'), true);
+  assert.equal(await page.isVisible('#lesson-link-algorithms-sorting'), false);
+  await page.fill('#lesson-search', 'zzz');
+  assert.equal(await page.isVisible('.nav-empty'), true);
+  await page.fill('#lesson-search', '');
+
+  // A section header expands in place instead of navigating.
+  await page.click('#section-link-patterns');
+  assert.equal(new URL(page.url()).pathname, '/algorithms/binary-search');
+  assert.equal(await page.isVisible('#lesson-link-patterns-two-pointers'), true);
+
+  // "On this page" lists the headings, including the demo.
+  assert.match(await page.textContent('.toc'), /Demo: Halve the search range/);
+
+  // The theme button flips and remembers the choice.
+  const before = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+  await page.click('#theme-toggle');
+  assert.notEqual(await page.evaluate(() => getComputedStyle(document.body).backgroundColor), before);
+  await page.reload();
+  assert.equal(await page.evaluate(() => document.documentElement.dataset.theme), 'dark');
+  assert.deepEqual(errors, []);
+  await page.close();
 });

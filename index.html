@@ -20,6 +20,13 @@
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="Simplified DSA: a binary search tree with the search path highlighted." />
     <meta name="twitter:card" content="summary_large_image" />
+    <!-- Apply a theme the learner picked before first paint, so there is no flash. -->
+    <script>
+      try {
+        const theme = localStorage.getItem('simplified-dsa:theme');
+        if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme;
+      } catch {}
+    </script>
   </head>
   <body>
     <div id="app"></div>
