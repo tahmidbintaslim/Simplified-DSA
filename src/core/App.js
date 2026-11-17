@@ -33,7 +33,7 @@ const HOME_FIGURE = [
 // Banner colours for the home section cards (decorative art, not step states).
 const SECTION_ART = [
   { a: '#bcd3ff', b: '#6d9bff', c: '#2f5fe0', icon: 'cells' },
-  { a: '#bdeee6', b: '#4fc2b1', c: '#0f7f74', icon: 'halve' },
+  { a: '#ffd9cc', b: '#ff9b7d', c: '#d9532f', icon: 'halve' },
   { a: '#d9d0ff', b: '#9d86f5', c: '#5b3fd0', icon: 'pointers' },
 ];
 

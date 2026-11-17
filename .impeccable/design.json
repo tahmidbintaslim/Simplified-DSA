@@ -1,701 +1,797 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-11T10:33:40+00:00",
+  "generatedAt": "2026-11-17T03:11:19+00:00",
   "title": "Design System: Simplified DSA",
   "extensions": {
     "colorMeta": {
       "page": {
         "role": "neutral",
-        "displayName": "Paper",
-        "canonical": "#f6f1e7",
-        "oklch": "oklch(95.9% 0.014 85)",
-        "dark": "#11110f",
+        "displayName": "Page",
+        "canonical": "#ffffff",
+        "dark": "#0b0b0d",
         "tonalRamp": [
-          "#0c0b08",
-          "#282622",
-          "#48453e",
-          "#6a665e",
-          "#8d8981",
-          "#b1ada7",
-          "#d3d1cb",
-          "#f0eeea"
+          "#262626",
+          "#454545",
+          "#636363",
+          "#828282",
+          "#a1a1a1",
+          "#bfbfbf",
+          "#dedede",
+          "#f2f2f2"
         ]
       },
       "surface": {
         "role": "neutral",
-        "displayName": "Desk",
-        "canonical": "#efe7d8",
-        "oklch": "oklch(93.0% 0.022 83)",
-        "dark": "#171612",
+        "displayName": "Surface",
+        "canonical": "#f8f8f9",
+        "dark": "#111114",
         "tonalRamp": [
-          "#0d0b07",
-          "#29261f",
-          "#49443b",
-          "#6c6559",
-          "#8f887c",
-          "#b3ada3",
-          "#d5d0c8",
-          "#f1eee8"
+          "#262626",
+          "#454545",
+          "#636364",
+          "#828283",
+          "#a1a1a1",
+          "#bfbfc0",
+          "#dededf",
+          "#f2f2f3"
         ]
       },
       "sunken": {
         "role": "neutral",
-        "displayName": "Fresh Sheet",
-        "canonical": "#fffdf8",
-        "oklch": "oklch(99.4% 0.007 89)",
-        "dark": "#191711",
+        "displayName": "Sunken",
+        "canonical": "#ffffff",
+        "dark": "#141417",
         "tonalRamp": [
-          "#0c0b0a",
-          "#272624",
-          "#464542",
-          "#676662",
-          "#8b8985",
-          "#afaeaa",
-          "#d2d1ce",
-          "#efeeec"
+          "#262626",
+          "#454545",
+          "#636363",
+          "#828282",
+          "#a1a1a1",
+          "#bfbfbf",
+          "#dedede",
+          "#f2f2f2"
         ]
       },
       "raised": {
         "role": "neutral",
-        "displayName": "Fresh Sheet (raised)",
-        "canonical": "#fffdf8",
-        "oklch": "oklch(99.4% 0.007 89)",
-        "dark": "#1d1b16",
+        "displayName": "Raised",
+        "canonical": "#ffffff",
+        "dark": "#18181b",
         "tonalRamp": [
-          "#0c0b0a",
-          "#272624",
-          "#464542",
-          "#676662",
-          "#8b8985",
-          "#afaeaa",
-          "#d2d1ce",
-          "#efeeec"
+          "#262626",
+          "#454545",
+          "#636363",
+          "#828282",
+          "#a1a1a1",
+          "#bfbfbf",
+          "#dedede",
+          "#f2f2f2"
         ]
       },
       "code-bg": {
         "role": "neutral",
-        "displayName": "Code Paper",
-        "canonical": "#efe6d4",
-        "oklch": "oklch(92.7% 0.026 85)",
-        "dark": "#201d17",
+        "displayName": "Code Bg",
+        "canonical": "#f4f4f5",
+        "dark": "#18181b",
         "tonalRamp": [
-          "#0d0b06",
-          "#2a261e",
-          "#4a4439",
-          "#6d6556",
-          "#90887a",
-          "#b3ada1",
-          "#d5d0c7",
-          "#f2eee6"
+          "#262626",
+          "#454545",
+          "#636364",
+          "#828283",
+          "#a1a1a1",
+          "#bfbfc0",
+          "#dededf",
+          "#f2f2f3"
         ]
       },
       "hover": {
         "role": "neutral",
-        "displayName": "Thumb Mark",
-        "canonical": "#ebe1cd",
-        "oklch": "oklch(91.2% 0.029 85)",
-        "dark": "#272318",
+        "displayName": "Hover",
+        "canonical": "#f1f1f3",
+        "dark": "#1f1f23",
         "tonalRamp": [
-          "#0e0b06",
-          "#2a261d",
-          "#4b4438",
-          "#6d6555",
-          "#908878",
-          "#b4ada0",
-          "#d6d0c6",
-          "#f2eee6"
+          "#262627",
+          "#454545",
+          "#636364",
+          "#828283",
+          "#a1a1a2",
+          "#bfbfc1",
+          "#dedee0",
+          "#f2f2f4"
         ]
       },
       "line": {
         "role": "neutral",
-        "displayName": "Rule",
-        "canonical": "#dccfb8",
-        "oklch": "oklch(85.9% 0.034 82)",
-        "dark": "#302d26",
+        "displayName": "Hairline",
+        "canonical": "#e4e4e7",
+        "dark": "#27272a",
         "tonalRamp": [
-          "#0e0b05",
-          "#2b261b",
-          "#4c4435",
-          "#6f6551",
-          "#928875",
-          "#b6ad9d",
-          "#d7d0c4",
-          "#f3eee4"
+          "#262627",
+          "#454546",
+          "#636365",
+          "#828284",
+          "#a0a0a3",
+          "#bfbfc2",
+          "#dedee1",
+          "#f2f2f4"
         ]
       },
       "line-soft": {
         "role": "neutral",
-        "displayName": "Soft Rule",
-        "canonical": "#e7ddcb",
-        "oklch": "oklch(90.1% 0.026 82)",
-        "dark": "#2a2721",
+        "displayName": "Line Soft",
+        "canonical": "#efeff1",
+        "dark": "#1f1f23",
         "tonalRamp": [
-          "#0d0b06",
-          "#2a261e",
-          "#4a4439",
-          "#6d6556",
-          "#90887a",
-          "#b4ada1",
-          "#d6d0c7",
-          "#f2eee6"
+          "#262627",
+          "#454545",
+          "#636364",
+          "#828283",
+          "#a1a1a2",
+          "#bfbfc1",
+          "#dedee0",
+          "#f2f2f4"
         ]
       },
       "line-strong": {
         "role": "neutral",
-        "displayName": "Firm Rule",
-        "canonical": "#c4b498",
-        "oklch": "oklch(77.6% 0.042 82)",
-        "dark": "#3a352b",
+        "displayName": "Line Strong",
+        "canonical": "#d4d4d8",
+        "dark": "#3f3f46",
         "tonalRamp": [
-          "#0f0a04",
-          "#2d2518",
-          "#4e4331",
-          "#72644c",
-          "#958770",
-          "#b8ac99",
-          "#d9d0c0",
-          "#f5eee1"
+          "#262627",
+          "#454546",
+          "#636365",
+          "#828284",
+          "#a0a0a3",
+          "#bfbfc3",
+          "#dedee1",
+          "#f2f2f3"
         ]
       },
       "edge": {
         "role": "neutral",
-        "displayName": "Cell Edge",
-        "canonical": "#b5a68d",
-        "oklch": "oklch(73.1% 0.039 81)",
-        "dark": "#4a4436",
+        "displayName": "Edge",
+        "canonical": "#a1a1aa",
+        "dark": "#52525b",
         "tonalRamp": [
-          "#0f0a04",
-          "#2c251a",
-          "#4d4433",
-          "#71644e",
-          "#948772",
-          "#b7ac9b",
-          "#d8d0c2",
-          "#f4eee3"
+          "#262628",
+          "#454548",
+          "#636369",
+          "#828289",
+          "#a0a0a9",
+          "#bfbfc5",
+          "#dedee1",
+          "#f2f2f3"
         ]
       },
       "neutral-fill": {
         "role": "neutral",
-        "displayName": "Graphite Fill",
-        "canonical": "#c9bda8",
-        "oklch": "oklch(80.3% 0.032 82)",
-        "dark": "#5a523f",
+        "displayName": "Neutral Fill",
+        "canonical": "#d4d4d8",
+        "dark": "#52525b",
         "tonalRamp": [
-          "#0e0b05",
-          "#2b261c",
-          "#4c4436",
-          "#6f6553",
-          "#928876",
-          "#b5ad9e",
-          "#d7d0c4",
-          "#f3eee5"
-        ]
-      },
-      "accent-line": {
-        "role": "neutral",
-        "displayName": "Brass Rule",
-        "canonical": "#b8924a",
-        "oklch": "oklch(68.1% 0.101 82)",
-        "dark": "#7b6842",
-        "tonalRamp": [
-          "#140900",
-          "#352300",
-          "#5a4005",
-          "#816018",
-          "#a48446",
-          "#c5aa7a",
-          "#e4cea8",
-          "#fdeccf"
+          "#262627",
+          "#454546",
+          "#636365",
+          "#828284",
+          "#a0a0a3",
+          "#bfbfc3",
+          "#dedee1",
+          "#f2f2f3"
         ]
       },
       "ink-strong": {
         "role": "neutral",
         "displayName": "Heading Ink",
-        "canonical": "#1d1813",
-        "oklch": "oklch(21.3% 0.012 67)",
-        "dark": "#f5f0e6",
+        "canonical": "#09090b",
+        "dark": "#fafafa",
         "tonalRamp": [
-          "#0d0b09",
-          "#292623",
-          "#494440",
-          "#6b655f",
-          "#8e8882",
-          "#b2ada8",
-          "#d4d0cc",
-          "#f1eeeb"
+          "#262628",
+          "#454546",
+          "#636365",
+          "#828283",
+          "#a1a1a1",
+          "#bfbfc0",
+          "#dedede",
+          "#f2f2f2"
         ]
       },
       "ink": {
         "role": "neutral",
-        "displayName": "Ink",
-        "canonical": "#2a241d",
-        "oklch": "oklch(26.5% 0.015 71)",
-        "dark": "#ece8dd",
+        "displayName": "UI Ink",
+        "canonical": "#18181b",
+        "dark": "#f4f4f5",
         "tonalRamp": [
-          "#0d0b08",
-          "#292622",
-          "#49443e",
-          "#6c655d",
-          "#8f8880",
-          "#b2ada7",
-          "#d5d0cb",
-          "#f1eeea"
+          "#262629",
+          "#454547",
+          "#636365",
+          "#828284",
+          "#a1a1a2",
+          "#bfbfc0",
+          "#dedede",
+          "#f2f2f2"
         ]
       },
       "ink-body": {
         "role": "neutral",
         "displayName": "Reading Ink",
-        "canonical": "#2c261f",
-        "oklch": "oklch(27.3% 0.015 71)",
-        "dark": "#ddd5c6",
+        "canonical": "#27272a",
+        "dark": "#d4d4d8",
         "tonalRamp": [
-          "#0d0b08",
-          "#292622",
-          "#49443e",
-          "#6b655d",
-          "#8e8880",
-          "#b2ada7",
-          "#d5d0cb",
-          "#f1eeea"
+          "#262629",
+          "#454547",
+          "#636365",
+          "#828284",
+          "#a1a1a2",
+          "#bfbfc0",
+          "#dedede",
+          "#f2f2f2"
         ]
       },
       "ink-code": {
         "role": "neutral",
-        "displayName": "Code Ink",
-        "canonical": "#3b3226",
-        "oklch": "oklch(32.3% 0.024 75)",
-        "dark": "#eadfc9",
+        "displayName": "Ink Code",
+        "canonical": "#27272a",
+        "dark": "#e4e4e7",
         "tonalRamp": [
-          "#0e0b07",
-          "#2b261f",
-          "#4b443a",
-          "#6e6458",
-          "#91887b",
-          "#b4ada2",
-          "#d6d0c8",
-          "#f3eee7"
+          "#262629",
+          "#454547",
+          "#636365",
+          "#828284",
+          "#a1a1a2",
+          "#bfbfc0",
+          "#dedede",
+          "#f2f2f2"
         ]
       },
       "muted": {
         "role": "neutral",
-        "displayName": "Pencil Grey",
-        "canonical": "#574e40",
-        "oklch": "oklch(42.9% 0.025 79)",
-        "dark": "#bdb3a3",
+        "displayName": "Muted",
+        "canonical": "#52525b",
+        "dark": "#a1a1aa",
         "tonalRamp": [
-          "#0e0b07",
-          "#2a261e",
-          "#4b443a",
-          "#6e6557",
-          "#91887a",
-          "#b4ada2",
-          "#d6d0c7",
-          "#f2eee7"
+          "#26262a",
+          "#44444c",
+          "#63636b",
+          "#828288",
+          "#a0a0a5",
+          "#bfbfc2",
+          "#dededf",
+          "#f2f2f3"
         ]
       },
       "subtle": {
         "role": "neutral",
-        "displayName": "Soft Pencil",
-        "canonical": "#645a4a",
-        "oklch": "oklch(47.2% 0.028 80)",
-        "dark": "#a99f8d",
+        "displayName": "Subtle",
+        "canonical": "#5c5c66",
+        "dark": "#a1a1aa",
         "tonalRamp": [
-          "#0e0b06",
-          "#2b261d",
-          "#4b4438",
-          "#6e6555",
-          "#918879",
-          "#b5ada0",
-          "#d6d0c6",
-          "#f3eee6"
+          "#26262a",
+          "#44444c",
+          "#63636c",
+          "#818189",
+          "#a0a0a6",
+          "#bfbfc3",
+          "#dedee0",
+          "#f2f2f3"
         ]
       },
       "faint": {
         "role": "neutral",
-        "displayName": "Faint Pencil",
-        "canonical": "#6f6553",
-        "oklch": "oklch(51.1% 0.030 82)",
-        "dark": "#8f8676",
+        "displayName": "Faint",
+        "canonical": "#6b6b74",
+        "dark": "#8b8b94",
         "tonalRamp": [
-          "#0e0b06",
-          "#2b261d",
-          "#4b4437",
-          "#6e6554",
-          "#918877",
-          "#b5ad9f",
-          "#d6d0c5",
-          "#f3eee5"
+          "#262629",
+          "#44444a",
+          "#63636b",
+          "#818189",
+          "#a0a0a6",
+          "#bfbfc3",
+          "#dedee0",
+          "#f2f2f3"
         ]
       },
-      "look": {
+      "accent": {
         "role": "primary",
-        "displayName": "Pencil Gold",
-        "canonical": "#8a5e04",
-        "oklch": "oklch(51.6% 0.107 77)",
-        "dark": "#f1cd86",
+        "displayName": "Action Blue",
+        "canonical": "#1d4ed8",
+        "dark": "#2563eb",
         "tonalRamp": [
-          "#150800",
-          "#382100",
-          "#5d3e00",
-          "#865d11",
-          "#aa8143",
-          "#caa877",
-          "#e7cda7",
-          "#ffebce"
+          "#0e266b",
+          "#1a45c0",
+          "#3964dd",
+          "#6082e4",
+          "#87a1ea",
+          "#aebff1",
+          "#d5def8",
+          "#eff2fc"
+        ]
+      },
+      "accent-hover": {
+        "role": "primary",
+        "displayName": "Action Blue Hover",
+        "canonical": "#1e40af",
+        "dark": "#3b82f6",
+        "tonalRamp": [
+          "#122667",
+          "#2344b1",
+          "#4763be",
+          "#6b82ca",
+          "#8fa0d7",
+          "#b4bfe4",
+          "#d8def1",
+          "#f0f2fa"
+        ]
+      },
+      "accent-soft": {
+        "role": "primary",
+        "displayName": "Blue Wash",
+        "canonical": "#e0e9ff",
+        "dark": "#172554",
+        "tonalRamp": [
+          "#25262a",
+          "#42454b",
+          "#60646d",
+          "#7d828f",
+          "#9ba1b0",
+          "#b8c0d2",
+          "#d6def3",
+          "#edf2ff"
+        ]
+      },
+      "accent-ink": {
+        "role": "primary",
+        "displayName": "Blue Ink",
+        "canonical": "#1d4ed8",
+        "dark": "#93b4ff",
+        "tonalRamp": [
+          "#0e266b",
+          "#1a45c0",
+          "#3964dd",
+          "#6082e4",
+          "#87a1ea",
+          "#aebff1",
+          "#d5def8",
+          "#eff2fc"
+        ]
+      },
+      "accent-line": {
+        "role": "primary",
+        "displayName": "Accent Line",
+        "canonical": "#2563eb",
+        "dark": "#3b82f6",
+        "tonalRamp": [
+          "#0f285e",
+          "#1b47a9",
+          "#2a67eb",
+          "#5485ef",
+          "#7ea3f3",
+          "#a8c1f7",
+          "#d2dffb",
+          "#eef3fd"
         ]
       },
       "link": {
         "role": "primary",
-        "displayName": "Burnt Gold Link",
-        "canonical": "#8a5600",
-        "oklch": "oklch(50.0% 0.109 70)",
-        "dark": "#d9b36a",
+        "displayName": "Link Blue",
+        "canonical": "#1d4ed8",
+        "dark": "#8ab0ff",
         "tonalRamp": [
-          "#170700",
-          "#3a1f00",
-          "#613c02",
-          "#8b5a15",
-          "#ae7e44",
-          "#cea678",
-          "#ebcba7",
-          "#ffeace"
+          "#0e266b",
+          "#1a45c0",
+          "#3964dd",
+          "#6082e4",
+          "#87a1ea",
+          "#aebff1",
+          "#d5def8",
+          "#eff2fc"
+        ]
+      },
+      "on-accent": {
+        "role": "primary",
+        "displayName": "On Accent",
+        "canonical": "#ffffff",
+        "dark": "#ffffff",
+        "tonalRamp": [
+          "#262626",
+          "#454545",
+          "#636363",
+          "#828282",
+          "#a1a1a1",
+          "#bfbfbf",
+          "#dedede",
+          "#f2f2f2"
+        ]
+      },
+      "look": {
+        "role": "state",
+        "displayName": "Look Gold",
+        "canonical": "#8a5e04",
+        "dark": "#fcd34d",
+        "tonalRamp": [
+          "#362502",
+          "#624303",
+          "#8c6108",
+          "#a38039",
+          "#b99f69",
+          "#d0be9a",
+          "#e6ddca",
+          "#f6f2eb"
         ]
       },
       "look-line": {
-        "role": "primary",
-        "displayName": "Highlighter Edge",
-        "canonical": "#c08f2c",
-        "oklch": "oklch(68.0% 0.125 81)",
+        "role": "state",
+        "displayName": "Look Line",
+        "canonical": "#d4a12f",
         "dark": "#b8924a",
         "tonalRamp": [
-          "#160700",
-          "#392100",
-          "#5f3e00",
-          "#885d00",
-          "#ac812e",
-          "#cba86b",
-          "#e9cd9e",
-          "#ffecc8"
+          "#32260b",
+          "#594414",
+          "#81621d",
+          "#a98025",
+          "#d09e2e",
+          "#e1bd6e",
+          "#efddb4",
+          "#f9f2e2"
         ]
       },
       "look-fill": {
-        "role": "primary",
-        "displayName": "Highlighter Gold",
-        "canonical": "#f4d58c",
-        "oklch": "oklch(88.3% 0.098 87)",
+        "role": "state",
+        "displayName": "Look Fill",
+        "canonical": "#fde68a",
         "dark": "#4a3a17",
         "tonalRamp": [
-          "#120900",
-          "#322400",
-          "#564208",
-          "#7d621c",
-          "#9f8648",
-          "#c1ac7b",
-          "#e0d0a9",
-          "#faedd0"
+          "#2a2717",
+          "#4c452a",
+          "#6e643c",
+          "#90834f",
+          "#b2a261",
+          "#d4c174",
+          "#f6e086",
+          "#fef3c7"
         ]
       },
       "look-soft": {
-        "role": "primary",
-        "displayName": "Soft Highlight",
-        "canonical": "#fbecc6",
-        "oklch": "oklch(94.5% 0.052 89)",
+        "role": "state",
+        "displayName": "Look Soft",
+        "canonical": "#fef3c7",
         "dark": "#33291a",
         "tonalRamp": [
-          "#0f0b03",
-          "#2c2614",
-          "#4e442c",
-          "#716545",
-          "#948869",
-          "#b7ad94",
-          "#d8d0bc",
-          "#f4eede"
+          "#28261f",
+          "#484539",
+          "#686452",
+          "#88836b",
+          "#a9a184",
+          "#c9c09d",
+          "#e9dfb6",
+          "#fef3c7"
         ]
       },
       "on-look": {
-        "role": "primary",
-        "displayName": "Ink on Gold",
-        "canonical": "#2b1f04",
-        "oklch": "oklch(24.8% 0.045 85)",
-        "dark": "#fbf0d6",
+        "role": "state",
+        "displayName": "On Look",
+        "canonical": "#3b2a04",
+        "dark": "#fef3c7",
         "tonalRamp": [
-          "#0f0b03",
-          "#2d2517",
-          "#4e4430",
-          "#71644a",
-          "#94886e",
-          "#b7ad97",
-          "#d9d0bf",
-          "#f4eee1"
+          "#352504",
+          "#534423",
+          "#6f6347",
+          "#8c826b",
+          "#a8a08f",
+          "#c4bfb4",
+          "#e0ded8",
+          "#f3f2f0"
         ]
       },
       "done": {
-        "role": "secondary",
-        "displayName": "Ledger Teal",
-        "canonical": "#0f6f68",
-        "oklch": "oklch(49.0% 0.082 187)",
+        "role": "state",
+        "displayName": "Done Teal",
+        "canonical": "#0f766e",
         "dark": "#4f9c94",
         "tonalRamp": [
-          "#00100e",
-          "#002e2a",
-          "#0e504b",
-          "#23746d",
-          "#519890",
-          "#83bab4",
-          "#b1dbd6",
-          "#d6f6f2"
+          "#062f2c",
+          "#0b554f",
+          "#157972",
+          "#43948d",
+          "#71aea9",
+          "#9fc8c5",
+          "#cde3e1",
+          "#ecf4f3"
         ]
       },
       "done-fill": {
-        "role": "secondary",
-        "displayName": "Teal Wash",
-        "canonical": "#cde8e3",
-        "oklch": "oklch(91.0% 0.029 183)",
+        "role": "state",
+        "displayName": "Done Fill",
+        "canonical": "#ccfbf1",
         "dark": "#18332f",
         "tonalRamp": [
-          "#060d0c",
-          "#1d2927",
-          "#384946",
-          "#556b68",
-          "#798f8b",
-          "#a0b2af",
-          "#c6d5d2",
-          "#e6f1ef"
+          "#202826",
+          "#3a4845",
+          "#546864",
+          "#6e8882",
+          "#88a8a1",
+          "#a2c8c0",
+          "#bce8df",
+          "#d3fcf3"
         ]
       },
       "visited": {
-        "role": "secondary",
-        "displayName": "Visited Wash",
-        "canonical": "#e2f1ee",
-        "oklch": "oklch(94.6% 0.016 183)",
+        "role": "state",
+        "displayName": "Visited",
+        "canonical": "#ecfdf9",
         "dark": "#1f3a36",
         "tonalRamp": [
-          "#080c0b",
-          "#212827",
-          "#3e4745",
-          "#5d6967",
-          "#808c8a",
-          "#a6b0ae",
-          "#cbd3d1",
-          "#eaf0ef"
+          "#242726",
+          "#414645",
+          "#5e6563",
+          "#7b8482",
+          "#98a3a1",
+          "#b5c2bf",
+          "#d2e1de",
+          "#e6f6f2"
         ]
       },
       "on-done-fill": {
-        "role": "secondary",
-        "displayName": "Ink on Teal Wash",
-        "canonical": "#0b4f4a",
-        "oklch": "oklch(38.7% 0.063 187)",
+        "role": "state",
+        "displayName": "On Done Fill",
+        "canonical": "#115e59",
         "dark": "#8fd0c8",
         "tonalRamp": [
-          "#000f0d",
-          "#0c2c2a",
-          "#224e49",
-          "#3a716c",
-          "#61948f",
-          "#8eb8b3",
-          "#b8d9d5",
-          "#dcf5f1"
+          "#082f2c",
+          "#0f544f",
+          "#2f726e",
+          "#588e8a",
+          "#81aaa7",
+          "#aac5c3",
+          "#d3e1e0",
+          "#eef3f3"
         ]
       },
       "on-done": {
-        "role": "secondary",
-        "displayName": "Ink on Teal",
+        "role": "state",
+        "displayName": "On Done",
         "canonical": "#ffffff",
-        "oklch": "oklch(100.0% 0.000 90)",
         "dark": "#0e1f1d",
         "tonalRamp": [
-          "#0b0b0b",
           "#262626",
           "#454545",
-          "#666666",
-          "#898989",
-          "#aeaeae",
-          "#d1d1d1",
-          "#eeeeee"
+          "#636363",
+          "#828282",
+          "#a1a1a1",
+          "#bfbfbf",
+          "#dedede",
+          "#f2f2f2"
         ]
       },
       "danger": {
-        "role": "tertiary",
-        "displayName": "Correction Red",
-        "canonical": "#b03a2a",
-        "oklch": "oklch(51.7% 0.156 31)",
-        "dark": "#c4574a",
+        "role": "state",
+        "displayName": "Danger",
+        "canonical": "#b91c1c",
+        "dark": "#ef4444",
         "tonalRamp": [
-          "#200000",
-          "#4a0d06",
-          "#782418",
-          "#aa3c2d",
-          "#cf6554",
-          "#ec9383",
-          "#ffbdaf",
-          "#ffdfd4"
+          "#731111",
+          "#bc2525",
+          "#c74949",
+          "#d26d6d",
+          "#dd9090",
+          "#e8b4b4",
+          "#f3d8d8",
+          "#faf0f0"
         ]
       },
       "danger-fill": {
-        "role": "tertiary",
-        "displayName": "Correction Wash",
-        "canonical": "#f7dcd6",
-        "oklch": "oklch(91.5% 0.031 33)",
+        "role": "state",
+        "displayName": "Danger Fill",
+        "canonical": "#fee2e2",
         "dark": "#3a1f1b",
         "tonalRamp": [
-          "#100908",
-          "#2f2321",
-          "#51413d",
-          "#76605b",
-          "#99837f",
-          "#bba9a5",
-          "#dccdca",
-          "#f7ece9"
+          "#2a2525",
+          "#4b4343",
+          "#6d6161",
+          "#8e7f7f",
+          "#b09d9d",
+          "#d1baba",
+          "#f3d8d8",
+          "#feefef"
         ]
       },
       "danger-ink": {
-        "role": "tertiary",
-        "displayName": "Correction Ink",
-        "canonical": "#9c2c1c",
-        "oklch": "oklch(46.5% 0.151 31)",
-        "dark": "#ec9a8f",
+        "role": "state",
+        "displayName": "Danger Ink",
+        "canonical": "#b91c1c",
+        "dark": "#fca5a5",
         "tonalRamp": [
-          "#1f0000",
-          "#490f07",
-          "#77261a",
-          "#a83f2f",
-          "#cd6755",
-          "#ea9484",
-          "#ffbdb0",
-          "#ffe0d5"
+          "#731111",
+          "#bc2525",
+          "#c74949",
+          "#d26d6d",
+          "#dd9090",
+          "#e8b4b4",
+          "#f3d8d8",
+          "#faf0f0"
         ]
       },
       "on-danger": {
-        "role": "tertiary",
-        "displayName": "Ink on Red",
+        "role": "state",
+        "displayName": "On Danger",
         "canonical": "#ffffff",
-        "oklch": "oklch(100.0% 0.000 90)",
         "dark": "#fff4f2",
         "tonalRamp": [
-          "#0b0b0b",
           "#262626",
           "#454545",
-          "#666666",
-          "#898989",
-          "#aeaeae",
-          "#d1d1d1",
-          "#eeeeee"
+          "#636363",
+          "#828282",
+          "#a1a1a1",
+          "#bfbfbf",
+          "#dedede",
+          "#f2f2f2"
         ]
       },
       "analogy": {
         "role": "tertiary",
-        "displayName": "Margin Green",
-        "canonical": "#4b8650",
-        "oklch": "oklch(56.5% 0.103 146)",
-        "dark": "#6aa36f",
+        "displayName": "Analogy",
+        "canonical": "#15803d",
+        "dark": "#4ade80",
         "tonalRamp": [
-          "#011002",
-          "#0f2e13",
-          "#26502a",
-          "#3e7543",
-          "#649868",
-          "#91bb92",
-          "#badcbb",
-          "#ddf7de"
+          "#083117",
+          "#0e582a",
+          "#157f3c",
+          "#429862",
+          "#70b189",
+          "#9fcbaf",
+          "#cde4d5",
+          "#ecf5ef"
         ]
       },
       "analogy-ink": {
         "role": "tertiary",
-        "displayName": "Margin Green Ink",
-        "canonical": "#356b3b",
-        "oklch": "oklch(47.8% 0.095 146)",
-        "dark": "#9bd09f",
+        "displayName": "Analogy Ink",
+        "canonical": "#166534",
+        "dark": "#86efac",
         "tonalRamp": [
-          "#010f03",
-          "#122e15",
-          "#294f2d",
-          "#417446",
-          "#67976a",
-          "#93ba95",
-          "#bcdbbd",
-          "#def6df"
+          "#0a3019",
+          "#13562c",
+          "#2f764a",
+          "#58916e",
+          "#81ac91",
+          "#aac7b5",
+          "#d3e2d8",
+          "#eef4f0"
         ]
-      }
-    },
-    "themes": {
-      "light": {
-        "name": "Paper",
-        "selector": ":root (default)"
       },
-      "dark": {
-        "name": "Night",
-        "selector": "@media (prefers-color-scheme: dark) :root"
+      "orange": {
+        "role": "tertiary",
+        "displayName": "Orange",
+        "canonical": "#c2410c",
+        "dark": "#fb923c",
+        "tonalRamp": [
+          "#541c05",
+          "#973309",
+          "#c64d1c",
+          "#d17049",
+          "#dc9375",
+          "#e8b6a2",
+          "#f3d9cf",
+          "#faf0ec"
+        ]
+      },
+      "on-solid": {
+        "role": "neutral",
+        "displayName": "On Solid",
+        "canonical": "#09090b",
+        "dark": "#0b0b0d",
+        "tonalRamp": [
+          "#262628",
+          "#454546",
+          "#636365",
+          "#828283",
+          "#a1a1a1",
+          "#bfbfc0",
+          "#dedede",
+          "#f2f2f2"
+        ]
       }
     },
     "typographyMeta": {
       "display": {
-        "displayName": "Display (Fraunces)",
-        "purpose": "The single lesson h1."
+        "displayName": "Display",
+        "purpose": "Home hero heading only; second line is a solid --accent-ink span."
       },
       "headline": {
-        "displayName": "Headline (Fraunces)",
-        "purpose": "Lesson sections and demo panel headings."
+        "displayName": "Headline",
+        "purpose": "Lesson h1."
+      },
+      "section": {
+        "displayName": "Section",
+        "purpose": "Home block headings and the closing band."
       },
       "title": {
-        "displayName": "Title (Fraunces)",
-        "purpose": "h3, quiz questions, contents-list section rows."
+        "displayName": "Title",
+        "purpose": "Lesson h2 (demo h2 1.45rem, h3 1.12rem)."
       },
       "lead": {
-        "displayName": "Lead (Literata)",
-        "purpose": "The one-paragraph promise under the h1; 1.12rem on phones."
+        "displayName": "Lead",
+        "purpose": "Lesson and hero lead in --muted."
       },
       "body": {
-        "displayName": "Body (Literata)",
-        "purpose": "The reading column, capped at 72ch."
+        "displayName": "Body",
+        "purpose": "Lesson reading text in --ink-body inside the 760px column."
       },
-      "label": {
-        "displayName": "Label (system sans)",
-        "purpose": "Metadata, callout tags, legends, buttons, counts."
+      "ui": {
+        "displayName": "UI",
+        "purpose": "Top nav, lesson tree, search, buttons."
+      },
+      "caption": {
+        "displayName": "Caption",
+        "purpose": "Meta lines, step-card summaries, footer, TOC."
       },
       "mono": {
-        "displayName": "Mono (JetBrains Mono)",
-        "purpose": "Code and values only; ligatures off."
+        "displayName": "Mono",
+        "purpose": "Code, cell values, indexes, pointers, kbd; ligatures off."
       }
+    },
+    "themes": {
+      "default": "light",
+      "switch": "html[data-theme=\"light\"|\"dark\"]; absent = follow prefers-color-scheme",
+      "storageKey": "simplified-dsa:theme",
+      "noFlash": "inline script in index.html sets data-theme before first paint"
     },
     "shadows": [
       {
+        "name": "hero-glow",
+        "value": "0 1px 2px rgb(9 9 11 / 4%), 0 24px 48px -24px color-mix(in srgb, var(--accent) 40%, transparent)",
+        "purpose": "The drawn step card in the home hero, over a 16% accent radial light."
+      },
+      {
+        "name": "card-lift",
+        "value": "0 18px 40px -26px rgb(9 9 11 / 35%)",
+        "purpose": "Section cards on hover only."
+      },
+      {
+        "name": "banner-mark",
+        "value": "0 10px 24px -12px rgb(0 0 0 / 35%)",
+        "purpose": "Frosted icon tile on section card banners."
+      },
+      {
         "name": "shadow-paper",
-        "value": "0 1px 0 rgb(60 45 20 / 6%), 0 8px 24px -12px rgb(60 45 20 / 22%)",
-        "dark": "0 1px 0 rgb(0 0 0 / 30%), 0 10px 28px -14px rgb(0 0 0 / 60%)",
-        "purpose": "A sheet resting on the desk: lesson card, figures, demo stage and panel, quiz. The only shadow."
-      }
-    ],
-    "focus": [
+        "value": "0 1px 2px rgb(9 9 11 / 4%), 0 6px 20px -10px rgb(9 9 11 / 12%)",
+        "dark": "0 1px 2px rgb(0 0 0 / 40%), 0 8px 24px -12px rgb(0 0 0 / 70%)",
+        "purpose": "Small figure values."
+      },
       {
         "name": "focus-ring",
-        "value": "outline: 2px solid var(--look); outline-offset: 2px",
-        "purpose": "Every link, button and focusable element, on :focus-visible."
+        "value": "outline: 2px solid var(--accent); outline-offset: 2px",
+        "purpose": "Every :focus-visible element."
       }
     ],
     "motion": [
       {
-        "name": "colour-change",
-        "value": "140ms ease",
-        "purpose": "Background, border and colour on contents-list rows and controls."
-      },
-      {
-        "name": "figure-change",
+        "name": "state-change",
         "value": "160ms ease",
-        "purpose": "Height, width and background of bars and array values, only under prefers-reduced-motion: no-preference."
+        "purpose": "Cell fills, bar sizes, chevron rotation, card hover; cell and bar motion only under prefers-reduced-motion: no-preference."
       }
     ],
     "breakpoints": [
       {
-        "name": "phone-tight",
-        "value": "max-width: 480px"
+        "name": "compact-stage",
+        "value": "480px",
+        "purpose": "Demo stage padding tightens for seven cells on a 390px phone."
       },
       {
-        "name": "drawer",
-        "value": "max-width: 760px"
+        "name": "phone",
+        "value": "760px",
+        "purpose": "Max-width: one column, tree in a drawer, 56px top bar, 16px gutter."
       },
       {
-        "name": "sticky-sidebar",
-        "value": "min-width: 761px"
+        "name": "hero",
+        "value": "900px",
+        "purpose": "Min-width: home hero becomes two columns (1.15fr | 1fr)."
+      },
+      {
+        "name": "toc",
+        "value": "1200px",
+        "purpose": "Min-width: right-hand On this page TOC (220px) appears; jump chips hide."
       }
     ]
   },
@@ -704,138 +800,126 @@
       "name": "Primary Button",
       "kind": "button",
       "refersTo": "button-primary",
-      "description": "Play and Mark as complete: highlighter gold, one per toolbar.",
-      "html": "<button class=\"ds-btn ds-btn-primary\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7.5 5.6v12.8a1 1 0 0 0 1.52.85l10.24-6.4a1 1 0 0 0 0-1.7L9.02 4.75A1 1 0 0 0 7.5 5.6Z\"/></svg> Play</button>",
-      "css": ".ds-btn{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:8px 14px;border:1px solid var(--line-strong);border-radius:10px;background:var(--raised);color:var(--ink);font:inherit;font-family:var(--font-ui);cursor:pointer;transition:background-color 140ms ease,border-color 140ms ease,color 140ms ease;} .ds-btn svg{width:1.15em;height:1.15em;flex:none;} .ds-btn-primary{border-color:var(--look-line);background:var(--look-fill);color:var(--on-look);font-weight:600;} .ds-btn-primary:hover{border-color:var(--look);} .ds-btn:focus-visible{outline:2px solid var(--look);outline-offset:2px;}"
+      "description": "The one main action on a view: start or continue a lesson.",
+      "html": "<a class=\"ds-btn ds-btn-primary\" href=\"#\">Start learning <svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"m13 6 6 6-6 6\"/></svg></a>",
+      "css": ".ds-btn { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border: 1px solid; border-radius: 8px; font: 600 0.95rem var(--font-ui); text-decoration: none; cursor: pointer; } .ds-btn-primary { border-color: var(--accent); background: var(--accent); color: var(--on-accent); } .ds-btn-primary:hover { border-color: var(--accent-hover); background: var(--accent-hover); } .ds-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }"
     },
     {
       "name": "Secondary Button",
       "kind": "button",
       "refersTo": "button-secondary",
-      "description": "Back, Step and First in the step player.",
-      "html": "<button class=\"ds-btn\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M15 5.5 8.5 12l6.5 6.5\"/></svg> Back</button> <button class=\"ds-btn\">Step <svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m9 5.5 6.5 6.5L9 18.5\"/></svg></button>",
-      "css": ".ds-btn{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:8px 14px;border:1px solid var(--line-strong);border-radius:10px;background:var(--raised);color:var(--ink);font:inherit;font-family:var(--font-ui);cursor:pointer;transition:background-color 140ms ease,border-color 140ms ease;} .ds-btn svg{width:1.15em;height:1.15em;flex:none;} .ds-btn:hover{border-color:var(--accent-line);background:var(--hover);} .ds-btn:focus-visible{outline:2px solid var(--look);outline-offset:2px;}"
+      "description": "Outlined companion action beside a primary, and demo controls.",
+      "html": "<a class=\"ds-btn-secondary\" href=\"#\">Browse all lessons</a>",
+      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--raised); color: var(--ink-strong); font: 500 0.95rem var(--font-ui); text-decoration: none; } .ds-btn-secondary:hover { border-color: var(--edge); background: var(--hover); } .ds-btn-secondary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }"
     },
     {
-      "name": "Demo Input",
+      "name": "Lesson Search",
       "kind": "input",
-      "refersTo": "input",
-      "description": "Learner input in demo toolbars, 44px tall.",
-      "html": "<label class=\"ds-field\">Your list <input class=\"ds-input\" value=\"3, 8, 12, 19, 27\"></label>",
-      "css": ".ds-field{display:flex;align-items:center;gap:8px;color:var(--muted);font-family:var(--font-ui);font-size:0.88rem;} .ds-input{min-height:44px;padding:8px 10px;border:1px solid var(--line-strong);border-radius:10px;background:var(--raised);color:var(--ink-strong);font:inherit;font-family:var(--font-mono);} .ds-input:focus-visible{outline:2px solid var(--look);outline-offset:2px;}"
+      "refersTo": "input-search",
+      "description": "Filters the lesson tree; \"/\" or Ctrl/Cmd+K focuses it.",
+      "html": "<label class=\"ds-search\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"11\" cy=\"11\" r=\"6.5\"/><path d=\"m16 16 4 4\"/></svg><input type=\"search\" placeholder=\"Search lessons\"><kbd>/</kbd></label>",
+      "css": ".ds-search { display: flex; align-items: center; gap: 8px; min-height: 44px; border: 1px solid var(--line); border-radius: 8px; background: var(--raised); padding: 0 10px; color: var(--subtle); } .ds-search:focus-within { border-color: var(--accent); } .ds-search input { flex: 1; min-width: 0; border: 0; background: transparent; color: var(--ink-strong); font: 0.94rem var(--font-ui); outline: none; } .ds-search kbd { border: 1px solid var(--line); border-radius: 5px; padding: 0 6px; font: 0.8rem var(--font-mono); color: var(--subtle); }"
     },
     {
-      "name": "Callout",
-      "kind": "card",
-      "refersTo": "callout",
-      "description": "Tinted note with a tone tag; never side-striped.",
-      "html": "<aside class=\"ds-callout\"><strong class=\"ds-callout-tag\">Analogy</strong><p>A hash table is like a coat check: hand over a coat, get a numbered ticket.</p></aside>",
-      "css": ".ds-callout{--tone:var(--analogy);border:1px solid color-mix(in srgb,var(--tone) 35%,var(--line));border-radius:12px;background:color-mix(in srgb,var(--tone) 7%,var(--sunken));padding:16px 18px 14px;color:var(--ink-body);font-family:var(--font-body);} .ds-callout p{margin:4px 0 0;font-size:1rem;line-height:1.6;} .ds-callout-tag{display:inline-block;margin-bottom:6px;border-radius:6px;background:color-mix(in srgb,var(--tone) 16%,transparent);padding:2px 8px;color:var(--analogy-ink);font-family:var(--font-ui);font-size:0.8rem;font-weight:700;}"
+      "name": "Top Bar",
+      "kind": "nav",
+      "refersTo": "topnav-link",
+      "description": "Sticky blurred bar: brand, Course map, Lessons, theme toggle.",
+      "html": "<header class=\"ds-topbar\"><a class=\"ds-brand\" href=\"#\">Simplified DSA</a><nav class=\"ds-topnav\"><a href=\"#\" aria-current=\"page\">Course map</a><a href=\"#\">Lessons</a></nav><button class=\"ds-icon-btn\" aria-label=\"Switch to dark theme\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M19.5 14.2A7.8 7.8 0 0 1 9.8 4.5a7.8 7.8 0 1 0 9.7 9.7Z\"/></svg></button></header>",
+      "css": ".ds-topbar { display: flex; align-items: center; gap: 28px; height: 64px; padding: 0 24px; border-bottom: 1px solid var(--line); background: color-mix(in srgb, var(--page) 92%, transparent); backdrop-filter: saturate(1.4) blur(10px); font-family: var(--font-ui); } .ds-brand { color: var(--ink-strong); font-size: 1.12rem; font-weight: 650; letter-spacing: -0.02em; text-decoration: none; } .ds-topnav { display: flex; gap: 4px; } .ds-topnav a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 12px; border-radius: 8px; color: var(--ink); font-size: 0.95rem; text-decoration: none; } .ds-topnav a:hover { background: var(--hover); } .ds-topnav a[aria-current] { color: var(--accent-ink); font-weight: 600; } .ds-icon-btn { display: inline-grid; place-items: center; width: 44px; height: 44px; margin-left: auto; border: 0; border-radius: 8px; background: transparent; color: var(--ink); cursor: pointer; } .ds-icon-btn:hover { background: var(--hover); } .ds-topnav a:focus-visible, .ds-icon-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }"
     },
     {
-      "name": "Cells Figure",
-      "kind": "custom",
-      "refersTo": "cells-figure",
-      "description": "An array drawn on paper with the one state scale: look, found, ruled out.",
-      "html": "<figure class=\"ds-cells\"><div class=\"ds-row\"><span class=\"ds-cell ds-out\">3</span><span class=\"ds-cell ds-out\">8</span><span class=\"ds-cell ds-look\"><i>mid</i>12</span><span class=\"ds-cell\">19</span><span class=\"ds-cell ds-found\">27</span></div></figure>",
-      "css": ".ds-cells{margin:0;border:1px solid var(--line);border-radius:8px;background:var(--sunken);padding:28px 16px 12px;box-shadow:var(--shadow-paper);} .ds-row{display:flex;gap:6px;} .ds-cell{position:relative;min-width:44px;padding:10px 6px;text-align:center;border:1.5px solid var(--edge);border-radius:8px;background:var(--raised);color:var(--ink-strong);font-family:var(--font-mono);font-weight:600;font-variant-ligatures:none;} .ds-cell i{position:absolute;bottom:100%;left:0;right:0;color:var(--look);font-style:normal;font-size:0.75rem;} .ds-look{border-color:var(--look-line);background:var(--look-fill);color:var(--on-look);} .ds-found{border-color:var(--done);background:var(--done);color:var(--on-done);} .ds-out{opacity:0.55;background-image:linear-gradient(to top right,transparent calc(50% - 1px),var(--faint) calc(50% - 1px),var(--faint) calc(50% + 1px),transparent calc(50% + 1px));}"
-    },
-    {
-      "name": "Step Caption",
-      "kind": "custom",
-      "refersTo": "step-badge",
-      "description": "Every demo caption opens with a numbered gold badge.",
-      "html": "<p class=\"ds-caption\"><span class=\"ds-badge\" aria-hidden=\"true\">3</span>12 is smaller than 19, so everything left of mid is ruled out.</p>",
-      "css": ".ds-caption{display:flex;align-items:center;gap:10px;margin:0;color:var(--ink-caption);font-family:var(--font-body);font-size:1.02rem;} .ds-badge{display:inline-grid;place-items:center;flex:none;min-width:28px;height:28px;padding:0 8px;border-radius:999px;background:var(--look-fill);color:var(--on-look);font-family:var(--font-mono);font-size:0.85rem;font-weight:700;font-variant-ligatures:none;}"
-    },
-    {
-      "name": "Quiz Option",
-      "kind": "chip",
-      "refersTo": "quiz-option",
-      "description": "Answer row with a letter chip and a written mark after answering.",
-      "html": "<div class=\"ds-quiz\"><button class=\"ds-opt\"><span class=\"ds-letter\">A</span><span>O(n)</span></button><button class=\"ds-opt ds-right\" data-mark=\"Correct\"><span class=\"ds-letter\">B</span><span>O(log n)</span></button><button class=\"ds-opt ds-wrong\" data-mark=\"Not this one\"><span class=\"ds-letter\">C</span><span>O(1)</span></button></div>",
-      "css": ".ds-quiz{display:grid;gap:8px;} .ds-opt{display:flex;align-items:center;gap:12px;min-height:44px;padding:10px 12px;border:1px solid var(--line-strong);border-radius:12px;background:var(--raised);color:var(--ink);font:inherit;font-family:var(--font-body);text-align:left;cursor:pointer;transition:border-color 140ms ease;} .ds-opt:hover{border-color:var(--look-line);} .ds-opt:focus-visible{outline:2px solid var(--look);outline-offset:2px;} .ds-letter{display:grid;place-items:center;flex:none;width:28px;height:28px;border:1.5px solid var(--line-strong);border-radius:999px;color:var(--subtle);font-family:var(--font-ui);font-size:0.85rem;font-weight:700;} .ds-right{border-color:var(--done);background:var(--done-fill);} .ds-wrong{border-color:var(--danger);background:var(--danger-fill);} .ds-right .ds-letter{border-color:var(--done);background:var(--done);color:var(--on-done);} .ds-wrong .ds-letter{border-color:var(--danger);background:var(--danger);color:var(--on-danger);} .ds-opt[data-mark]::after{content:attr(data-mark);margin-left:auto;border-radius:999px;padding:1px 8px;font-family:var(--font-ui);font-size:0.8rem;font-weight:700;} .ds-right::after{background:var(--done);color:var(--on-done);} .ds-wrong::after{background:var(--danger);color:var(--on-danger);}"
-    },
-    {
-      "name": "Contents List",
+      "name": "Lesson Tree Row",
       "kind": "nav",
       "refersTo": "lesson-link",
-      "description": "Lessons with status dots: hollow, gold ring (here), teal check (done).",
-      "html": "<nav class=\"ds-toc\"><a class=\"ds-lesson\" href=\"#\"><span class=\"ds-dot ds-done\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m5.5 12.5 4 4 9-9\"/></svg></span><strong>Arrays</strong><span class=\"ds-sum\">Boxes in a row</span></a><a class=\"ds-lesson ds-active\" href=\"#\"><span class=\"ds-dot\"></span><strong>Linked lists</strong><span class=\"ds-sum\">Nodes that point on</span></a><a class=\"ds-lesson\" href=\"#\"><span class=\"ds-dot\"></span><strong>Stacks</strong><span class=\"ds-sum\">Last in, first out</span></a></nav>",
-      "css": ".ds-toc{display:grid;gap:2px;margin-left:10px;border-left:1px solid var(--line);padding:4px 0 6px 10px;background:var(--surface);} .ds-lesson{display:grid;grid-template-columns:22px minmax(0,1fr);column-gap:8px;row-gap:2px;border-radius:8px;padding:9px 10px 9px 6px;color:var(--ink-strong);text-decoration:none;font-family:var(--font-body);transition:background-color 140ms ease;} .ds-lesson:hover{background:var(--hover);} .ds-lesson:focus-visible{outline:2px solid var(--look);outline-offset:2px;} .ds-lesson.ds-active{background:color-mix(in srgb,var(--look) 12%,var(--surface));} .ds-lesson strong{grid-column:2;font-size:0.98rem;} .ds-sum{grid-column:2;color:var(--subtle);font-size:0.86rem;} .ds-dot{grid-row:1 / span 2;display:grid;place-items:center;width:20px;height:20px;margin-top:2px;border:1.5px solid var(--line-strong);border-radius:50%;color:var(--on-done);} .ds-dot.ds-done{border-color:var(--done);background:var(--done);} .ds-active .ds-dot{border-color:var(--look);box-shadow:inset 0 0 0 3px var(--sunken),inset 0 0 0 10px var(--look);}"
+      "description": "Lesson rows with status dots; the active row takes the blue wash.",
+      "html": "<ol class=\"ds-tree\"><li><a class=\"ds-lesson\" href=\"#\"><span class=\"ds-dot is-done\"><svg width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m5.5 12.5 4 4 9-9\"/></svg></span><strong>Arrays</strong></a></li><li><a class=\"ds-lesson is-active\" href=\"#\" aria-current=\"page\"><span class=\"ds-dot\"></span><strong>Binary search</strong></a></li><li><a class=\"ds-lesson\" href=\"#\"><span class=\"ds-dot\"></span><strong>Two pointers</strong></a></li></ol>",
+      "css": ".ds-tree { margin: 0; padding: 2px 0 2px 8px; border-left: 1px solid var(--line); list-style: none; font-family: var(--font-ui); } .ds-lesson { display: grid; grid-template-columns: 20px 1fr; align-items: center; gap: 8px; min-height: 40px; padding: 7px 8px 7px 6px; border-radius: 8px; text-decoration: none; } .ds-lesson strong { color: var(--muted); font-size: 0.93rem; font-weight: 500; } .ds-lesson:hover { background: var(--hover); } .ds-lesson:hover strong { color: var(--ink-strong); } .ds-lesson.is-active { background: var(--accent-soft); } .ds-lesson.is-active strong { color: var(--accent-ink); font-weight: 600; } .ds-dot { display: grid; place-items: center; width: 18px; height: 18px; border: 1.5px solid var(--line-strong); border-radius: 50%; color: var(--on-done); } .ds-dot.is-done { border-color: var(--done); background: var(--done); } .ds-lesson.is-active .ds-dot { border-color: var(--accent); box-shadow: inset 0 0 0 3px var(--accent-soft), inset 0 0 0 10px var(--accent); } .ds-lesson:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }"
     },
     {
-      "name": "Lesson Card",
+      "name": "On This Page",
+      "kind": "nav",
+      "description": "Right-hand TOC at 1200px and up; scroll-spy marks the current section.",
+      "html": "<nav class=\"ds-toc\" aria-label=\"On this page\"><p>On this page</p><ol><li><a href=\"#\">The idea</a></li><li><a href=\"#\" aria-current=\"true\">Trace it by hand</a></li><li><a href=\"#\">Demo: binary search</a></li></ol></nav>",
+      "css": ".ds-toc { width: 220px; font: 0.9rem var(--font-ui); } .ds-toc p { margin: 0 0 10px; color: var(--subtle); } .ds-toc ol { margin: 0; padding: 0; border-left: 1px solid var(--line); list-style: none; } .ds-toc a { display: block; margin-left: -1px; padding: 6px 0 6px 14px; border-left: 1px solid transparent; color: var(--muted); line-height: 1.4; text-decoration: none; } .ds-toc a:hover { color: var(--ink-strong); } .ds-toc a[aria-current] { border-left-color: var(--accent); color: var(--accent-ink); }"
+    },
+    {
+      "name": "Jump Chips",
+      "kind": "chip",
+      "refersTo": "jump-chip",
+      "description": "Below 1200px, the lesson header lists sections as pills instead of the TOC.",
+      "html": "<nav class=\"ds-jumps\" aria-label=\"Jump to\"><span>Jump to</span><a href=\"#\">The idea</a><a href=\"#\">Trace it</a><a href=\"#\">Demo</a></nav>",
+      "css": ".ds-jumps { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; font: 0.9rem var(--font-ui); color: var(--subtle); } .ds-jumps a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--raised); color: var(--ink); text-decoration: none; } .ds-jumps a:hover { border-color: var(--accent); color: var(--accent-ink); } .ds-jumps a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }"
+    },
+    {
+      "name": "Next Step Card",
       "kind": "card",
-      "refersTo": "lesson-card",
-      "description": "The margin note under the lead: where the lesson sits and what you will learn.",
-      "html": "<header class=\"ds-lcard\"><p class=\"ds-meta\"><span>Data Structures · Lesson 2 of 5</span><span>About 12 min</span><span class=\"ds-pill\">Beginner</span></p><p class=\"ds-goal\">You will be able to:</p><ul><li>Trace an insert by hand</li><li>State its cost</li></ul></header>",
-      "css": ".ds-lcard{display:grid;gap:10px;border:1px solid var(--line);border-radius:12px;background:var(--sunken);padding:14px 18px 16px;box-shadow:var(--shadow-paper);font-family:var(--font-body);color:var(--ink-body);} .ds-meta{display:flex;flex-wrap:wrap;gap:6px 14px;margin:0;color:var(--subtle);font-family:var(--font-ui);font-size:0.88rem;} .ds-pill{border:1px solid var(--done);border-radius:999px;padding:0 8px;color:var(--on-done-fill);} .ds-goal{margin:0;color:var(--ink-strong);font-size:0.98rem;} .ds-lcard ul{margin:0;padding-left:1.15rem;line-height:1.55;}"
+      "refersTo": "step-card",
+      "description": "Previous / next lesson card with a one-line summary.",
+      "html": "<a class=\"ds-step\" href=\"#\"><span>Next</span><strong>Two pointers</strong><small>Walk from both ends to find a pair without a nested loop.</small></a>",
+      "css": ".ds-step { display: grid; gap: 6px; max-width: 360px; padding: 16px 18px; border: 1px solid var(--line); border-radius: 12px; background: var(--raised); color: var(--ink-strong); font-family: var(--font-ui); text-decoration: none; } .ds-step:hover { border-color: var(--accent); } .ds-step span { color: var(--subtle); font-size: 0.86rem; } .ds-step strong { font-size: 1.02rem; font-weight: 600; } .ds-step small { color: var(--muted); font-size: 0.9rem; line-height: 1.45; } .ds-step:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }"
+    },
+    {
+      "name": "Step Cells",
+      "kind": "custom",
+      "refersTo": "cell",
+      "description": "Signature figure: gold = looking at, teal = found, faded and struck = ruled out.",
+      "html": "<div class=\"ds-cells\"><span class=\"ds-cell is-out\">4</span><span class=\"ds-cell is-out\">9</span><span class=\"ds-cell is-out\">21</span><span class=\"ds-cell\">30</span><span class=\"ds-cell is-look\">42</span><span class=\"ds-cell\">57</span><span class=\"ds-cell is-found\">63</span></div>",
+      "css": ".ds-cells { display: flex; gap: 6px; } .ds-cell { display: grid; place-items: center; width: 46px; height: 46px; border: 1.5px solid var(--edge); border-radius: 8px; background: var(--raised); color: var(--ink-strong); font: 600 1rem var(--font-mono); font-variant-numeric: tabular-nums; font-variant-ligatures: none; } .ds-cell.is-look { border-color: var(--look-line); background: var(--look-fill); color: var(--on-look); } .ds-cell.is-found { border-color: var(--done); background: var(--done); color: var(--on-done); } .ds-cell.is-out { opacity: 0.55; background-image: linear-gradient(to top right, transparent calc(50% - 1px), var(--faint) calc(50% - 1px), var(--faint) calc(50% + 1px), transparent calc(50% + 1px)); } @media (prefers-reduced-motion: no-preference) { .ds-cell { transition: background-color 160ms ease; } }"
     }
   ],
   "narrative": {
-    "northStar": "Margin Notes",
-    "overview": "A lesson is a page of a good textbook that someone has worked through in pencil. The reading column stays calm: warm paper, a bookish serif at a long-form measure, quiet ink. The frame carries the world: the contents list in the margin, the lesson card under the title, figures of arrays drawn on paper cards, and the demo, which is the hero block of every lesson. Everything the learner should notice is drawn the way a careful note-taker would mark a page: a gold highlight for what is being looked at, a teal tick for what is settled, a faded strike-through for what has been ruled out.\n\nThe system ships in two themes from one set of semantic roles. Paper (light) is the default; Night, the project's original warm-dark palette, follows the reader's system setting. Roles never change meaning between themes; only their values do.\n\nDensity is low and patient, built for a beginner on a phone between classes. Depth is paper laid on paper, never glass or glow. Motion is barely there and only for people who have not asked to reduce it.",
+    "northStar": "Clear Steps",
+    "overview": "A lesson is a clean documentation page that happens to teach. The frame is the familiar docs shell: a sticky top bar, a lesson tree on the left, one reading column, an \"On this page\" list on the right. Nothing in the frame competes with the lesson. White paper (or a near-black night page), Geist for everything, hairline borders, and one blue accent that only ever means \"go here\" or \"do this\".\n\nWhat the learner should notice lives inside the figures and demos, and it is marked in a fixed vocabulary that never changes between lessons or themes: gold for what is being looked at, teal for what is settled, moved or on the path, and faded plus crossed out for what has been ruled out. Blue never enters that vocabulary.\n\nThe system ships two themes from one set of semantic roles. Light is the default; night follows the system setting until the learner picks one with the theme button (`html[data-theme]`, stored in `localStorage` under `simplified-dsa:theme`, applied by an inline script before first paint). Roles keep their meaning in both themes; only values change. Depth is hairlines and tonal surfaces; the only glow is the soft blue light behind the home hero's drawn step and the closing band.",
     "keyCharacteristics": [
-      "Warm paper and dark-brown ink; no pure white, no pure black.",
-      "Three serif-adjacent voices: Literata to read, Fraunces to title, JetBrains Mono for code and values only, plus a system sans for small labels.",
-      "One state scale across every figure and demo: look (gold), done (teal), ruled out (faded and crossed out).",
-      "State is always carried by form or words as well as colour.",
-      "Paper cards with one soft shadow; demos and quizzes are the largest, roundest cards.",
-      "An authored line-icon set in the Iconly Light Outline style, always beside words."
+      "Docs shell: top bar, lesson tree, 760px column, scroll-spy table of contents at 1200px and up.",
+      "Geist and Geist Mono, self-hosted via `@fontsource-variable`; no font CDN.",
+      "One blue accent for navigation and actions; gold and teal are step states only.",
+      "Ruled out is a form (opacity plus a diagonal strike), never colour alone.",
+      "Flat, hairline-bordered cards; 44px touch targets throughout."
     ],
     "rules": [
       {
-        "name": "The Same Meaning Rule",
-        "body": "Gold means \"being looked at\" and teal means \"moved, done, found or on the path\" in every figure, demo, legend and list, in both themes. A new demo maps its states onto these roles; it never introduces a new state colour.",
+        "name": "The Blue Means Go Rule",
+        "body": "`--accent` marks navigation, actions, focus and \"you are here\". It is never a step state: no blue cell, node, bar or line in a figure or demo.",
         "section": "colors"
       },
       {
-        "name": "The Two Themes, One Role Rule",
-        "body": "Every colour is used through its semantic role, never as a literal hex in a component. Paper is defined on the root; Night redefines the same roles under the dark colour-scheme query.",
+        "name": "The Fixed Vocabulary Rule",
+        "body": "Gold = being looked at, teal = done or on the path, faded and crossed out = ruled out. Same meaning in every lesson, every demo and both themes.",
         "section": "colors"
       },
       {
-        "name": "The Typed Code Rule",
-        "body": "Mono text never uses ligatures: liga and calt are off on code, array values, pointer labels, the tracer's variables and the step badge, so a beginner reads `<=` and `==` as typed.",
+        "name": "The Form Not Hue Rule",
+        "body": "Every state is readable without colour: ruled-out cells carry the strike, done items carry a check, the current line carries a marker.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Family Rule",
+        "body": "Geist carries every role; contrast comes from weight (400/500/600), size and tracking, never from a second display face.",
         "section": "typography"
       },
       {
-        "name": "The Mono Is For Values Rule",
-        "body": "JetBrains Mono appears only on code and values. Prose, captions, questions and labels are never set in mono.",
-        "section": "typography"
-      },
-      {
-        "name": "The Calm Column Rule",
-        "body": "The reading column carries no decoration; the frame (sidebar, lesson card, figures, demo, quiz) carries the world.",
-        "section": "layout"
-      },
-      {
-        "name": "The One Sheet Rule",
-        "body": "There is exactly one shadow, and it means \"a sheet of paper on the page\". No hover lifts, no glows, no hard offset shadows.",
+        "name": "The Hairline First Rule",
+        "body": "Reach for a border and a surface step before a shadow. A shadow is a response to hover or the one hero moment, not a resting state.",
         "section": "elevation"
-      },
-      {
-        "name": "The Crossed-Out Rule",
-        "body": "Ruled out is a shape, not only a colour: the cell drops to 55% opacity and a 2px diagonal stroke in the faint ink crosses it, the way a note-taker strikes a candidate off.",
-        "section": "shapes"
       }
     ],
     "dos": [
-      "Do map every new demo state onto look (gold), done (teal) or ruled out (faded and crossed out), and show it in the legend with the same form.",
-      "Do carry state in form or words as well as colour: the crossed-out cell, the check in the done dot, the gold ring, the \"Correct\" / \"Not this one\" marks, the screen-reader step count.",
-      "Do keep text pairs at WCAG AA in both themes (paper ink on page is 13.6:1, faint on page 5.1:1, gold on desk 4.6:1, white on teal 6.0:1).",
-      "Do give every control a 44px target, a visible gold focus ring, and keep the skip link and a single h1 on every page.",
-      "Do gate every transition behind a no-preference reduced-motion query, animate only colour and bar size (140-160ms ease), and never move layout.",
-      "Do draw new icons in the Iconly Light Outline grammar and put a word beside them."
+      "Do keep gold for \"being looked at\", teal for \"done / on the path\" and faded-plus-struck for \"ruled out\", in every lesson and both themes.",
+      "Do use `--accent` only for navigation, actions, focus and the current location.",
+      "Do define every new colour as a role token with a light value on `:root` and a night value under both `prefers-color-scheme: dark` and `:root[data-theme=\"dark\"]`.",
+      "Do separate surfaces with a `--line` hairline and a tonal step before considering a shadow.",
+      "Do keep interactive targets at 44px and focus rings at 2px `--accent` with a 2px offset.",
+      "Do keep Geist and Geist Mono self-hosted through `@fontsource-variable`."
     ],
     "donts": [
-      "Don't use side-stripe borders on callouts, cards or alerts; tint the whole note instead.",
-      "Don't put eyebrow or kicker labels above headings, and don't use uppercase tracked labels.",
-      "Don't use text glyphs or emoji as icons; use the authored SVG set.",
-      "Don't set prose, captions or questions in mono.",
-      "Don't add a second shadow, a glow or a hard offset shadow.",
-      "Don't introduce a new state colour or let gold and teal swap meanings between demos."
+      "Don't use blue as a step state in any figure, demo, trace or legend.",
+      "Don't add eyebrow or kicker labels above headings.",
+      "Don't use gradient text; the hero's accent line is a solid `--accent-ink`.",
+      "Don't mark a state by colour alone.",
+      "Don't add resting shadows to lesson cards, demos, quizzes or callouts.",
+      "Don't load fonts or scripts from a CDN."
     ]
   }
 }
