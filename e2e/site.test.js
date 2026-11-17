@@ -347,6 +347,7 @@ test('critique 3: the hero search is drivable and the beam follows the middle ce
   const start = await left();
   await page.click('#hero-next');
   assert.match(await page.textContent('.hero-figure figcaption'), /Step 2 of 3/);
+  await page.waitForTimeout(600); // the beam slides on the same element now
   assert.ok((await left()) > start, 'beam moved right, to the new middle');
   await page.click('#hero-next');
   assert.equal(await page.locator('.hero-figure .array-cell.is-found').count(), 1);
@@ -372,7 +373,10 @@ test('motion: worked examples scrub with pointers that glide; reduced motion sti
   await figure.locator('[data-stepper="scrub"]').fill('3');
   assert.match(await figure.locator('figcaption').textContent(), /^Check 3/);
   assert.equal(await figure.locator('[data-stepper="next"]').isDisabled(), true);
-  // The demo's timeline scrubs too.
+  // The demo's timeline scrubs too (fixed input: a random list could be a one-step search).
+  await page.fill('[data-field="list"]', '1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16');
+  await page.fill('[data-field="target"]', '16');
+  await page.click('[data-op="use"]');
   await page.locator('.demo-timeline input').fill('2');
   assert.match(await page.textContent('.demo-count'), /^Step 2 \//);
   await page.close();
@@ -408,4 +412,54 @@ test('motion: stack, queue and list keep their elements, so values move instead 
   assert.match(await list.page.textContent('.list-row'), /null$/);
   assert.deepEqual([...errors, ...list.errors], []);
   await list.page.close();
+});
+
+test('predict, then reveal: Step asks first, a picked cell plays the step and says whether it was right', async () => {
+  const { page, errors } = await open('/algorithms/binary-search');
+  await page.fill('[data-field="list"]', '3 9 14 21 30 42 57');
+  await page.fill('[data-field="target"]', '30');
+  await page.click('[data-op="use"]');
+  await page.check('[data-player="predict"]');
+  await page.click('[data-player="next"]');
+  // Step 1 checked mid = 3 (21 < 30). The next check is (4 + 6) // 2 = 5, then (4 + 4) // 2 = 4.
+  assert.match(await page.textContent('.predict-question'), /^Predict: lo = 4 and hi = 6\. Which cell is checked next\?/);
+  assert.match(await page.textContent('.demo-count'), /^Step 1 \//, 'the step waits for a guess');
+  await page.locator('.bs-row .is-pickable').nth(4).click();
+  assert.match(await page.textContent('.predict-question'), /^You picked cell 4; it was cell 5\. mid = \(lo \+ hi\) \/\/ 2 = \(4 \+ 6\) \/\/ 2 = 5\./);
+  assert.match(await page.textContent('.demo-count'), /^Step 2 \//);
+  assert.equal(await page.locator('.bs-row .is-pickable').count(), 0);
+  // Keyboard: → asks again, Enter on the focused right cell answers it.
+  await page.keyboard.press('ArrowRight');
+  await page.locator('.bs-row .is-pickable').nth(4).focus();
+  await page.keyboard.press('Enter');
+  assert.match(await page.textContent('.predict-question'), /^Right: cell 4\./);
+  assert.deepEqual(errors, []);
+  await page.close();
+});
+
+test('the home hero plays its search once by itself when it comes into view', async () => {
+  const { page, errors } = await open('/');
+  const beam = await page.locator('.beam').elementHandle();
+  await page.waitForTimeout(4800);
+  assert.match(await page.textContent('.hero-figure figcaption'), /Step 3 of 3/);
+  assert.equal(await page.locator('.hero-figure .array-cell.is-found').count(), 1);
+  // Updated in place: the beam is the same element, so it slid rather than jumped.
+  assert.equal(await beam.evaluate((el) => el.isConnected), true);
+  await page.close();
+
+  const calm = await open('/');
+  await calm.page.emulateMedia({ reducedMotion: 'reduce' });
+  await calm.page.reload();
+  await calm.page.waitForTimeout(3500);
+  assert.match(await calm.page.textContent('.hero-figure figcaption'), /Step 1 of 3/);
+  assert.deepEqual([...errors, ...calm.errors], []);
+  await calm.page.close();
+});
+
+test('the binary-search demo never starts on a one-step search', async () => {
+  for (let i = 0; i < 12; i++) {
+    const { page } = await open('/algorithms/binary-search');
+    assert.doesNotMatch(await page.textContent('.demo-count'), /\/ 1$/, 'random start must take more than one check');
+    await page.close();
+  }
 });

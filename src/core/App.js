@@ -5,7 +5,8 @@ import { DEMO_MARKER, escapeHtml, MarkdownRenderer } from '../utils/markdown.js'
 import { icon } from '../utils/icons.js';
 import { loadCompleted, saveCompleted } from './progress.js';
 import { hydrateSteppers } from './steppers.js';
-import { revealOnScroll } from '../demos/motion.js';
+import { inView } from 'motion';
+import { patchRow, reduceMotion, revealOnScroll } from '../demos/motion.js';
 
 const HOME_DESCRIPTION =
   'Free, beginner-first lessons on data structures and algorithms: plain words, every step traced, a demo on every lesson.';
@@ -187,6 +188,7 @@ export class App {
       this.buildToc();
     }
     if (!this.home) this.filterLessons();
+    else this.autoplayHero();
 
     if (restoreId || hadFocus) {
       // If that element no longer exists, the current lesson link takes focus.
@@ -213,10 +215,12 @@ export class App {
 
       const heroButton = event.target.closest('[data-hero]');
       if (heroButton) {
+        this.stopHeroAutoplay();
         const last = HERO_FRAMES.length - 1;
         this.heroStep = heroButton.dataset.hero === 'next' ? Math.min(last, this.heroStep + 1) : 0;
+        this.updateHero();
         // Keep focus on a button that still works: Next until the end, then Start over.
-        this.render({ focusId: this.heroStep === last ? 'hero-reset' : this.heroStep === 0 ? 'hero-next' : heroButton.id });
+        if (document.activeElement?.disabled) document.getElementById(this.heroStep === last ? 'hero-reset' : 'hero-next')?.focus();
         return;
       }
 
@@ -729,6 +733,59 @@ export class App {
           <button id="hero-reset" type="button" class="demo-button" data-hero="reset" ${this.heroStep === 0 ? 'disabled' : ''}>Start over</button>
         </p>
       </div>`;
+  }
+
+  /**
+   * Move the hero to this.heroStep in place: the same cells cross-fade, the
+   * beam slides to the new middle (a CSS transition on the same element) and
+   * the caption updates. A full re-render would rebuild the beam and jump.
+   */
+  updateHero() {
+    const figure = this.root.querySelector('.hero-figure');
+    if (!figure) return;
+    const holder = document.createElement('div');
+    holder.innerHTML = this.renderHeroStep();
+    const next = holder.firstElementChild;
+    const row = figure.querySelector('.array-row');
+    // The first fill came from Markdown, without keys: give the cells their keys.
+    [...row.children].forEach((cell, i) => (cell.dataset.key ||= `h${i}`));
+    patchRow(
+      row,
+      [...next.querySelectorAll('.array-row > .array-cell')].map((cell, i) => ({ key: `h${i}`, className: cell.className, html: cell.innerHTML })),
+    );
+    figure.style.cssText = next.style.cssText;
+    figure.querySelector('figcaption').innerHTML = next.querySelector('figcaption').innerHTML;
+    for (const id of ['hero-next', 'hero-reset']) document.getElementById(id).disabled = next.querySelector(`#${id}`).disabled;
+  }
+
+  stopHeroAutoplay() {
+    this.heroAutoplayed = true;
+    clearTimeout(this.heroTimer);
+  }
+
+  /**
+   * The first time the hero comes into view, it plays its search once by
+   * itself, a step every 1.6s, so a visitor sees the promise before reading.
+   * Any click on it stops the show; reduced motion skips it.
+   */
+  autoplayHero() {
+    const figure = this.root.querySelector('.hero-figure');
+    if (!figure || this.heroAutoplayed || reduceMotion() || typeof IntersectionObserver !== 'function') return;
+    const stop = inView(
+      figure,
+      () => {
+        stop();
+        const tick = () => {
+          if (this.heroAutoplayed || !figure.isConnected) return;
+          if (this.heroStep >= HERO_FRAMES.length - 1) return this.stopHeroAutoplay();
+          this.heroStep += 1;
+          this.updateHero();
+          this.heroTimer = setTimeout(tick, 1600);
+        };
+        this.heroTimer = setTimeout(tick, 1200);
+      },
+      { amount: 0.6 },
+    );
   }
 
   /**

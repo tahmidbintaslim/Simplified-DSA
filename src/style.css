@@ -4175,3 +4175,67 @@ input:focus-visible,
     transition: none;
   }
 }
+
+/* Predict, then reveal. */
+.predict-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: 0.92rem;
+  cursor: pointer;
+}
+
+.predict-toggle input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+}
+
+.predict-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 14px;
+  margin-top: 12px;
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--line));
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--accent) 6%, var(--raised));
+  padding: 10px 14px;
+}
+
+.predict-card.is-right {
+  border-color: var(--done);
+  background: color-mix(in srgb, var(--done) 8%, var(--raised));
+}
+
+.predict-card.is-wrong {
+  border-color: color-mix(in srgb, var(--danger) 55%, var(--line));
+  background: color-mix(in srgb, var(--danger) 6%, var(--raised));
+}
+
+.predict-question {
+  flex: 1 1 240px;
+  margin: 0;
+  color: var(--ink-strong);
+  font-weight: 500;
+}
+
+/* While predicting, every cell is a choice. */
+.is-pickable {
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.is-pickable > .array-value {
+  border-style: dashed;
+  border-color: var(--accent);
+}
+
+.is-pickable:hover > .array-value,
+.is-pickable:focus-visible > .array-value {
+  background: var(--accent-soft);
+}
