@@ -74,6 +74,11 @@
 
   --shadow-paper: 0 1px 2px rgb(9 9 11 / 4%), 0 6px 20px -10px rgb(9 9 11 / 12%);
 
+  /* The home hero's search beam: a column of light on the middle cell. */
+  --beam-core: #ffffff;
+  --beam-glow: #3b82f6;
+  --beam-haze: rgb(59 130 246 / 22%);
+
   font-family: var(--font-body);
   background: var(--page);
   color: var(--ink);
@@ -108,8 +113,8 @@
     --subtle: #a1a1aa;
     --faint: #8b8b94;
 
-    --accent: #2563eb;
-    --accent-hover: #3b82f6;
+    --accent: #1d4ed8;
+    --accent-hover: #2563eb;
     --accent-soft: #172554;
     --accent-ink: #93b4ff;
     --on-accent: #ffffff;
@@ -138,6 +143,9 @@
     --on-solid: #0b0b0d;
 
     --shadow-paper: 0 1px 2px rgb(0 0 0 / 40%), 0 8px 24px -12px rgb(0 0 0 / 70%);
+    --beam-core: #ffffff;
+    --beam-glow: #3b82f6;
+    --beam-haze: rgb(37 99 235 / 42%);
   }
 }
 
@@ -166,8 +174,8 @@
   --subtle: #a1a1aa;
   --faint: #8b8b94;
 
-  --accent: #2563eb;
-  --accent-hover: #3b82f6;
+  --accent: #1d4ed8;
+  --accent-hover: #2563eb;
   --accent-soft: #172554;
   --accent-ink: #93b4ff;
   --on-accent: #ffffff;
@@ -196,6 +204,9 @@
   --on-solid: #0b0b0d;
 
   --shadow-paper: 0 1px 2px rgb(0 0 0 / 40%), 0 8px 24px -12px rgb(0 0 0 / 70%);
+    --beam-core: #ffffff;
+    --beam-glow: #3b82f6;
+    --beam-haze: rgb(37 99 235 / 42%);
 }
 
 * {
@@ -3535,4 +3546,277 @@ input:focus-visible,
 .language-details > summary::before {
   border-right-color: var(--accent);
   border-bottom-color: var(--accent);
+}
+
+/* ---------- Clear Steps, round 2: closer to modern course sites ---------- */
+
+/* The top bar content sits in the same centred column as the home page. */
+.topbar-inner {
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+.demo-button,
+.icon-button,
+.nav-search,
+.demo-input {
+  border-radius: 6px;
+}
+
+/* --- Hero band: full width, with the search beam landing on the middle cell. --- */
+.lesson-main:has(.home) {
+  padding: 0 clamp(20px, 4vw, 48px) 0;
+}
+
+.hero-band {
+  position: relative;
+  isolation: isolate;
+  margin-inline: calc(50% - 50vw);
+  padding-inline: calc(50vw - 50%);
+  overflow: hidden;
+  border-bottom: 1px solid var(--line);
+}
+
+.hero-haze {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(34% 60% at 74% 100%, var(--beam-haze), transparent 72%),
+    radial-gradient(22% 90% at 74% 40%, color-mix(in srgb, var(--beam-haze) 55%, transparent), transparent 70%);
+  pointer-events: none;
+}
+
+.hero::before {
+  display: none;
+}
+
+.hero {
+  min-height: min(760px, calc(100vh - 64px));
+}
+
+.hero-figure {
+  position: relative;
+}
+
+.beam {
+  position: absolute;
+  bottom: calc(100% - 1px);
+  left: 50%;
+  width: 4px;
+  height: 120vh;
+  border-radius: 3px;
+  background: linear-gradient(to top, var(--beam-core), color-mix(in srgb, var(--beam-glow) 70%, var(--beam-core)) 18%, color-mix(in srgb, var(--beam-glow) 40%, transparent) 60%, transparent);
+  box-shadow:
+    0 0 16px 4px color-mix(in srgb, var(--beam-glow) 80%, transparent),
+    0 0 90px 30px color-mix(in srgb, var(--beam-glow) 30%, transparent),
+    0 0 220px 60px color-mix(in srgb, var(--beam-glow) 14%, transparent);
+  transform: translateX(-50%);
+}
+
+/* Where the light lands: a pool on the card's top edge. */
+.hero-figure::after {
+  content: "";
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  width: 70%;
+  height: 80px;
+  background: radial-gradient(50% 50% at 50% 50%, color-mix(in srgb, var(--beam-glow) 45%, transparent), transparent 70%);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.hero-figure .cells-figure {
+  position: relative;
+  z-index: 1;
+  border-color: color-mix(in srgb, var(--beam-glow) 35%, var(--line));
+}
+
+.hero-figure .array-row {
+  justify-content: center;
+  width: max-content;
+  margin-inline: auto;
+}
+
+.hero-figure figcaption {
+  text-align: center;
+}
+
+/* The cell under the beam glows. */
+.hero-figure .is-hit > .array-value {
+  box-shadow:
+    0 0 0 4px color-mix(in srgb, var(--beam-glow) 22%, transparent),
+    0 0 28px 4px color-mix(in srgb, var(--beam-glow) 45%, transparent);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .beam {
+    animation: beam-breathe 4.8s ease-in-out infinite;
+  }
+
+  @keyframes beam-breathe {
+    50% {
+      opacity: 0.78;
+    }
+  }
+}
+
+/* --- Numbers panel --- */
+.home-numbers {
+  border-top: 0;
+}
+
+.numbers-panel {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  margin: 0 0 56px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background:
+    radial-gradient(80% 140% at 0% 0%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 60%),
+    radial-gradient(70% 140% at 100% 100%, color-mix(in srgb, #9d86f5 12%, transparent), transparent 60%),
+    var(--surface);
+}
+
+.numbers-panel > div {
+  display: grid;
+  gap: 8px;
+  padding: 22px 22px 24px;
+  border-right: 1px solid var(--line);
+}
+
+.numbers-panel > div:last-child {
+  border-right: 0;
+}
+
+.numbers-panel dt {
+  color: var(--subtle);
+  font-size: 0.88rem;
+}
+
+.numbers-panel dd {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.numbers-panel strong {
+  color: var(--ink-strong);
+  font-size: clamp(2.2rem, 4vw, 2.8rem);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.numbers-panel span {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+/* --- Closing panel with floating section tiles --- */
+.home-closing {
+  position: relative;
+  overflow: hidden;
+  min-height: 340px;
+  align-content: center;
+}
+
+.closing-tiles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.closing-tile {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border: 1px solid rgb(255 255 255 / 40%);
+  border-radius: 14px;
+  background: var(--art-b);
+  color: #ffffff;
+  box-shadow: 0 12px 24px -12px rgb(0 0 0 / 40%);
+}
+
+.closing-tile .icon {
+  width: 26px;
+  height: 26px;
+}
+
+.closing-tile.t0 { top: 14%; left: 8%; transform: rotate(-8deg); }
+.closing-tile.t1 { top: 62%; left: 12%; transform: rotate(6deg); }
+.closing-tile.t2 { top: 18%; right: 9%; transform: rotate(7deg); }
+.closing-tile.t3 { top: 64%; right: 13%; transform: rotate(-6deg); }
+.closing-tile.t4 { top: 10%; left: 20%; transform: rotate(4deg) scale(0.8); opacity: 0.8; }
+.closing-tile.t5 { bottom: 10%; right: 22%; transform: rotate(-5deg) scale(0.8); opacity: 0.8; }
+
+@media (max-width: 900px) {
+  .closing-tiles {
+    display: none;
+  }
+}
+
+/* --- Wordmark: the name, large and fading into the footer. --- */
+.wordmark {
+  height: clamp(3rem, 9.6vw, 7.8rem);
+  margin: 40px 0 0;
+  overflow: hidden;
+  color: var(--ink-strong);
+  font-size: clamp(3.2rem, 11vw, 9rem);
+  font-weight: 700;
+  letter-spacing: -0.055em;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  opacity: 0.12;
+  -webkit-mask-image: linear-gradient(to bottom, #000 30%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 30%, transparent 100%);
+  user-select: none;
+}
+
+@media (max-width: 760px) {
+  .hero {
+    min-height: 0;
+    padding-top: 40px;
+  }
+
+  .beam {
+    display: none;
+  }
+
+  .numbers-panel > div {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .numbers-panel > div:last-child {
+    border-bottom: 0;
+  }
+}
+
+@media (max-width: 760px) {
+  /* Numbers sit two by two on a phone. */
+  .numbers-panel {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .numbers-panel > div,
+  .numbers-panel > div:last-child {
+    border-right: 0;
+    border-bottom: 0;
+    padding: 18px 16px;
+  }
+
+  .numbers-panel > div:nth-child(odd) {
+    border-right: 1px solid var(--line);
+  }
+
+  .numbers-panel > div:nth-child(-n + 2) {
+    border-bottom: 1px solid var(--line);
+  }
 }

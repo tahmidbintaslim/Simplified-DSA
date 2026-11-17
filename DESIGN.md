@@ -219,7 +219,7 @@ A lesson is a clean documentation page that happens to teach. The frame is the f
 
 What the learner should notice lives inside the figures and demos, and it is marked in a fixed vocabulary that never changes between lessons or themes: gold for what is being looked at, teal for what is settled, moved or on the path, and faded plus crossed out for what has been ruled out. Blue never enters that vocabulary.
 
-The system ships two themes from one set of semantic roles. Light is the default; night follows the system setting until the learner picks one with the theme button (`html[data-theme]`, stored in `localStorage` under `simplified-dsa:theme`, applied by an inline script before first paint). Roles keep their meaning in both themes; only values change. Depth is hairlines and tonal surfaces; the only glow is the soft blue light behind the home hero's drawn step and the closing band.
+The system ships two themes from one set of semantic roles. Light is the default; night follows the system setting until the learner picks one with the theme button (`html[data-theme]`, stored in `localStorage` under `simplified-dsa:theme`, applied by an inline script before first paint). Roles keep their meaning in both themes; only values change. Depth is hairlines and tonal surfaces; the only glow is the home hero's search beam (below) and the closing band.
 
 **Key Characteristics:**
 - Docs shell: top bar, lesson tree, 760px column, scroll-spy table of contents at 1200px and up.
@@ -233,7 +233,7 @@ The system ships two themes from one set of semantic roles. Light is the default
 Zinc neutrals on white (or near-black), one confident blue, and two state hues that belong to the algorithms.
 
 ### Primary
-- **Action Blue** (`#1d4ed8` light, `#2563eb` night; `--accent`): primary buttons, the skip link, step badges, focus rings, the TOC's current marker, the active lesson's status dot, list markers, range inputs. Hover deepens to `#1e40af` (light) or lightens to `#3b82f6` (night).
+- **Action Blue** (`#1d4ed8` in both themes; `--accent`): primary buttons, the skip link, step badges, focus rings, the TOC's current marker, the active lesson's status dot, list markers, range inputs. Hover deepens to `#1e40af` (light) or lightens to `#2563eb` (night).
 - **Blue Ink** (`#1d4ed8` light, `#93b4ff` night; `--accent-ink`): text in the accent: current top-nav link, active lesson title, current TOC entry, the hero's second line, level chip.
 - **Blue Wash** (`#e0e9ff` light, `#172554` night; `--accent-soft`): the active lesson row and the level chip background.
 - **Link Blue** (`#1d4ed8` light, `#8ab0ff` night; `--link`): inline links, underlined with a 3px offset.
@@ -302,7 +302,9 @@ Zinc neutrals on white (or near-black), one confident blue, and two state hues t
 Flat by default. Surfaces separate by a 1px `--line` hairline and a tonal step (page, surface, raised), not by shadow. Lesson cards, demos, quizzes and callouts carry no shadow. Three exceptions, all on the home page or as hover feedback:
 
 ### Shadow Vocabulary
-- **Hero step glow** (`box-shadow: 0 1px 2px rgb(9 9 11 / 4%), 0 24px 48px -24px color-mix(in srgb, var(--accent) 40%, transparent)`): the drawn binary-search card in the hero, over a `radial-gradient` of 16% accent behind it.
+- **Search beam** (`--beam-core` `#ffffff`, `--beam-glow` `#3b82f6`, `--beam-haze` 22% light / 42% night): the home hero is a full-width band whose one authored moment is a 4px column of light falling on the middle cell of a drawn binary-search step, with layered blue glows, a pool where it lands, a haze at the band's foot, and a slow 4.8s breathe (off under reduced motion; hidden on phones). The beam is our own image: binary search looks at the middle.
+- **Numbers panel:** four counts computed from the curriculum at render time (lessons, demos, quiz questions, minutes) in a 16px hairline panel tinted with faint blue and violet corners; 2×2 on phones. Every number is real.
+- **Closing tiles and wordmark:** the closing band floats six section-mark tiles (hidden under 900px); the page ends with the name set very large at 12% opacity, fading out by mask into the footer.
 - **Section card lift** (`box-shadow: 0 18px 40px -26px rgb(9 9 11 / 35%)`): section cards on hover only, with the border moving to `--edge`.
 - **Banner mark** (`box-shadow: 0 10px 24px -12px rgb(0 0 0 / 35%)`): the frosted icon tile on section card banners.
 - **Paper** (`--shadow-paper`): small figure values; night uses a deeper value.
