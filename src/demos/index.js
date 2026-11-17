@@ -25,6 +25,7 @@ import {
   windowSumCode,
   windowSumFrames,
 } from './algorithms.js';
+import { cellHtml, identityKeys, motionRow, motionRowHtml, motionStageHtml, patchRow } from './motion.js';
 import { createPlayer } from './player.js';
 
 /**
@@ -82,23 +83,28 @@ function mountArray(root) {
       <button type="button" class="demo-button" data-op="delete">Delete at i</button>
       <button type="button" class="demo-button" data-op="append">Append</button>
     </div>
-    <div class="demo-stage"><div class="array-row"></div></div>
+    ${motionStageHtml()}
     ${legend([['hit', 'the value you asked for'], ['moved', 'shifted to make room or close the gap'], ['gap', 'empty slot']])}
     <p class="bs-compare arr-status" aria-live="polite"></p>
   `;
 
-  const row = root.querySelector('.array-row');
+  const stage = motionRow(root.querySelector('.motion-row'));
+  // Keys follow values, so a shift is the same value sliding one slot over.
+  const keys = identityKeys();
   const status = root.querySelector('.arr-status');
   const valueInput = root.querySelector('[data-field="value"]');
   const indexInput = root.querySelector('[data-field="index"]');
 
-  const player = createPlayer(root, ({ values: shown, hit, moved }) => {
-    row.innerHTML = shown
-      .map((value, i) => {
-        const state = value === null ? 'is-gap' : i === hit ? 'is-hit' : moved.includes(i) ? 'is-moved' : '';
-        return `<div class="array-cell ${state}"><span class="array-value">${value ?? ''}</span><span class="array-index">${i}</span></div>`;
-      })
-      .join('');
+  const player = createPlayer(root, ({ values: shown, hit, moved, vars }) => {
+    const ids = keys(shown);
+    stage.update(
+      shown.map((value, i) => ({
+        key: ids[i],
+        className: `array-cell ${value === null ? 'is-gap' : i === hit ? 'is-hit' : moved.includes(i) ? 'is-moved' : ''}`,
+        html: cellHtml(value ?? '', i),
+      })),
+      { pointers: { i: hit >= 0 ? hit : null, j: vars?.j ?? null } },
+    );
   });
 
   // One-step operations still go through the player, so every demo reads the same way.
@@ -519,26 +525,27 @@ function mountBinarySearch(root) {
   <button type="button" class="demo-button" data-op="use">Use list</button>
       </div>
     </div>
-    <div class="demo-stage"><div class="array-row bs-row"></div></div>
-    ${legend([['mid', 'checking (mid)'], ['found', 'found'], ['out', 'ruled out']])}
+    ${motionStageHtml('bs-row')}
+    ${legend([['mid', 'checking (mid)'], ['found', 'found'], ['out', 'ruled out'], ['range', 'still in play (lo..hi)']])}
     <p class="bs-compare" aria-live="polite"></p>
   `;
 
-  const row = root.querySelector('.bs-row');
+  const stage = motionRow(root.querySelector('.motion-row'));
   const compare = root.querySelector('.bs-compare');
   const input = root.querySelector('[data-field="target"]');
   const listInput = root.querySelector('[data-field="list"]');
 
-  // Pointer names sit under the cells they point at, like the hand-drawn traces in the lessons.
+  // lo, mid and hi glide under the cells; the bracket around lo..hi shrinks by half each check.
   const player = createPlayer(root, ({ lo, hi, mid, found }) => {
-    row.innerHTML = values
-      .map((value, i) => {
-        const state = i === found ? 'is-found' : i === mid ? 'is-mid' : i < lo || i > hi ? 'is-out' : '';
-        const tags = [i === lo && 'lo', i === mid && 'mid', i === hi && 'hi'].filter(Boolean).join(' ');
-        const pointer = tags ? `<span class="cell-pointer">${tags}</span>` : '';
-        return `<div class="array-cell ${state}"><span class="array-value">${value}</span><span class="array-index">${i}</span>${pointer}</div>`;
-      })
-      .join('');
+    const isFound = Number.isInteger(found) && found >= 0;
+    stage.update(
+      values.map((value, i) => ({
+        key: `i${i}`,
+        className: `array-cell ${i === found ? 'is-found' : i === mid ? 'is-mid' : i < lo || i > hi ? 'is-out' : ''}`,
+        html: cellHtml(value, i),
+      })),
+      { pointers: { lo, mid: isFound ? found : mid, hi }, range: lo <= hi ? [lo, hi] : null },
+    );
   });
 
   const run = () => {
@@ -613,21 +620,28 @@ function mountSorting(root) {
   `;
 
   const bars = root.querySelector('.sort-bars');
+  // Keys follow values, so a swap is two bars trading places.
+  const keys = identityKeys();
   const meta = root.querySelector('.sort-meta');
   const algorithmSelect = root.querySelector('[data-field="algorithm"]');
   const sizeSelect = root.querySelector('[data-field="size"]');
   const listInput = root.querySelector('[data-field="list"]');
 
   const player = createPlayer(root, ({ values: frameValues, active, sorted }) => {
-    bars.innerHTML = frameValues
-      .map((value, i) => {
-        const state = active.includes(i) ? 'is-active' : sorted.includes(i) ? 'is-sorted' : '';
-        return `<div class="sort-bar ${state}" style="height: ${value}%"><span>${value}</span></div>`;
-      })
-      .join('');
+    const ids = keys(frameValues);
+    patchRow(
+      bars,
+      frameValues.map((value, i) => ({
+        key: ids[i],
+        className: `sort-bar ${active.includes(i) ? 'is-active' : sorted.includes(i) ? 'is-sorted' : ''}`,
+        style: `height: ${value}%`,
+        html: `<span>${value}</span>`,
+      })),
+    );
   });
 
   const load = () => {
+    keys.reset();
     const algorithm = sortingAlgorithms[algorithmSelect.value];
     const frames = algorithm.frames(values);
     setStatus(meta, `${algorithm.label} · ${algorithm.big} · ${frames.length} recorded steps for ${values.length} values.`);
@@ -766,26 +780,26 @@ function mountTwoPointers(root) {
   <button type="button" class="demo-button" data-op="use">Use list</button>
       </div>
     </div>
-    <div class="demo-stage"><div class="array-row tp-row"></div></div>
-    ${legend([['mid', 'L and R, being added'], ['found', 'the pair'], ['out', 'ruled out for good']])}
+    ${motionStageHtml('tp-row')}
+    ${legend([['mid', 'L and R, being added'], ['found', 'the pair'], ['out', 'ruled out for good'], ['range', 'still possible (L..R)']])}
     <p class="bs-compare tp-compare" aria-live="polite"></p>
   `;
 
-  const row = root.querySelector('.tp-row');
+  const stage = motionRow(root.querySelector('.motion-row'));
   const compare = root.querySelector('.tp-compare');
   const targetInput = root.querySelector('[data-field="target"]');
   const listInput = root.querySelector('[data-field="list"]');
 
   // Values outside left..right are ruled out for good: grey them.
   const player = createPlayer(root, ({ left, right, found }) => {
-    row.innerHTML = values
-      .map((value, i) => {
-        const state = found?.includes(i) ? 'is-found' : i === left || i === right ? 'is-mid' : i < left || i > right ? 'is-out' : '';
-        const tags = [i === left && 'L', i === right && 'R'].filter(Boolean).join(' ');
-        const pointer = tags ? `<span class="cell-pointer">${tags}</span>` : '';
-        return `<div class="array-cell ${state}"><span class="array-value">${value}</span><span class="array-index">${i}</span>${pointer}</div>`;
-      })
-      .join('');
+    stage.update(
+      values.map((value, i) => ({
+        key: `i${i}`,
+        className: `array-cell ${found?.includes(i) ? 'is-found' : i === left || i === right ? 'is-mid' : i < left || i > right ? 'is-out' : ''}`,
+        html: cellHtml(value, i),
+      })),
+      { pointers: { L: left, R: right }, range: left <= right ? [left, right] : null },
+    );
   });
 
   const run = () => {
@@ -829,28 +843,27 @@ function mountSlidingWindow(root) {
   <button type="button" class="demo-button" data-op="use">Use list</button>
       </div>
     </div>
-    <div class="demo-stage"><div class="array-row sw-row"></div></div>
-    ${legend([['moved', 'inside the window'], ['hit', 'just entered']])}
+    ${motionStageHtml('sw-row')}
+    ${legend([['moved', 'inside the window'], ['hit', 'just entered'], ['range', 'the window']])}
     <p class="bs-compare sw-compare" aria-live="polite"></p>
   `;
 
-  const row = root.querySelector('.sw-row');
+  const stage = motionRow(root.querySelector('.motion-row'));
   const compare = root.querySelector('.sw-compare');
   const kInput = root.querySelector('[data-field="k"]');
   const listInput = root.querySelector('[data-field="list"]');
 
   // Teal = inside the window; gold = the value that just entered.
+  // The window is one frame that slides right; start and end glide with it.
   const player = createPlayer(root, ({ start, end, line }) => {
-    row.innerHTML = values
-      .map((value, i) => {
+    stage.update(
+      values.map((value, i) => {
         const inside = i >= start && i <= end;
         const entering = i === end && line !== 0 && line !== 4;
-        const state = entering ? 'is-hit' : inside ? 'is-moved' : '';
-        const tags = [i === start && 'start', i === end && 'end'].filter(Boolean).join(' ');
-        const pointer = tags ? `<span class="cell-pointer">${tags}</span>` : '';
-        return `<div class="array-cell ${state}"><span class="array-value">${value}</span><span class="array-index">${i}</span>${pointer}</div>`;
-      })
-      .join('');
+        return { key: `i${i}`, className: `array-cell ${entering ? 'is-hit' : inside ? 'is-moved' : ''}`, html: cellHtml(value, i) };
+      }),
+      { pointers: { start, end }, range: end >= start ? [start, end] : null },
+    );
   });
 
   const run = () => {
@@ -895,12 +908,15 @@ function mountFastSlow(root) {
       <label>Last node points to <select class="demo-input demo-select" data-field="loop"></select></label>
       <button type="button" class="demo-button" data-op="run">Run</button>
     </div>
-    <div class="demo-stage"><div class="array-row fs-row"></div></div>
+    ${motionStageHtml('fs-row')}
     ${legend([['hit', 'where slow and fast are'], ['found', 'where they meet'], ['gap', 'the loop back']])}
     <p class="bs-compare fs-compare" aria-live="polite"></p>
   `;
 
-  const row = root.querySelector('.fs-row');
+  const stage = motionRow(root.querySelector('.motion-row'));
+  const loop = document.createElement('span');
+  loop.className = 'fs-loop';
+  loop.setAttribute('aria-hidden', 'true');
   const compare = root.querySelector('.fs-compare');
   const nInput = root.querySelector('[data-field="n"]');
   const loopSelect = root.querySelector('[data-field="loop"]');
@@ -915,16 +931,21 @@ function mountFastSlow(root) {
     loopSelect.value = String(Math.min(loopTo, n - 1));
   };
 
+  // Slow steps one cell and fast jumps two: watch fast lap slow on a loop.
   const player = createPlayer(root, ({ slow, fast, met }) => {
-    const cells = Array.from({ length: n }, (_, i) => {
-      const state = met && i === slow ? 'is-found' : i === slow || i === fast ? 'is-hit' : '';
-      const tags = [i === slow && 'slow', i === fast && 'fast'].filter(Boolean).join(' ');
-      const pointer = tags ? `<span class="cell-pointer">${tags}</span>` : '<span class="cell-pointer">&nbsp;</span>';
-      return `<div class="array-cell ${state}"><span class="array-value">${names[i]}</span><span class="array-index">${i}</span>${pointer}</div>`;
-    }).join('');
+    stage.update(
+      Array.from({ length: n }, (_, i) => ({
+        key: `i${i}`,
+        className: `array-cell ${met && i === slow ? 'is-found' : i === slow || i === fast ? 'is-hit' : ''}`,
+        html: cellHtml(names[i], i),
+      })),
+      { pointers: { slow, fast: fast >= 0 ? fast : null } },
+    );
     // The loop is drawn as a dashed U from the last node back to its target.
-    const loop = loopTo >= 0 ? `<span class="fs-loop" style="--from:${loopTo};--to:${n - 1}" aria-hidden="true"></span>` : '';
-    row.innerHTML = cells + loop;
+    if (loopTo >= 0) {
+      loop.style.cssText = `--from:${loopTo};--to:${n - 1}`;
+      stage.row.append(loop);
+    } else loop.remove();
   });
 
   const run = () => {
@@ -969,32 +990,35 @@ function mountPrefixSums(root) {
     </div>
     <div class="demo-stage">
       <p class="ps-label">a</p>
-      <div class="array-row ps-values"></div>
+      ${motionRowHtml('ps-values')}
       <p class="ps-label">prefix</p>
-      <div class="array-row ps-prefix"></div>
+      ${motionRowHtml('ps-prefix')}
     </div>
     ${legend([['hit', 'being read'], ['moved', 'just written, or the range asked for'], ['gap', 'not built yet']])}
     <p class="bs-compare ps-compare" aria-live="polite"></p>
   `;
 
-  const valueRow = root.querySelector('.ps-values');
-  const prefixRow = root.querySelector('.ps-prefix');
+  const [valueStage, prefixStage] = [...root.querySelectorAll('.motion-row')].map(motionRow);
   const compare = root.querySelector('.ps-compare');
   const lInput = root.querySelector('[data-field="l"]');
   const rInput = root.querySelector('[data-field="r"]');
   const listInput = root.querySelector('[data-field="list"]');
-  const cell = (value, i, state) =>
-    `<div class="array-cell ${state}"><span class="array-value">${value}</span><span class="array-index">${i}</span></div>`;
+  const cell = (value, j, state) => ({ key: `i${j}`, className: `array-cell ${state}`, html: cellHtml(value, j) });
 
+  // Building: i walks the values while prefix[i+1] fills in. Asking: the range
+  // a[l..r] is framed, and the two prefix entries that answer it are pointed at.
   const player = createPlayer(root, ({ prefix, i, query }) => {
-    valueRow.innerHTML = values
-      .map((value, j) => cell(value, j, query ? (j >= query.l && j <= query.r ? 'is-moved' : '') : j === i ? 'is-hit' : ''))
-      .join('');
-    prefixRow.innerHTML = Array.from({ length: values.length + 1 }, (_, j) => {
-      if (j >= prefix.length) return cell('', j, 'is-gap');
-      const state = query ? (j === query.r + 1 || j === query.l ? 'is-hit' : '') : j === i + 1 ? 'is-moved' : j === i ? 'is-hit' : '';
-      return cell(prefix[j], j, state);
-    }).join('');
+    valueStage.update(
+      values.map((value, j) => cell(value, j, query ? (j >= query.l && j <= query.r ? 'is-moved' : '') : j === i ? 'is-hit' : '')),
+      { pointers: { i: query ? null : i }, range: query ? [query.l, query.r] : null },
+    );
+    prefixStage.update(
+      Array.from({ length: values.length + 1 }, (_, j) => {
+        if (j >= prefix.length) return cell('', j, 'is-gap');
+        return cell(prefix[j], j, query ? (j === query.r + 1 || j === query.l ? 'is-hit' : '') : j === i + 1 ? 'is-moved' : j === i ? 'is-hit' : '');
+      }),
+      { pointers: query ? { l: query.l, 'r+1': query.r + 1 } : { 'i+1': i >= 0 ? i + 1 : null } },
+    );
   });
 
   const run = () => {

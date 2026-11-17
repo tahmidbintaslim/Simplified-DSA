@@ -98,6 +98,18 @@ function renderQuiz(lines) {
     </div>`;
 }
 
+/**
+ * A worked example: consecutive ```cells figures of the same length become one
+ * stepper. Every step stays in the page (hidden), so the text is complete
+ * without script; the lesson page turns it into one animated figure with a
+ * slider and Back / Next (src/core/steppers.js).
+ */
+function renderSteps(steps) {
+  if (steps.length === 1) return steps[0];
+  const frames = steps.map((figure, i) => figure.replace('<figure class="cells-figure">', `<figure class="cells-figure cells-step" data-step="${i + 1}"${i ? ' hidden' : ''}>`)).join('');
+  return `<div class="cells-steps" data-steps="${steps.length}">${frames}</div>`;
+}
+
 function renderTable(rows) {
   const cells = (row) =>
     row
@@ -177,7 +189,14 @@ export class MarkdownRenderer {
       if (line.startsWith('```')) {
         if (fence) {
           const { kind, lines: body } = fence;
-          if (kind === 'cells') html.push(renderCells(body));
+          // Back-to-back cells figures of the same length are one worked
+          // example: they are grouped into a stepper (see renderSteps).
+          if (kind === 'cells') {
+            const figure = { html: renderCells(body), size: (body.find((l) => l.startsWith('values:')) ?? '').split(/\s+/).length };
+            const previous = html.at(-1);
+            if (previous?.steps && previous.size === figure.size) previous.steps.push(figure.html);
+            else html.push({ steps: [figure.html], size: figure.size });
+          }
           else if (kind === 'quiz') html.push(renderQuiz(body));
           else if (kind === 'demo') html.push(DEMO_MARKER);
           // An answer to a practice prompt stays folded until the learner has tried.
@@ -248,6 +267,6 @@ export class MarkdownRenderer {
     flushAll();
     // An unclosed fence still shows its text rather than vanishing.
     if (fence?.lines.length) html.push(`<pre><code>${escapeHtml(fence.lines.join('\n'))}</code></pre>`);
-    return html.join('');
+    return html.map((part) => (typeof part === 'string' ? part : renderSteps(part.steps))).join('');
   }
 }

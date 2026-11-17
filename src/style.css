@@ -3943,3 +3943,196 @@ input:focus-visible,
   cursor: default;
   opacity: 0.5;
 }
+
+/* ---------- Motion: cells that move, pointers that glide, ranges that shrink ---------- */
+
+.motion-row {
+  position: relative;
+  width: max-content;
+  padding-top: 6px;
+}
+
+.motion-row .array-row {
+  position: relative;
+  z-index: 1;
+}
+
+/* One element per value across steps: colours cross-fade (short ease, not a
+   spring: springs are for movement). */
+.array-cell > .array-value,
+.sort-bar {
+  transition:
+    background-color 220ms ease,
+    border-color 220ms ease,
+    color 220ms ease,
+    opacity 220ms ease;
+}
+
+.pointer-track {
+  position: relative;
+  height: 38px;
+}
+
+.pointer-token {
+  position: absolute;
+  top: 7px;
+  left: 0;
+  padding: 0 4px;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--look);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+  transform: translate(calc(var(--x, 0px) - 50%), calc(var(--level, 0) * 15px));
+  transition:
+    transform var(--spring-ms, 420ms) var(--spring, ease),
+    opacity 180ms ease;
+}
+
+/* A small caret above each token points at its cell. */
+.pointer-token::before {
+  content: "";
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  border: 4px solid transparent;
+  border-bottom-color: currentColor;
+  transform: translateX(-50%);
+}
+
+.pointer-token.is-hidden {
+  opacity: 0;
+}
+
+/* The live range: one frame that stretches and shrinks with lo..hi or a window. */
+.range-bracket {
+  position: absolute;
+  top: 0;
+  bottom: 34px;
+  left: 0;
+  z-index: 0;
+  width: var(--width, 0px);
+  border: 1.5px solid color-mix(in srgb, var(--accent) 55%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--accent) 7%, transparent);
+  transform: translateX(var(--left, 0px));
+  transition:
+    transform var(--spring-ms, 420ms) var(--spring, ease),
+    width var(--spring-ms, 420ms) var(--spring, ease),
+    opacity 180ms ease;
+}
+
+.range-bracket.is-hidden {
+  opacity: 0;
+}
+
+/* The first placement after load or attach happens without movement. */
+.motion-row.is-settling .pointer-token,
+.motion-row.is-settling .range-bracket {
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pointer-token,
+  .range-bracket,
+  .array-cell > .array-value,
+  .sort-bar {
+    transition: none;
+  }
+}
+
+.swatch-range {
+  border: 1.5px solid color-mix(in srgb, var(--accent) 55%, transparent);
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--accent) 7%, transparent);
+}
+
+/* Fast/slow: the loop is placed inside the motion row's cell row. */
+.motion-row .fs-row {
+  padding-bottom: 24px;
+}
+
+/* The step timeline: a full-width scrubber with a filled track. */
+.demo-timeline {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.demo-scrub {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  min-height: 44px;
+}
+
+.demo-scrub input {
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(to right, var(--accent) var(--progress, 0%), var(--line-strong) var(--progress, 0%));
+  cursor: pointer;
+  appearance: none;
+}
+
+.demo-scrub input::-webkit-slider-thumb {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--page);
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+  appearance: none;
+}
+
+.demo-scrub input::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--page);
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.demo-timeline .demo-count {
+  min-width: 6.5em;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Worked examples: the static steps are the source; the live figure is shown. */
+.cells-steps.is-live > .cells-step {
+  display: none;
+}
+
+.cells-live figcaption {
+  min-height: 3.2em;
+}
+
+.cells-steps-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.cells-steps-controls .demo-scrub {
+  flex: 1;
+}
+
+.cells-steps-count {
+  min-width: 3.2em;
+  color: var(--subtle);
+  font-family: var(--font-ui);
+  font-size: 0.88rem;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Inside the live figure, pointer labels are gliding tokens, not cell text. */
+.cells-live .motion-row {
+  margin-bottom: -6px;
+}
