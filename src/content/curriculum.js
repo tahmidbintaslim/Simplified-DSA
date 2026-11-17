@@ -9,6 +9,8 @@ import sorting from './algorithms/sorting.md?raw';
 import graphTraversal from './algorithms/graph-traversal.md?raw';
 import twoPointers from './patterns/two-pointers.md?raw';
 import slidingWindow from './patterns/sliding-window.md?raw';
+import fastAndSlowPointers from './patterns/fast-and-slow-pointers.md?raw';
+import prefixSums from './patterns/prefix-sums.md?raw';
 import { arrayLanguageExamples } from './languageExamples.js';
 
 // `demo` names an interactive panel in src/demos/index.js; a ```demo block in the
@@ -144,6 +146,26 @@ export const curriculum = [
         goals: ['Slide a window in O(1) per step', 'Grow and shrink a flexible window', 'Spot "consecutive" problems that fit'],
         markdown: slidingWindow,
         demo: 'sliding-window',
+      },
+      {
+        id: 'fast-and-slow-pointers',
+        title: 'Fast and Slow Pointers',
+        summary: 'Two speeds on one list: find a loop or the middle in O(1) memory.',
+        level: 'Intermediate',
+        minutes: 14,
+        goals: ['Detect a loop in a linked list with two pointers', 'Find the middle of a list in one pass', 'Explain why the pointers must meet'],
+        markdown: fastAndSlowPointers,
+        demo: 'fast-slow',
+      },
+      {
+        id: 'prefix-sums',
+        title: 'Prefix Sums',
+        summary: 'Build running totals once, then answer any range sum with one subtraction.',
+        level: 'Intermediate',
+        minutes: 13,
+        goals: ['Build a prefix array by hand', 'Answer sum(l..r) in O(1)', 'Avoid the r + 1 off-by-one'],
+        markdown: prefixSums,
+        demo: 'prefix-sums',
       },
     ],
   },

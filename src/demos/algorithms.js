@@ -563,3 +563,104 @@ export function arrayDeleteFrames(values, i) {
   frames.push(snap(3, { n: n - 1, i }, `Drop the empty last slot. ${count} value${count === 1 ? '' : 's'} shifted left to close the gap: O(n).`));
   return frames;
 }
+
+/* ---------- Pattern: fast and slow pointers (Floyd's cycle check) ---------- */
+
+export const fastSlowCode = [
+  'slow = head;  fast = head',
+  'while fast and fast.next exist:',
+  '  slow = slow.next',
+  '  fast = fast.next.next',
+  '  if slow == fast: return "loop"',
+  'return "no loop"',
+];
+
+/**
+ * A list of n nodes where node i points to i + 1, and the last node points
+ * back to `loopTo` (or to nothing when loopTo is -1).
+ * Frame: { slow, fast, met, line, vars, caption }; fast is -1 once it falls
+ * off the end. Slow moves 1 node per step, fast moves 2, so on a loop fast
+ * gains one node each step and must land on slow.
+ */
+export function fastSlowFrames(n, loopTo = -1) {
+  const next = (i) => (i < 0 ? -1 : i + 1 < n ? i + 1 : loopTo);
+  const name = (i) => (i < 0 ? 'the end' : `node ${i}`);
+  let slow = 0;
+  let fast = 0;
+  let steps = 0;
+  const frames = [{ slow, fast, met: false, line: 0, vars: { slow, fast, steps }, caption: 'Both pointers start at the head, node 0.' }];
+
+  while (fast >= 0 && next(fast) >= 0) {
+    slow = next(slow);
+    fast = next(next(fast));
+    steps += 1;
+    const met = slow === fast;
+    frames.push({
+      slow,
+      fast,
+      met,
+      line: met ? 4 : 3,
+      vars: { slow, fast, steps },
+      caption: met
+        ? `Slow steps to node ${slow} and fast jumps to node ${fast}: they meet, so the list has a loop. Found in ${steps} step${steps === 1 ? '' : 's'}.`
+        : `Slow steps to ${name(slow)}; fast jumps two, to ${name(fast)}.`,
+    });
+    if (met) return frames;
+  }
+
+  frames.push({
+    slow,
+    fast,
+    met: false,
+    line: 5,
+    vars: { slow, fast: fast < 0 ? 'none' : fast, steps },
+    caption: `Fast reached the end after ${steps} step${steps === 1 ? '' : 's'}, so there is no loop. Slow is at node ${slow}, the middle.`,
+  });
+  return frames;
+}
+
+/* ---------- Pattern: prefix sums ---------- */
+
+export const prefixSumCode = [
+  'prefix[0] = 0',
+  'for i from 0 to n-1:',
+  '  prefix[i+1] = prefix[i] + a[i]',
+  'sum(l..r) = prefix[r+1] - prefix[l]',
+];
+
+/**
+ * Build the prefix array once, then answer one range-sum question with a
+ * single subtraction. Frame: { prefix (filled so far), i, query, line, vars,
+ * caption }; `query` is { l, r, sum } on the last frame.
+ */
+export function prefixSumFrames(values, l, r) {
+  const prefix = [0];
+  const frames = [{ prefix: [...prefix], i: -1, query: null, line: 0, vars: { n: values.length }, caption: 'prefix[0] = 0: the sum of no values.' }];
+  values.forEach((value, i) => {
+    prefix.push(prefix[i] + value);
+    frames.push({
+      prefix: [...prefix],
+      i,
+      query: null,
+      line: 2,
+      vars: { i, 'a[i]': value, [`prefix[${i + 1}]`]: prefix[i + 1] },
+      caption: `prefix[${i + 1}] = prefix[${i}] + a[${i}] = ${prefix[i]} + ${value} = ${prefix[i + 1]}.`,
+    });
+  });
+
+  const valid = Number.isInteger(l) && Number.isInteger(r) && l >= 0 && r < values.length && l <= r;
+  if (!valid) {
+    frames.push({ prefix: [...prefix], i: -1, query: null, line: -1, vars: { l, r }, caption: `Pick 0 ≤ l ≤ r ≤ ${values.length - 1} to ask for a range sum.` });
+    return frames;
+  }
+  const sum = prefix[r + 1] - prefix[l];
+  frames.push({
+    prefix: [...prefix],
+    i: -1,
+    query: { l, r, sum },
+    line: 3,
+    vars: { l, r, [`prefix[${r + 1}]`]: prefix[r + 1], [`prefix[${l}]`]: prefix[l], sum },
+    caption: `sum(${l}..${r}) = prefix[${r + 1}] - prefix[${l}] = ${prefix[r + 1]} - ${prefix[l]} = ${sum}. One subtraction, however long the range.`,
+  });
+  return frames;
+}

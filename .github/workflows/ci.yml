@@ -38,15 +38,43 @@ jobs:
       - name: Build
         run: pnpm build
 
-      # Browser tests run against the build above in a real Chromium.
-      - name: Install Chromium for browser tests
-        run: pnpm exec playwright install --with-deps chromium
-
-      - name: Browser tests
-        run: node --test "e2e/**/*.test.js"
-
       # The plugin ships a prebuilt server bundle; fail if it is out of date.
       - name: Check plugin bundle is current
         run: |
           pnpm build:plugin
           git diff --exit-code -- plugin/server
+
+  # The browser suite in all three engines learners use: Chromium (Chrome,
+  # Edge), Firefox and WebKit (Safari).
+  browser-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+    name: browser-tests (${{ matrix.browser }})
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
+      - name: Install ${{ matrix.browser }}
+        run: pnpm exec playwright install --with-deps ${{ matrix.browser }}
+
+      - name: Browser tests
+        run: node --test "e2e/**/*.test.js"
+        env:
+          BROWSER: ${{ matrix.browser }}

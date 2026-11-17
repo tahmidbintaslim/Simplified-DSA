@@ -22,8 +22,10 @@ import {
   bstSearchPath,
   bruteForcePairChecks,
   bruteForceWindowAdds,
+  fastSlowFrames,
   gridTraversalFrames,
   pairSumFrames,
+  prefixSumFrames,
   simpleHash,
   sortingAlgorithms,
   windowSumFrames,
@@ -261,6 +263,39 @@ export function createServer() {
       const state = (f) => (f.end >= f.start ? `  window [${input.slice(f.start, f.end + 1).join(', ')}]` : '');
       const brute = k <= input.length ? `\n\nRecomputing every window would make ${bruteForceWindowAdds(input.length, k)} additions.` : '';
       return text(`${numbered(frames, state)}${brute}`);
+    },
+  );
+
+  server.registerTool(
+    'trace_fast_slow',
+    {
+      title: 'Trace fast and slow pointers (loop check)',
+      description:
+        'A linked list of n nodes (0 to n-1) where each node points to the next, and the last node points back to loop_to (or to nothing when loop_to is -1). Slow moves 1 node per step, fast moves 2. Returns every step: where they meet (a loop) or where fast falls off the end (no loop, slow is in the middle).',
+      inputSchema: { n: z.number().int().min(1).max(30), loop_to: z.number().int().min(-1).max(29).default(-1) },
+      annotations: { readOnlyHint: true },
+    },
+    ({ n, loop_to: loopTo }) => {
+      if (loopTo >= n) return text(`loop_to must be -1 (no loop) or a node from 0 to ${n - 1}.`);
+      const frames = fastSlowFrames(n, loopTo);
+      const state = (f) => `  (slow=${f.slow}, fast=${f.fast < 0 ? 'none' : f.fast})`;
+      const shape = loopTo >= 0 ? `Node ${n - 1} points back to node ${loopTo}.` : 'A plain list with no loop.';
+      return text(`${shape}\n${numbered(frames, state)}\n\nMemory: two pointers. A visited set would store up to ${n} nodes.`);
+    },
+  );
+
+  server.registerTool(
+    'trace_prefix_sums',
+    {
+      title: 'Trace prefix sums (range sum query)',
+      description:
+        'Build the prefix array (prefix[0] = 0, prefix[i+1] = prefix[i] + a[i]) step by step, then answer sum(left..right) with one subtraction. Returns every step and the final prefix array.',
+      inputSchema: { values, left: z.number().int().min(0), right: z.number().int().min(0) },
+      annotations: { readOnlyHint: true },
+    },
+    ({ values: input, left, right }) => {
+      const frames = prefixSumFrames(input, left, right);
+      return text(`${numbered(frames)}\n\nprefix = [${frames.at(-1).prefix.join(', ')}]`);
     },
   );
 

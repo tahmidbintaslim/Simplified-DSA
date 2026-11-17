@@ -7,7 +7,7 @@
  */
 import { after, before, test } from 'node:test';
 import assert from 'node:assert/strict';
-import { chromium } from 'playwright';
+import * as playwright from 'playwright';
 import { preview } from 'vite';
 import { loadLessons } from '../mcp/server.js';
 
@@ -19,9 +19,13 @@ let base;
 before(async () => {
   server = await preview({ logLevel: 'silent', preview: { port: 4180, strictPort: false } });
   base = server.resolvedUrls.local[0].replace(/\/$/, '');
+  // BROWSER picks the engine (chromium, firefox or webkit; CI runs all three).
   // CHROMIUM_PATH lets a machine with a preinstalled Chromium run the suite
   // when its Playwright version expects a different browser build.
-  browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
+  const engine = process.env.BROWSER || 'chromium';
+  browser = await playwright[engine].launch({
+    executablePath: engine === 'chromium' ? process.env.CHROMIUM_PATH || undefined : undefined,
+  });
 });
 
 after(async () => {
@@ -313,4 +317,26 @@ test('docs shell: search filters the lesson tree, sections expand in place, them
   assert.equal(await page.evaluate(() => document.documentElement.dataset.theme), 'dark');
   assert.deepEqual(errors, []);
   await page.close();
+});
+
+test('new patterns: fast and slow pointers meet on the loop; prefix sums answer with one subtraction', async () => {
+  const { page, errors } = await open('/patterns/fast-and-slow-pointers');
+  await page.selectOption('[data-field="loop"]', '3');
+  await page.click('[data-op="run"]');
+  // Step to the end: the last caption reports the meeting, and that cell is teal.
+  for (let i = 0; i < 10; i++) await page.click('[data-player="next"]');
+  assert.match(await page.textContent('.demo-caption'), /they meet, so the list has a loop/);
+  assert.equal(await page.locator('.fs-row .array-cell.is-found').count(), 1);
+  assert.equal(await page.locator('.fs-loop').count(), 1);
+  await page.close();
+
+  const prefix = await open('/patterns/prefix-sums');
+  await prefix.page.fill('[data-field="l"]', '2');
+  await prefix.page.fill('[data-field="r"]', '4');
+  await prefix.page.click('[data-op="run"]');
+  for (let i = 0; i < 12; i++) await prefix.page.click('[data-player="next"]');
+  assert.match(await prefix.page.textContent('.demo-caption'), /sum\(2\.\.4\) = prefix\[5\] - prefix\[2\] = 12 - 2 = 10/);
+  assert.equal(await prefix.page.locator('.ps-values .array-cell.is-moved').count(), 3);
+  assert.deepEqual([...errors, ...prefix.errors], []);
+  await prefix.page.close();
 });

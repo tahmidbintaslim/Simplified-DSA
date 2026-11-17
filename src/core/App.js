@@ -146,6 +146,7 @@ export class App {
             <button id="theme-toggle" class="icon-button" type="button" data-theme-toggle aria-label="Switch to ${this.isDark ? 'light' : 'dark'} theme">${icon(this.isDark ? 'sun' : 'moon')}</button>
           </div>
         </div>
+        ${onLesson ? '<span class="read-progress" aria-hidden="true"></span>' : ''}
       </header>
       <div class="app-shell ${this.home ? 'is-home' : ''}">
         ${sidebar}

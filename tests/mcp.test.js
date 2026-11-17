@@ -51,6 +51,13 @@ test('trace tools return the same steps the website uses', async () => {
   const tooBig = await call(client, 'trace_sliding_window', { values: [1, 2], k: 5 });
   assert.match(tooBig, /must be between 1 and 2/);
   assert.doesNotMatch(tooBig, /Recomputing/);
+  const loop = await call(client, 'trace_fast_slow', { n: 6, loop_to: 3 });
+  assert.match(loop, /they meet, so the list has a loop/);
+  const plain = await call(client, 'trace_fast_slow', { n: 7 });
+  assert.match(plain, /no loop\. Slow is at node 3, the middle/);
+  const prefix = await call(client, 'trace_prefix_sums', { values: [3, -1, 4, 1, 5, 9], left: 2, right: 4 });
+  assert.match(prefix, /sum\(2\.\.4\) = prefix\[5\] - prefix\[2\] = 12 - 2 = 10/);
+  assert.match(prefix, /prefix = \[0, 3, 2, 6, 7, 12, 21\]/);
   const bst = await call(client, 'trace_bst', { values: [1, 2, 3, 4], search: 4 });
   assert.match(bst, /Height: 4/);
   assert.match(bst, /1 → 2 → 3 → 4 → found/);
