@@ -347,6 +347,7 @@ test('critique 3: the hero search is drivable and the beam follows the middle ce
   const start = await left();
   await page.click('#hero-next');
   assert.match(await page.textContent('.hero-figure figcaption'), /Step 2 of 3/);
+  await page.waitForTimeout(600); // the beam slides on the same element now
   assert.ok((await left()) > start, 'beam moved right, to the new middle');
   await page.click('#hero-next');
   assert.equal(await page.locator('.hero-figure .array-cell.is-found').count(), 1);
@@ -431,4 +432,23 @@ test('predict, then reveal: Step asks first, a picked cell plays the step and sa
   assert.match(await page.textContent('.predict-question'), /^Right: cell 4\./);
   assert.deepEqual(errors, []);
   await page.close();
+});
+
+test('the home hero plays its search once by itself when it comes into view', async () => {
+  const { page, errors } = await open('/');
+  const beam = await page.locator('.beam').elementHandle();
+  await page.waitForTimeout(4800);
+  assert.match(await page.textContent('.hero-figure figcaption'), /Step 3 of 3/);
+  assert.equal(await page.locator('.hero-figure .array-cell.is-found').count(), 1);
+  // Updated in place: the beam is the same element, so it slid rather than jumped.
+  assert.equal(await beam.evaluate((el) => el.isConnected), true);
+  await page.close();
+
+  const calm = await open('/');
+  await calm.page.emulateMedia({ reducedMotion: 'reduce' });
+  await calm.page.reload();
+  await calm.page.waitForTimeout(3500);
+  assert.match(await calm.page.textContent('.hero-figure figcaption'), /Step 1 of 3/);
+  assert.deepEqual([...errors, ...calm.errors], []);
+  await calm.page.close();
 });
