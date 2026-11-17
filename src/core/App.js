@@ -4,6 +4,7 @@ import { binarySearchFrames } from '../demos/algorithms.js';
 import { DEMO_MARKER, escapeHtml, MarkdownRenderer } from '../utils/markdown.js';
 import { icon } from '../utils/icons.js';
 import { loadCompleted, saveCompleted } from './progress.js';
+import { hydrateSteppers } from './steppers.js';
 
 const HOME_DESCRIPTION =
   'Free, beginner-first lessons on data structures and algorithms: plain words, every step traced, a demo on every lesson.';
@@ -67,6 +68,8 @@ export class App {
     // Sidebar sections the learner opened or closed by hand, and the search text.
     this.openSections = new Map();
     this.navQuery = '';
+    // Which step each worked example in the open lesson is showing.
+    this.stepperMemory = new Map();
     // Which step of the home hero's binary search is showing.
     this.heroStep = 0;
     this.activeSectionId = this.sections[0].id;
@@ -176,6 +179,7 @@ export class App {
       );
     if (onLesson) {
       this.attachDemo();
+      hydrateSteppers(this.root.querySelector('.lesson-content'), this.stepperMemory);
       this.buildToc();
     }
     if (!this.home) this.filterLessons();
@@ -343,6 +347,7 @@ export class App {
 
     if (lessonChanged) {
       this.openFolds.clear();
+      this.stepperMemory.clear();
       this.activeSectionId = route.sectionId;
       this.activeLessonId = route.lessonId;
       this.activeLanguageId = this.activeLesson.languageExamples?.[0]?.id ?? null;

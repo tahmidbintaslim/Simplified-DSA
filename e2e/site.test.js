@@ -358,3 +358,32 @@ test('critique 3: the hero search is drivable and the beam follows the middle ce
   assert.deepEqual(errors, []);
   await page.close();
 });
+
+test('motion: worked examples scrub with pointers that glide; reduced motion still updates, without movement', async () => {
+  const { page, errors } = await open('/algorithms/binary-search');
+  const figure = page.locator('.cells-live').first();
+  await figure.scrollIntoViewIfNeeded();
+  assert.match(await figure.locator('figcaption').textContent(), /^Check 1/);
+  const loX = () => figure.locator('.pointer-token[data-name="lo"]').evaluate((el) => el.style.getPropertyValue('--x'));
+  const before = await loX();
+  await figure.locator('[data-stepper="next"]').click();
+  assert.match(await figure.locator('figcaption').textContent(), /^Check 2/);
+  assert.notEqual(await loX(), before, 'lo moved to its new cell');
+  await figure.locator('[data-stepper="scrub"]').fill('3');
+  assert.match(await figure.locator('figcaption').textContent(), /^Check 3/);
+  assert.equal(await figure.locator('[data-stepper="next"]').isDisabled(), true);
+  // The demo's timeline scrubs too.
+  await page.locator('.demo-timeline input').fill('2');
+  assert.match(await page.textContent('.demo-count'), /^Step 2 \//);
+  await page.close();
+
+  const calm = await open('/algorithms/sorting');
+  await calm.page.emulateMedia({ reducedMotion: 'reduce' });
+  await calm.page.click('[data-player="next"]');
+  await calm.page.click('[data-player="next"]');
+  // No movement (script-driven slides, pops and glides); colour fades on buttons are fine.
+  assert.equal(await calm.page.evaluate(() => document.getAnimations().filter((a) => a.playState === 'running' && a.constructor.name === 'Animation').length), 0);
+  assert.match(await calm.page.textContent('.demo-count'), /^Step 3 \//);
+  assert.deepEqual([...errors, ...calm.errors], []);
+  await calm.page.close();
+});

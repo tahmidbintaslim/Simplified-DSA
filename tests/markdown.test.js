@@ -101,3 +101,14 @@ test('quiz options carry a hidden "why not"; cells can mark the found answer', a
   const cells = new MarkdownRenderer().render(['```cells', 'values: 1 2 3', 'found: 1', '```'].join('\n'));
   assert.match(cells, /array-cell is-found"><span class="array-value">2/);
 });
+
+test('back-to-back cells figures of the same length become one worked-example stepper', async () => {
+  const { MarkdownRenderer } = await import('../src/utils/markdown.js');
+  const r = new MarkdownRenderer();
+  const two = r.render(['```cells', 'values: 1 2', 'note: a', '```', '', '```cells', 'values: 1 2', 'highlight: 1', 'note: b', '```'].join('\n'));
+  assert.match(two, /^<div class="cells-steps" data-steps="2">/);
+  assert.match(two, /data-step="2" hidden>/);
+  // Different sizes, or text between them, keep figures separate.
+  assert.doesNotMatch(r.render(['```cells', 'values: 1 2', '```', '', '```cells', 'values: 1 2 3', '```'].join('\n')), /cells-steps/);
+  assert.doesNotMatch(r.render(['```cells', 'values: 1 2', '```', '', 'Then:', '', '```cells', 'values: 1 2', '```'].join('\n')), /cells-steps/);
+});

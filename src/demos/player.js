@@ -10,7 +10,8 @@ import { escapeHtml } from '../utils/markdown.js';
  * line and the variables always describe the same moment.
  *
  * Keyboard: ← and → step, Space plays or pauses (when focus is not on a
- * button or field, which already use those keys).
+ * button or field, which already use those keys). The timeline slider scrubs
+ * through every step and announces the step's caption.
  */
 export function createPlayer(root, onFrame) {
   root.insertAdjacentHTML(
@@ -25,6 +26,11 @@ export function createPlayer(root, onFrame) {
       </div>
       <label class="demo-speed">Speed
         <input type="range" min="1" max="10" value="5" data-player="speed" />
+      </label>
+    </div>
+    <div class="demo-timeline">
+      <label class="demo-scrub"><span class="sr-only">Step</span>
+        <input type="range" min="1" max="1" value="1" step="1" data-player="scrub" />
       </label>
       <span class="demo-count" aria-hidden="true"></span>
     </div>
@@ -45,6 +51,7 @@ export function createPlayer(root, onFrame) {
   const playButton = root.querySelector('[data-player="play"]');
   const speedInput = root.querySelector('[data-player="speed"]');
   const count = root.querySelector('.demo-count');
+  const scrub = root.querySelector('[data-player="scrub"]');
   const caption = root.querySelector('.demo-caption');
   const trace = root.querySelector('.trace');
   const codeList = root.querySelector('.trace-lines');
@@ -60,6 +67,11 @@ export function createPlayer(root, onFrame) {
     // A numbered step badge, like a numbered fold in a diagram; screen readers get the words.
     caption.innerHTML = `<span class="step-badge" aria-hidden="true">${index + 1}</span><span class="sr-only">Step ${index + 1} of ${frames.length}. </span>${escapeHtml(frame.caption)}`;
     count.textContent = `Step ${index + 1} / ${frames.length}`;
+    // The timeline: drag through every step, like scrubbing a video.
+    scrub.max = String(frames.length);
+    scrub.value = String(index + 1);
+    scrub.setAttribute('aria-valuetext', `Step ${index + 1} of ${frames.length}: ${frame.caption}`);
+    scrub.style.setProperty('--progress', frames.length > 1 ? `${(index / (frames.length - 1)) * 100}%` : '100%');
     // The first frame can draw before the demo is attached and laid out; centre after layout too.
     keepActiveCellInView();
     requestAnimationFrame(keepActiveCellInView);
@@ -108,7 +120,7 @@ export function createPlayer(root, onFrame) {
 
   root.addEventListener('click', (event) => {
     const action = event.target.closest('[data-player]')?.dataset.player;
-    if (!action || action === 'speed') return;
+    if (!action || action === 'speed' || action === 'scrub') return;
     if (action === 'play') return toggle();
     stop();
     if (action === 'first') step(-index);
@@ -130,6 +142,12 @@ export function createPlayer(root, onFrame) {
       event.preventDefault();
       toggle();
     }
+  });
+
+  scrub.addEventListener('input', () => {
+    stop();
+    index = Math.min(frames.length - 1, Math.max(0, Number(scrub.value) - 1));
+    show();
   });
 
   // A new speed takes effect right away by restarting the timer.
