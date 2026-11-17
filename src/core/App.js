@@ -8,11 +8,13 @@ const HOME_DESCRIPTION =
   'Free, beginner-first lessons on data structures and algorithms: plain words, every step traced, a demo on every lesson.';
 
 // "Cost Cheat Sheet" → "cost-cheat-sheet", for heading anchors.
+// Tags and entities become spaces (never ''), so no fragments can join up, and
+// the result is only [a-z0-9-] either way.
 const slugify = (html) =>
   html
-    .replace(/<[^>]+>/g, '')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/&[a-z#0-9]+;/g, ' ')
     .toLowerCase()
-    .replace(/&[a-z#0-9]+;/g, '')
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '');
 
