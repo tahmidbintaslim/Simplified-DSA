@@ -30,7 +30,7 @@ A free, open learning site that teaches data structures, algorithms and intervie
 ## Capabilities and Constraints
 
 - Existing stack (from the codebase): vanilla JavaScript + Vite, Markdown lessons rendered by a small escaping renderer, no JS framework, deployed on Vercel. Hard constraint not yet confirmed by the owner; keep it unless they decide otherwise.
-- Lessons: 11 across Data Structures, Algorithms and Interview Patterns, each with an inline demo, quizzes and traced examples.
+- Lessons: 13 across Data Structures, Algorithms and Interview Patterns, each with an inline demo, quizzes and traced examples.
 - No accounts, no analytics, no tracking (see `public/privacy.html`). Progress is stored only in the learner's browser.
 - Terminology used consistently: lesson, demo, step, trace, pattern, cost (Big O).
 - Open decisions: rename (waits for user research), light vs dark theme, a home/course-map page.
@@ -44,7 +44,7 @@ A free, open learning site that teaches data structures, algorithms and intervie
 
 ## Evidence on Hand
 
-- 11 lessons with traced examples, quizzes and demos (`src/content/`).
+- 13 lessons with traced examples, quizzes and demos (`src/content/`).
 - Design critique: 25/40, priority issues and personas (`.impeccable/critique/`).
 - Research on how VisuAlgo, Hello Interview, InterviewRank, AlgoMaster and Expora teach (summarised in PR #14).
 - No testimonials, user numbers or learner research yet. Do not invent any.

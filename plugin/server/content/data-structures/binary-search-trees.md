@@ -32,8 +32,10 @@ Find `60`:
 ```quiz
 Q: In the tree above, which nodes do you visit when searching for 40?
 - 50, 70, 40
+  Why not: 40 is smaller than 50, so the search goes left, not right. Every value under 70 is larger than 50.
 * 50, 30, 40
 - 20, 30, 40
+  Why not: A search always starts at the root, 50. 20 is a leaf at the bottom, so you never start there.
 Why: 40 is smaller than 50 (go left to 30), then larger than 30 (go right to 40).
 ```
 
@@ -69,7 +71,9 @@ balanced (height 3)      degenerate (height 5)
 ```quiz
 Q: You insert 10, 20, 30, 40 into an empty BST in that order. What is the height?
 - 2
+  Why not: Two levels hold at most 3 nodes, so 4 values can never fit in a tree of height 2.
 - 3
+  Why not: Three levels would need some node with two children. Each value here is larger than all before it, so no node ever gets a left child.
 * 4
 Why: Each value is larger than the last, so each becomes the right child of the previous one: a straight line of 4 levels.
 ```

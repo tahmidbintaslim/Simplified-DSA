@@ -93,7 +93,7 @@ export const curriculum = [
       {
         id: 'binary-search',
         title: 'Binary Search',
-        summary: 'Halve a sorted range each step: O(log n) you can watch.',
+        summary: 'Halve a sorted range each step until the value is found.',
         level: 'Beginner',
         minutes: 12,
         goals: ['Trace lo, mid and hi by hand', 'Explain why it needs sorted data', 'Avoid the two classic off-by-one bugs'],

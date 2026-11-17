@@ -28,7 +28,8 @@ const slug = (text) =>
  *   values: 3 9 14 21 30
  *   pointers: lo=0 mid=2 hi=4     (labels under cells; several may share one)
  *   highlight: 2                  (gold: the cell being looked at)
- *   done: 0 1                     (teal: finished / moved / on the path)
+ *   done: 0 1                     (pale teal: finished / moved / on the path)
+ *   found: 4                      (solid teal: the answer, as in the demos)
  *   dim: 3 4                      (grey: ruled out)
  *   note: First, look at the middle.
  */
@@ -43,6 +44,7 @@ function renderCells(lines) {
   const indexes = (key) => new Set((fields[key] ?? '').split(/\s+/).filter(Boolean).map(Number));
   const highlight = indexes('highlight');
   const done = indexes('done');
+  const found = indexes('found');
   const dim = indexes('dim');
   const labels = {};
   for (const pair of (fields.pointers ?? '').split(/\s+/).filter(Boolean)) {
@@ -52,7 +54,7 @@ function renderCells(lines) {
 
   const cells = values
     .map((value, i) => {
-      const state = highlight.has(i) ? 'is-hit' : done.has(i) ? 'is-moved' : dim.has(i) ? 'is-out' : '';
+      const state = found.has(i) ? 'is-found' : highlight.has(i) ? 'is-hit' : done.has(i) ? 'is-moved' : dim.has(i) ? 'is-out' : '';
       const label = labels[i] ? `<span class="cell-pointer">${escapeHtml(labels[i].join(' '))}</span>` : '';
       return `<div class="array-cell ${state}"><span class="array-value">${escapeHtml(value)}</span><span class="array-index">${i}</span>${label}</div>`;
     })
@@ -66,23 +68,31 @@ function renderCells(lines) {
  *
  *   Q: The question?
  *   - a wrong option
+ *     Why not: what this choice gets wrong (optional, shown after picking it)
  *   * the right option
  *   Why: The explanation shown after any answer.
  */
 function renderQuiz(lines) {
   const question = lines.find((line) => line.startsWith('Q:'))?.slice(2).trim() ?? '';
   const why = lines.find((line) => line.startsWith('Why:'))?.slice(4).trim() ?? '';
-  const options = lines
-    .filter((line) => /^[-*] /.test(line))
+  // Each option, with the indented "Why not:" line that follows it, if any.
+  const options = [];
+  for (const line of lines) {
+    if (/^[-*] /.test(line)) options.push({ text: line.slice(2), right: line.startsWith('*'), whyNot: '' });
+    else if (line.trim().startsWith('Why not:') && options.length) options.at(-1).whyNot = line.trim().slice(8).trim();
+  }
+  const buttons = options
     .map(
-      (line, i) =>
-        `<button type="button" class="quiz-option" data-quiz-option="${line.startsWith('*')}"><span class="quiz-letter" aria-hidden="true">${'ABCDEFGH'[i]}</span><span>${inlineMarkdown(line.slice(2))}</span></button>`,
+      ({ text, right, whyNot }, i) =>
+        `<button type="button" class="quiz-option" data-quiz-option="${right}"><span class="quiz-letter" aria-hidden="true">${'ABCDEFGH'[i]}</span><span>${inlineMarkdown(text)}</span>${
+          whyNot ? `<span class="quiz-why-not" hidden>${inlineMarkdown(whyNot)}</span>` : ''
+        }</button>`,
     )
     .join('');
   return `
     <div class="quiz">
       <p class="quiz-question">${inlineMarkdown(question)}</p>
-      <div class="quiz-options">${options}</div>
+      <div class="quiz-options">${buttons}</div>
       <p class="quiz-feedback" aria-live="polite"></p>
       <p class="quiz-why" hidden>${inlineMarkdown(why)}</p>
     </div>`;

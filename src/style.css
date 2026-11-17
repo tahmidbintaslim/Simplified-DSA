@@ -3286,33 +3286,10 @@ input:focus-visible,
   place-items: center;
   height: 168px;
   margin: 0 -22px 0;
-}
-
-.section-card-art svg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.section-card-mark {
-  position: relative;
-  display: grid;
-  place-items: center;
-  width: 72px;
-  height: 72px;
-  border: 1px solid rgb(255 255 255 / 55%);
-  border-radius: 18px;
-  background: rgb(255 255 255 / 28%);
-  color: #ffffff;
-  backdrop-filter: blur(6px);
-  box-shadow: 0 10px 24px -12px rgb(0 0 0 / 35%);
-}
-
-.section-card-mark .icon {
-  width: 34px;
-  height: 34px;
-  stroke-width: 1.6;
+  border-bottom: 1px solid var(--line);
+  background:
+    radial-gradient(70% 90% at 50% 0%, color-mix(in srgb, var(--accent) 7%, transparent), transparent 70%),
+    var(--surface);
 }
 
 /* The lesson count sits on a tab cut out of the banner's bottom-left corner. */
@@ -3716,69 +3693,6 @@ input:focus-visible,
   font-size: 0.9rem;
 }
 
-/* --- Closing panel with floating section tiles --- */
-.home-closing {
-  position: relative;
-  overflow: hidden;
-  min-height: 340px;
-  align-content: center;
-}
-
-.closing-tiles {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-.closing-tile {
-  position: absolute;
-  display: grid;
-  place-items: center;
-  width: 56px;
-  height: 56px;
-  border: 1px solid rgb(255 255 255 / 40%);
-  border-radius: 14px;
-  background: var(--art-b);
-  color: #ffffff;
-  box-shadow: 0 12px 24px -12px rgb(0 0 0 / 40%);
-}
-
-.closing-tile .icon {
-  width: 26px;
-  height: 26px;
-}
-
-.closing-tile.t0 { top: 14%; left: 8%; transform: rotate(-8deg); }
-.closing-tile.t1 { top: 62%; left: 12%; transform: rotate(6deg); }
-.closing-tile.t2 { top: 18%; right: 9%; transform: rotate(7deg); }
-.closing-tile.t3 { top: 64%; right: 13%; transform: rotate(-6deg); }
-.closing-tile.t4 { top: 10%; left: 20%; transform: rotate(4deg) scale(0.8); opacity: 0.8; }
-.closing-tile.t5 { bottom: 10%; right: 22%; transform: rotate(-5deg) scale(0.8); opacity: 0.8; }
-
-@media (max-width: 900px) {
-  .closing-tiles {
-    display: none;
-  }
-}
-
-/* --- Wordmark: the name, large and fading into the footer. --- */
-.wordmark {
-  height: clamp(3rem, 9.6vw, 7.8rem);
-  margin: 40px 0 0;
-  overflow: hidden;
-  color: var(--ink-strong);
-  font-size: clamp(3.2rem, 11vw, 9rem);
-  font-weight: 700;
-  letter-spacing: -0.055em;
-  line-height: 1;
-  text-align: center;
-  white-space: nowrap;
-  opacity: 0.12;
-  -webkit-mask-image: linear-gradient(to bottom, #000 30%, transparent 100%);
-  mask-image: linear-gradient(to bottom, #000 30%, transparent 100%);
-  user-select: none;
-}
-
 @media (max-width: 760px) {
   .hero {
     min-height: 0;
@@ -3914,4 +3828,118 @@ input:focus-visible,
 
 .swatch-gap {
   border: 1px dashed var(--line-strong);
+}
+
+/* ---------- Critique 3 fixes ---------- */
+
+/* Hover is an action cue (blue), never the gold "looking at" state; an answered
+   option keeps its result border under the pointer. */
+.quiz-option:hover {
+  border-color: var(--accent);
+}
+
+.quiz-option.is-right,
+.quiz-option.is-right:hover {
+  border-color: var(--done);
+}
+
+.quiz-option.is-wrong,
+.quiz-option.is-wrong:hover {
+  border-color: var(--danger);
+}
+
+/* The written mark stays one short pill, even on a 390px phone. */
+.quiz-option[data-mark]::after {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* "Watch out" label: darker ink so the small bold text clears 4.5:1. */
+.callout-watch-out .callout-label {
+  color: color-mix(in srgb, var(--danger-ink) 80%, var(--ink-strong));
+}
+
+/* The "/" shortcut means nothing on touch screens. */
+@media (hover: none) {
+  .nav-search kbd {
+    display: none;
+  }
+}
+
+/* Paragraph endings without one-word last lines. */
+.lesson-content p,
+.lesson-content li,
+.demo-caption {
+  text-wrap: pretty;
+}
+
+/* Home section cards: one real step each, in the lesson figures' vocabulary. */
+.mini-figure {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  padding-bottom: 10px;
+}
+
+.mini-figure .array-row {
+  gap: 5px;
+}
+
+.mini-figure .array-cell {
+  width: 38px;
+  min-width: 38px;
+}
+
+.mini-figure .array-value {
+  padding: 8px 0;
+  font-size: 0.95rem;
+}
+
+.mini-caption {
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.home-closing {
+  min-height: 0;
+}
+
+/* The hero step is driven by the learner; the beam follows the middle cell. */
+.hero-figure .array-cell {
+  width: 48px;
+  min-width: 48px;
+}
+
+.hero-figure .array-row {
+  gap: 6px;
+}
+
+.beam {
+  left: calc(50% + var(--mid-offset, 0) * 54px);
+}
+
+.hero-figure::after {
+  left: calc(50% + var(--mid-offset, 0) * 54px);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .beam,
+  .hero-figure::after {
+    transition: left 420ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+}
+
+.hero-steps {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin: 16px 0 0;
+}
+
+.demo-button:disabled {
+  cursor: default;
+  opacity: 0.5;
 }

@@ -50,7 +50,7 @@ note: Step 2: slow moves to C, fast jumps to E.
 ```cells
 values: A B C D E F
 pointers: slow=3 fast=3
-done: 3
+found: 3
 note: Step 3: slow moves to D. Fast goes E → F → back to D. They meet on D, so the list has a loop.
 ```
 
@@ -59,8 +59,10 @@ Three steps, and nothing was stored except the two pointers.
 ```quiz
 Q: A plain list of 7 nodes (no loop). Slow and fast start at node 0. Where is slow when fast can no longer move two steps?
 - Node 2
+  Why not: Slow is on node 2 when fast is on node 4. From node 4, fast can still take two steps to node 6.
 * Node 3, the middle
 - Node 6, the end
+  Why not: Node 6 is where fast stops. Slow moves only one step for every two that fast takes, so it covers half the distance.
 Why: Fast moves 0 → 2 → 4 → 6 while slow moves 0 → 1 → 2 → 3. Fast is on the last node and cannot take two more steps, so the loop stops with slow on node 3, the middle of 7 nodes.
 ```
 
@@ -80,8 +82,10 @@ Choose how many nodes the list has and where the last node points. Pick "nothing
 ```quiz
 Q: Why can't fast jump over slow on a loop and miss it?
 - Because fast moves only one node at a time
+  Why not: Fast moves two nodes each step, not one. The question is why those two-node jumps still never skip past slow.
 * Because the gap between them shrinks by exactly one node each step
 - Because slow waits for fast
+  Why not: Slow never stops. Both pointers move on every step; slow just moves one node while fast moves two.
 Why: Fast moves 2 and slow moves 1, so the distance from fast to slow (going forward around the loop) drops by 1 every step. It goes 3, 2, 1, 0 and cannot skip 0.
 ```
 

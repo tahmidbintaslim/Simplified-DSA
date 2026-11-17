@@ -51,8 +51,10 @@ Visit order: **A, B, C, D, E**. Everything one step away (B, C) comes before any
 ```quiz
 Q: In BFS from A, why is D visited before E?
 - D comes first in the alphabet
+  Why not: BFS never looks at the names. The order comes from when each node joined the waiting list.
 * D joined the queue first, because B (D's neighbour) was visited before C (E's neighbour)
 - DFS and BFS always visit in the same order
+  Why not: They use different waiting lists, so their orders usually differ. In this lesson, DFS from A visits A, C, E, D, B, while BFS visits A, B, C, D, E.
 Why: A queue is first-in, first-out. B was taken out before C, so B's neighbour D joined the queue before C's neighbour E.
 ```
 
@@ -83,8 +85,10 @@ Visit order: **A, C, E, D, B**. DFS went deep along one route (A, C, E, D) befor
 ```quiz
 Q: Which data structure turns BFS into DFS?
 - A hash table
+  Why not: A hash table can remember which nodes were visited, but it does not decide which waiting node comes out next. That choice is what changes the order.
 * A stack instead of a queue
 - A sorted array
+  Why not: A sorted array would hand out nodes by value, not by when they joined the waiting list. Going deep depends on arrival order.
 Why: The algorithm is the same loop. Taking the newest waiting node (stack) instead of the oldest (queue) makes it go deep first.
 ```
 

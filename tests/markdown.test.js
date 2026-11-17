@@ -91,3 +91,13 @@ test('an answer block folds its own Markdown behind "Show the answer"', () => {
     '<details class="answer"><summary>Show the answer</summary><p>It moves <strong>3</strong> values: <code>&lt;b&gt;</code>.</p></details>',
   );
 });
+
+test('quiz options carry a hidden "why not"; cells can mark the found answer', async () => {
+  const { MarkdownRenderer } = await import('../src/utils/markdown.js');
+  const html = new MarkdownRenderer().render(['```quiz', 'Q: Pick one', '- wrong', '  Why not: because <b>', '* right', 'Why: since', '```'].join('\n'));
+  assert.match(html, /<span class="quiz-why-not" hidden>because &lt;b&gt;<\/span>/);
+  assert.equal((html.match(/quiz-why-not/g) ?? []).length, 1);
+  assert.match(html, /data-quiz-option="true"><span class="quiz-letter" aria-hidden="true">B<\/span><span>right<\/span><\/button>/);
+  const cells = new MarkdownRenderer().render(['```cells', 'values: 1 2 3', 'found: 1', '```'].join('\n'));
+  assert.match(cells, /array-cell is-found"><span class="array-value">2/);
+});

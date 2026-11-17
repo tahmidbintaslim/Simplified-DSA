@@ -57,7 +57,7 @@ note: Step 4: 3 + 6 = 9, too small. Move L right.
 ```cells
 values: 1 3 4 6 8 11
 pointers: L=2 R=3
-done: 2 3
+found: 2 3
 dim: 0 1 4 5
 note: Step 5: 4 + 6 = 10. Found it in 5 steps instead of up to 15 pairs.
 ```
@@ -68,7 +68,9 @@ Each step rules out one value for good, so the pointers meet after at most `n - 
 Q: In `[2, 4, 7, 9]` you want a sum of 13. `L` is on 2 and `R` is on 9, so the sum is 11. What do you do?
 * Move L right, to 4
 - Move R left, to 7
+  Why not: Moving R left picks a smaller value: 2 + 7 = 9. The sum would shrink further away from 13.
 - Stop: there is no answer
+  Why not: A sum of 11 only rules out this one pair. L can still move to bigger values, so stopping now is too early.
 Why: 11 is too small. Moving R left would only pick a smaller value and shrink the sum. Moving L right picks a bigger value: 4 + 9 = 13.
 ```
 
@@ -88,8 +90,10 @@ Step through the search and read the pseudocode alongside. Change the target, or
 ```quiz
 Q: Why does pair-sum with two pointers need a sorted list?
 - Sorting makes the list shorter
+  Why not: Sorting keeps every value, so the list is just as long. It only changes the order.
 * So moving a pointer reliably makes the sum bigger or smaller
 - Two pointers only works on numbers that are all different
+  Why not: Repeats are fine: in `[3, 3]`, the pair sums to 6 without trouble. The method depends on the order of the values, not on them being unique.
 Why: On a sorted list, moving L right can only raise the sum and moving R left can only lower it. Without order, a move tells you nothing, and you would have to check every pair again.
 ```
 

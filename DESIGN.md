@@ -302,11 +302,11 @@ Zinc neutrals on white (or near-black), one confident blue, and two state hues t
 Flat by default. Surfaces separate by a 1px `--line` hairline and a tonal step (page, surface, raised), not by shadow. Lesson cards, demos, quizzes and callouts carry no shadow. Three exceptions, all on the home page or as hover feedback:
 
 ### Shadow Vocabulary
-- **Search beam** (`--beam-core` `#ffffff`, `--beam-glow` `#3b82f6`, `--beam-haze` 22% light / 42% night): the home hero is a full-width band whose one authored moment is a 4px column of light falling on the middle cell of a drawn binary-search step, with layered blue glows, a pool where it lands, a haze at the band's foot, and a slow 4.8s breathe (off under reduced motion; hidden on phones). The beam is our own image: binary search looks at the middle.
+- **Search beam** (`--beam-core` `#ffffff`, `--beam-glow` `#3b82f6`, `--beam-haze` 22% light / 42% night): the home hero is a full-width band whose one authored moment is a 4px column of light falling on the middle cell of a real binary search for 30 in `3 9 14 21 30 42 57`. The learner drives it with **Next step** / **Start over**; the beam slides (420ms ease-out, off under reduced motion) to whichever cell is the middle, and the found cell turns solid teal. Layered blue glows, a pool where it lands, a haze at the band's foot, a slow 4.8s breathe; hidden on phones. The beam is our own image: binary search looks at the middle.
 - **Numbers panel:** four counts computed from the curriculum at render time (lessons, demos, quiz questions, minutes) in a 16px hairline panel tinted with faint blue and violet corners; 2×2 on phones. Every number is real.
-- **Closing tiles and wordmark:** the closing band floats six section-mark tiles (hidden under 900px); the page ends with the name set very large at 12% opacity, fading out by mask into the footer.
+- **Section figures:** each home section card shows one real step in the lesson vocabulary instead of decoration (Data Structures: read `a[2]`, gold; Algorithms: compare 9 and 7 with a sorted pale-teal prefix; Patterns: L and R gold with the ends crossed out), on a `--surface` header with a faint blue top glow.
 - **Section card lift** (`box-shadow: 0 18px 40px -26px rgb(9 9 11 / 35%)`): section cards on hover only, with the border moving to `--edge`.
-- **Banner mark** (`box-shadow: 0 10px 24px -12px rgb(0 0 0 / 35%)`): the frosted icon tile on section card banners.
+- **No decoration-only art.** Wave banners, floating tiles and a giant wordmark were tried and removed: on this site, pictures teach or they go.
 - **Paper** (`--shadow-paper`): small figure values; night uses a deeper value.
 
 ### Named Rules
@@ -314,7 +314,7 @@ Flat by default. Surfaces separate by a 1px `--line` hairline and a tonal step (
 
 ## Shapes
 
-Gently rounded, docs-like. Cells 6-8px, controls and tree rows 8px, step cards, quizzes and lesson header 12px, demos 14px, the hero figure 16px, section cards 20px, the closing band 24px. Chips (level, jump links) are full pills. Status dots are circles (18px). Section card banners are three layered SVG wave bands clipped by the card's 20px corner, with a 72px frosted icon tile (18px radius) and a tab cut from the bottom-left corner (16px top-right radius) that carries the lesson count.
+Gently rounded, docs-like. Cells 6-8px, controls and tree rows 8px, step cards, quizzes and lesson header 12px, demos 14px, the hero figure 16px, section cards 20px, the closing band 24px. Chips (level, jump links) are full pills. Status dots are circles (18px). Section card headers hold a small step figure (38px cells) and a tab cut from the bottom-left corner (16px top-right radius) that carries the lesson count.
 
 ## Components
 
@@ -332,9 +332,11 @@ Gently rounded, docs-like. Cells 6-8px, controls and tree rows 8px, step cards, 
 
 ### Cards / Containers
 - **Lesson header:** 12px, `--surface`, `--line` border, no shadow.
+- **Quiz feedback:** a wrong pick names what that choice gets wrong (each wrong option carries a `Why not:` line in the lesson Markdown), then invites a retry; after two misses or a right pick the full `Why:` explains. Marks are one-line pills (`nowrap`). Hover on an option is the blue action cue; an answered option keeps its result border.
+- **Found in figures:** ```cells``` blocks take `found:` for the answer cell, drawn in solid `--done` exactly as in the demos; `done:` stays the pale teal for moved / finished / on the path.
 - **Demo:** 14px, `--surface`, `--line` border; the hero block of each lesson.
 - **Prev / next step cards:** 12px, `--raised`, 16px 18px padding; a small "Previous"/"Next" caption, the lesson title (1.02rem/600) and a one-line summary in `--muted`. Hover turns the border `--accent`.
-- **Section card:** 20px, `--raised`, wave banner 168px (140px on phones), count tab, title, summary, progress meta.
+- **Section card:** 20px, `--raised`, a 168px step-figure header (140px on phones), count tab, title, summary, progress meta.
 - **Course lesson:** 12px, `--raised`, status dot, title, summary, meta; hover border `--accent`.
 - **Closing band:** 24px, `--surface` with a 12% accent radial wash from the top, centred heading, line, primary button.
 

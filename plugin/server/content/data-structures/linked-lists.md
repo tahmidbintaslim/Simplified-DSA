@@ -31,8 +31,10 @@ find 5:   7 → 3 → 9 → null   not found after visiting all 3
 ```quiz
 Q: A linked list has 1,000 nodes. How many nodes do you visit to reach the last one?
 - 1, by jumping straight there
+  Why not: Linked list nodes are scattered in memory, so there is no formula for an address. Each node only knows where the next one is.
 * 1,000, by walking from the head
 - About 10, by halving
+  Why not: Halving needs a jump to the middle, and a linked list cannot jump. It can only follow one pointer at a time.
 Why: Nodes are not side by side, so there is no address formula. You must follow every pointer from the head.
 ```
 
@@ -74,7 +76,9 @@ Insert at the head, then at the tail, then search. Teal nodes are the ones the o
 Q: Which is cheaper in a singly linked list without a tail pointer?
 * Inserting at the head
 - Inserting at the tail
+  Why not: Without a tail pointer, the list does not know where the tail is. You must walk all n nodes to find it first.
 - They cost the same
+  Why not: One end is already known and the other must be found. Finding it means walking the whole list.
 Why: The head is already known, so inserting there is O(1). Reaching the tail means walking every node first, which is O(n).
 ```
 

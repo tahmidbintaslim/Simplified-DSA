@@ -66,8 +66,10 @@ while (n > 1) {
 ```quiz
 Q: A function loops over an array once, and inside the loop does one hash-table lookup. What is its Big O?
 - O(1)
+  Why not: O(1) means the work stays the same at any size. The loop runs once per item, so a bigger array means more work.
 * O(n)
 - O(n²)
+  Why not: O(n²) needs a loop inside a loop. The inside here is one hash lookup, which is O(1) on average, not a second loop.
 Why: The loop runs n times and each hash lookup is O(1) on average, so the total is n × 1 = O(n).
 ```
 
@@ -79,7 +81,9 @@ Why: The loop runs n times and each hash lookup is O(1) on average, so the total
 ```quiz
 Q: A function has one loop over the input, followed by a nested loop over the input. What is its Big O?
 - O(n)
+  Why not: The nested loop alone runs n × n times, so the total grows faster than n.
 - O(n + n²), and you cannot simplify it
+  Why not: Big O keeps only the term that grows fastest. For n = 1,000, n is 1,000 steps while n² is 1,000,000, so the small term barely matters.
 * O(n²)
 Why: The total is n + n² steps. Keep the biggest term: n² dominates, so it is O(n²).
 ```

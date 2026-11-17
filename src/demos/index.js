@@ -542,7 +542,11 @@ function mountBinarySearch(root) {
   });
 
   const run = () => {
-    const target = readInt(input) ?? 0;
+    const target = readInt(input);
+    if (target === null) {
+      setStatus(compare, 'Type a whole number to search for.', { error: true });
+      return;
+    }
     const frames = binarySearchFrames(values, target);
     const linear = values.indexOf(target);
     setStatus(compare, `Binary search: ${frames.length - (frames.at(-1).found === -1 ? 1 : 0)} checks. Linear search would check ${linear === -1 ? values.length : linear + 1} of ${values.length} values.`);
@@ -551,10 +555,12 @@ function mountBinarySearch(root) {
 
   const shuffle = () => {
     // Distinct sorted values: binary search needs sorted input.
-    // A 390px phone fits 7 cells at once; more would push lo and hi off-screen.
-    const count = window.matchMedia('(max-width: 480px)').matches ? 7 : 16;
+    // A 390px phone fits 7 cells at once and the 760px lesson column fits 12;
+    // more would push lo and hi out of view.
+    const count = window.matchMedia('(max-width: 480px)').matches ? 7 : 12;
     values = [...new Set(randomValues(40, 1, 99))].slice(0, count).sort((a, b) => a - b);
-    input.value = values[randomInt(0, values.length - 1)];
+    // Not the first two values: there a plain left-to-right scan would look better.
+    input.value = values[randomInt(2, values.length - 1)];
     run();
   };
 
