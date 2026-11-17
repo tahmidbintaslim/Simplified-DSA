@@ -23,10 +23,9 @@ const slugify = (html) =>
 const HOME_FIGURE = [
   '```cells',
   'values: 3 9 14 21 30 42 57',
-  'pointers: lo=4 mid=5 hi=6',
-  'highlight: 5',
-  'dim: 0 1 2 3',
-  'note: Step 2 of a binary search for 42. The middle value, 21, was too small, so it and everything left of it are ruled out. Now check the middle of what is left.',
+  'pointers: lo=0 mid=3 hi=6',
+  'highlight: 3',
+  'note: Step 1 of a binary search for 30: look at the middle value, 21. It is too small, so 21 and everything left of it can be ruled out.',
   '```',
 ].join('\n');
 
@@ -719,8 +718,19 @@ export class App {
         </li>`;
     };
 
+    // Every number on the home page is counted from the lessons themselves.
+    const lessons = all.map((entry) => entry.lesson);
+    const numbers = [
+      ['Lessons', all.length, 'From arrays to interview patterns.'],
+      ['Demos you drive', lessons.filter((lesson) => lesson.demo).length, 'Step, play, or type your own input.'],
+      ['Quiz questions', lessons.reduce((n, lesson) => n + (lesson.markdown.match(/^```quiz$/gm)?.length ?? 0), 0), 'Predict first, then see why.'],
+      ['Minutes in all', lessons.reduce((n, lesson) => n + (lesson.minutes ?? 0), 0), 'Short lessons, one idea each.'],
+    ];
+
     return `
       <div class="home">
+        <div class="hero-band">
+          <div class="hero-haze" aria-hidden="true"></div>
         <section class="hero" aria-labelledby="home-title">
           <div class="hero-text">
             <h1 id="home-title">See every step.<span>Learn DSA by tracing it.</span></h1>
@@ -735,7 +745,21 @@ export class App {
               <li>${icon('check')} No account, no tracking</li>
             </ul>
           </div>
-          <div class="hero-figure">${this.markdownRenderer.render(HOME_FIGURE)}</div>
+          <div class="hero-figure">
+            <span class="beam" aria-hidden="true"></span>
+            ${this.markdownRenderer.render(HOME_FIGURE)}
+          </div>
+        </section>
+        </div>
+
+        <section class="home-block home-numbers" aria-labelledby="numbers-title">
+          <div class="home-block-head">
+            <h2 id="numbers-title">Small enough to finish.</h2>
+            <p class="home-block-lead">Every number here is counted from the lessons themselves.</p>
+          </div>
+          <dl class="numbers-panel">
+            ${numbers.map(([label, value, note]) => `<div><dt>${label}</dt><dd><strong>${value}</strong><span>${note}</span></dd></div>`).join('')}
+          </dl>
         </section>
 
         <section class="home-block" aria-labelledby="sections-title">
@@ -761,10 +785,14 @@ export class App {
         </section>
 
         <section class="home-closing" aria-labelledby="closing-title">
+          <span class="closing-tiles" aria-hidden="true">${SECTION_ART.concat(SECTION_ART)
+            .map((art, i) => `<span class="closing-tile t${i}" style="--art-b:${art.b}">${icon(art.icon)}</span>`)
+            .join('')}</span>
           <h2 id="closing-title">Your first lesson takes about ${nextUp.lesson.minutes ?? 12} minutes.</h2>
           <p>Read it, trace it, then drive the demo yourself. Progress stays in this browser.</p>
           <a class="demo-button is-primary" ${linkTo(nextUp)}>${escapeHtml(startLabel)} ${icon('arrowRight')}</a>
         </section>
+        <p class="wordmark" aria-hidden="true">Simplified DSA</p>
       </div>
     `;
   }

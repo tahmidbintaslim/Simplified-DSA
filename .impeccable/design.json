@@ -296,7 +296,7 @@
         "role": "primary",
         "displayName": "Action Blue",
         "canonical": "#1d4ed8",
-        "dark": "#2563eb",
+        "dark": "#1d4ed8",
         "tonalRamp": [
           "#0e266b",
           "#1a45c0",
@@ -312,7 +312,7 @@
         "role": "primary",
         "displayName": "Action Blue Hover",
         "canonical": "#1e40af",
-        "dark": "#3b82f6",
+        "dark": "#2563eb",
         "tonalRamp": [
           "#122667",
           "#2344b1",
