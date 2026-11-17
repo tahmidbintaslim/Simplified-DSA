@@ -632,6 +632,14 @@ function mountBinarySearch(root) {
       })),
       { pointers: { lo, mid: isFound ? found : mid, hi }, range: lo <= hi ? [lo, hi] : null },
     );
+  }, {
+    // Predict: which cell will be checked next?
+    predict: {
+      question: (now, next) => `lo = ${next.lo} and hi = ${next.hi}. Which cell is checked next?`,
+      answer: (next) => (Number.isInteger(next.found) && next.found >= 0 ? next.found : next.mid),
+      explain: (next) => `mid = (lo + hi) // 2 = (${next.lo} + ${next.hi}) // 2 = ${Number.isInteger(next.found) && next.found >= 0 ? next.found : next.mid}.`,
+      cells: () => stage.row.querySelectorAll(':scope > [data-key]'),
+    },
   });
 
   const run = () => {
@@ -893,6 +901,17 @@ function mountTwoPointers(root) {
       })),
       { pointers: { L: left, R: right }, range: left <= right ? [left, right] : null },
     );
+  }, {
+    // Predict: after this sum, which pointer moves, and to which cell?
+    predict: {
+      question: (now) => `${values[now.left]} + ${values[now.right]} = ${values[now.left] + values[now.right]}, target ${readInt(targetInput) ?? 0}. Where does a pointer move?`,
+      answer: (next, now) => (next.found || next.left >= next.right ? null : next.left !== now.left ? next.left : next.right),
+      explain: (next, now) =>
+        next.left !== now.left
+          ? `The sum was too small, so L moves right to a bigger value.`
+          : `The sum was too big, so R moves left to a smaller value.`,
+      cells: () => stage.row.querySelectorAll(':scope > [data-key]'),
+    },
   });
 
   const run = () => {
@@ -957,6 +976,14 @@ function mountSlidingWindow(root) {
       }),
       { pointers: { start, end }, range: end >= start ? [start, end] : null },
     );
+  }, {
+    // Predict: which value enters the window next?
+    predict: {
+      question: (now) => `The window covers ${now.start}..${now.end}. Which value enters next?`,
+      answer: (next, now) => (next.line === 4 || next.end === now.end ? null : next.end),
+      explain: (next) => `The window slides one to the right: add a[${next.end}], drop a[${next.start - 1}].`,
+      cells: () => stage.row.querySelectorAll(':scope > [data-key]'),
+    },
   });
 
   const run = () => {
@@ -1039,6 +1066,14 @@ function mountFastSlow(root) {
       loop.style.cssText = `--from:${loopTo};--to:${n - 1}`;
       stage.row.append(loop);
     } else loop.remove();
+  }, {
+    // Predict: where does fast land after its two steps?
+    predict: {
+      question: (now) => `Fast is on node ${now.fast}. Where does it land after two steps?`,
+      answer: (next) => (next.fast >= 0 && next.line !== 5 ? next.fast : null),
+      explain: (next, now) => `Fast follows two next pointers from node ${now.fast} and lands on node ${next.fast}${now.fast + 2 > n - 1 && loopTo >= 0 ? ', going round the loop' : ''}.`,
+      cells: () => stage.row.querySelectorAll(':scope > [data-key]'),
+    },
   });
 
   const run = () => {

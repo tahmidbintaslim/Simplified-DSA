@@ -409,3 +409,26 @@ test('motion: stack, queue and list keep their elements, so values move instead 
   assert.deepEqual([...errors, ...list.errors], []);
   await list.page.close();
 });
+
+test('predict, then reveal: Step asks first, a picked cell plays the step and says whether it was right', async () => {
+  const { page, errors } = await open('/algorithms/binary-search');
+  await page.fill('[data-field="list"]', '3 9 14 21 30 42 57');
+  await page.fill('[data-field="target"]', '30');
+  await page.click('[data-op="use"]');
+  await page.check('[data-player="predict"]');
+  await page.click('[data-player="next"]');
+  // Step 1 checked mid = 3 (21 < 30). The next check is (4 + 6) // 2 = 5, then (4 + 4) // 2 = 4.
+  assert.match(await page.textContent('.predict-question'), /^Predict: lo = 4 and hi = 6\. Which cell is checked next\?/);
+  assert.match(await page.textContent('.demo-count'), /^Step 1 \//, 'the step waits for a guess');
+  await page.locator('.bs-row .is-pickable').nth(4).click();
+  assert.match(await page.textContent('.predict-question'), /^You picked cell 4; it was cell 5\. mid = \(lo \+ hi\) \/\/ 2 = \(4 \+ 6\) \/\/ 2 = 5\./);
+  assert.match(await page.textContent('.demo-count'), /^Step 2 \//);
+  assert.equal(await page.locator('.bs-row .is-pickable').count(), 0);
+  // Keyboard: → asks again, Enter on the focused right cell answers it.
+  await page.keyboard.press('ArrowRight');
+  await page.locator('.bs-row .is-pickable').nth(4).focus();
+  await page.keyboard.press('Enter');
+  assert.match(await page.textContent('.predict-question'), /^Right: cell 4\./);
+  assert.deepEqual(errors, []);
+  await page.close();
+});

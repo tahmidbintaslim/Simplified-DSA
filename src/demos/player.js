@@ -12,8 +12,14 @@ import { escapeHtml } from '../utils/markdown.js';
  * Keyboard: ← and → step, Space plays or pauses (when focus is not on a
  * button or field, which already use those keys). The timeline slider scrubs
  * through every step and announces the step's caption.
+ *
+ * Predict, then reveal: a demo can pass `predict` ({ question(now, next),
+ * answer(next) → cell index or null, explain(next), cells() }). With
+ * "Predict first" switched on, Step asks the question, the learner picks a
+ * cell (click, or Tab and Enter), and only then does the step play, with a
+ * line saying whether the guess was right and why.
  */
-export function createPlayer(root, onFrame) {
+export function createPlayer(root, onFrame, { predict } = {}) {
   root.insertAdjacentHTML(
     'beforeend',
     `
@@ -27,7 +33,9 @@ export function createPlayer(root, onFrame) {
       <label class="demo-speed">Speed
         <input type="range" min="1" max="10" value="5" data-player="speed" />
       </label>
+      ${predict ? '<label class="predict-toggle"><input type="checkbox" data-player="predict" /> Predict first</label>' : ''}
     </div>
+    ${predict ? '<div class="predict-card" hidden><p class="predict-question" aria-live="polite"></p><button type="button" class="demo-button" data-player="reveal">Just show me</button></div>' : ''}
     <div class="demo-timeline">
       <label class="demo-scrub"><span class="sr-only">Step</span>
         <input type="range" min="1" max="1" value="1" step="1" data-player="scrub" />
@@ -56,8 +64,12 @@ export function createPlayer(root, onFrame) {
   const trace = root.querySelector('.trace');
   const codeList = root.querySelector('.trace-lines');
   const varList = root.querySelector('.trace-var-list');
+  const predictToggle = root.querySelector('[data-player="predict"]');
+  const predictCard = root.querySelector('.predict-card');
+  const predictQuestion = root.querySelector('.predict-question');
   let frames = [];
   let index = 0;
+  let awaiting = null; // { answer } while the learner is choosing a cell
   let timer = null;
 
   const show = () => {
@@ -118,25 +130,92 @@ export function createPlayer(root, onFrame) {
 
   const toggle = () => (timer ? stop() : play());
 
+  /* ---------- Predict, then reveal ---------- */
+
+  const pickable = () => [...(predict?.cells() ?? [])];
+  const endPredict = () => {
+    awaiting = null;
+    for (const cell of pickable()) {
+      cell.classList.remove('is-pickable');
+      cell.removeAttribute('tabindex');
+      cell.removeAttribute('role');
+      cell.removeAttribute('aria-label');
+    }
+  };
+  // Ask before stepping, when the next step has a cell to predict.
+  const ask = () => {
+    const next = frames[index + 1];
+    const answer = next ? predict.answer(next, frames[index]) : null;
+    if (answer === null || answer === undefined || answer < 0) return false;
+    awaiting = { answer };
+    predictCard.hidden = false;
+    predictCard.classList.remove('is-right', 'is-wrong');
+    predictQuestion.textContent = `Predict: ${predict.question(frames[index], next)} Pick a cell.`;
+    pickable().forEach((cell, i) => {
+      cell.classList.add('is-pickable');
+      cell.tabIndex = 0;
+      cell.setAttribute('role', 'button');
+      cell.setAttribute('aria-label', `Pick cell ${i}`);
+    });
+    return true;
+  };
+  const reveal = (picked) => {
+    const { answer } = awaiting;
+    // The picked cell stops being a button: keep keyboard focus on Step.
+    const hadFocus = pickable().includes(document.activeElement);
+    endPredict();
+    if (hadFocus) root.querySelector('[data-player="next"]').focus();
+    step(1);
+    const why = predict.explain(frames[index], frames[index - 1]);
+    const right = picked === answer;
+    predictCard.classList.toggle('is-right', picked !== null && right);
+    predictCard.classList.toggle('is-wrong', picked !== null && !right);
+    predictQuestion.textContent =
+      picked === null ? `It was cell ${answer}. ${why}` : right ? `Right: cell ${answer}. ${why}` : `You picked cell ${picked}; it was cell ${answer}. ${why}`;
+  };
+  const stepOrAsk = () => {
+    if (awaiting) return;
+    if (predictToggle?.checked && ask()) return;
+    if (predictCard) predictCard.hidden = !predictToggle?.checked;
+    step(1);
+  };
+
   root.addEventListener('click', (event) => {
+    const picked = awaiting && event.target.closest('.is-pickable');
+    if (picked) return reveal(pickable().indexOf(picked));
     const action = event.target.closest('[data-player]')?.dataset.player;
-    if (!action || action === 'speed' || action === 'scrub') return;
-    if (action === 'play') return toggle();
+    if (!action || action === 'speed' || action === 'scrub' || action === 'predict') return;
+    if (action === 'reveal') return awaiting && reveal(null);
+    if (action === 'play') {
+      endPredict();
+      return toggle();
+    }
     stop();
+    if (action === 'next') return stepOrAsk();
+    endPredict();
     if (action === 'first') step(-index);
-    else step(action === 'next' ? 1 : -1);
+    else step(-1);
+  });
+
+  predictToggle?.addEventListener('change', () => {
+    endPredict();
+    predictCard.hidden = true;
   });
 
   root.addEventListener('keydown', (event) => {
     if (event.altKey || event.ctrlKey || event.metaKey) return;
     const onControl = event.target.closest('input, select, textarea');
-    if (event.key === 'ArrowRight' && !onControl) {
+    if (awaiting && (event.key === 'Enter' || event.key === ' ') && event.target.classList.contains('is-pickable')) {
+      event.preventDefault();
+      reveal(pickable().indexOf(event.target));
+    } else if (event.key === 'ArrowRight' && !onControl) {
       event.preventDefault();
       stop();
-      step(1);
+      stepOrAsk();
     } else if (event.key === 'ArrowLeft' && !onControl) {
       event.preventDefault();
       stop();
+      endPredict();
       step(-1);
     } else if (event.key === ' ' && !onControl && !event.target.closest('button')) {
       event.preventDefault();
@@ -146,6 +225,7 @@ export function createPlayer(root, onFrame) {
 
   scrub.addEventListener('input', () => {
     stop();
+    endPredict();
     index = Math.min(frames.length - 1, Math.max(0, Number(scrub.value) - 1));
     show();
   });
@@ -170,6 +250,8 @@ export function createPlayer(root, onFrame) {
     /** Load new frames; pass `code` (an array of lines) to show the code tracer. */
     load(newFrames, code) {
       stop();
+      endPredict();
+      if (predictCard) predictCard.hidden = true;
       if (code) {
         codeList.innerHTML = code.map((line) => `<li><code>${escapeHtml(line)}</code></li>`).join('');
         trace.hidden = false;
