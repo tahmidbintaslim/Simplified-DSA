@@ -1,342 +1,374 @@
 ---
 name: Simplified DSA
-description: Margin Notes. Warm paper, a reading serif, and algorithms drawn step by step in the margin.
+description: Clear Steps. A clean white docs world with one blue accent, where algorithms are drawn one step at a time.
 colors:
-  page: "#f6f1e7"
-  surface: "#efe7d8"
-  sunken: "#fffdf8"
-  raised: "#fffdf8"
-  code-bg: "#efe6d4"
-  hover: "#ebe1cd"
-  line: "#dccfb8"
-  line-soft: "#e7ddcb"
-  line-strong: "#c4b498"
-  edge: "#b5a68d"
-  neutral-fill: "#c9bda8"
-  accent-line: "#b8924a"
-  ink-strong: "#1d1813"
-  ink: "#2a241d"
-  ink-body: "#2c261f"
-  ink-code: "#3b3226"
-  muted: "#574e40"
-  subtle: "#645a4a"
-  faint: "#6f6553"
+  page: "#ffffff"
+  surface: "#f8f8f9"
+  sunken: "#ffffff"
+  raised: "#ffffff"
+  code-bg: "#f4f4f5"
+  hover: "#f1f1f3"
+  line: "#e4e4e7"
+  line-soft: "#efeff1"
+  line-strong: "#d4d4d8"
+  edge: "#a1a1aa"
+  neutral-fill: "#d4d4d8"
+  ink-strong: "#09090b"
+  ink: "#18181b"
+  ink-body: "#27272a"
+  ink-code: "#27272a"
+  muted: "#52525b"
+  subtle: "#5c5c66"
+  faint: "#6b6b74"
+  accent: "#1d4ed8"
+  accent-hover: "#1e40af"
+  accent-soft: "#e0e9ff"
+  accent-ink: "#1d4ed8"
+  accent-line: "#2563eb"
+  link: "#1d4ed8"
+  on-accent: "#ffffff"
   look: "#8a5e04"
-  link: "#8a5600"
-  look-line: "#c08f2c"
-  look-fill: "#f4d58c"
-  look-soft: "#fbecc6"
-  on-look: "#2b1f04"
-  done: "#0f6f68"
-  done-fill: "#cde8e3"
-  visited: "#e2f1ee"
-  on-done-fill: "#0b4f4a"
+  look-line: "#d4a12f"
+  look-fill: "#fde68a"
+  look-soft: "#fef3c7"
+  on-look: "#3b2a04"
+  done: "#0f766e"
+  done-fill: "#ccfbf1"
+  visited: "#ecfdf9"
+  on-done-fill: "#115e59"
   on-done: "#ffffff"
-  danger: "#b03a2a"
-  danger-fill: "#f7dcd6"
-  danger-ink: "#9c2c1c"
+  danger: "#b91c1c"
+  danger-fill: "#fee2e2"
+  danger-ink: "#b91c1c"
   on-danger: "#ffffff"
-  analogy: "#4b8650"
-  analogy-ink: "#356b3b"
+  analogy: "#15803d"
+  analogy-ink: "#166534"
+  orange: "#c2410c"
+  on-solid: "#09090b"
 typography:
   display:
-    fontFamily: "Fraunces Variable, Georgia, serif"
-    fontSize: "clamp(2.3rem, 5vw, 3.6rem)"
-    fontWeight: 620
-    lineHeight: 1.04
-    letterSpacing: "-0.025em"
-  headline:
-    fontFamily: "Fraunces Variable, Georgia, serif"
-    fontSize: "1.6rem"
-    fontWeight: 560
-    letterSpacing: "-0.012em"
-  title:
-    fontFamily: "Fraunces Variable, Georgia, serif"
-    fontSize: "1.12rem"
+    fontFamily: "Geist Variable, system-ui, -apple-system, Segoe UI, Roboto, sans-serif"
+    fontSize: "clamp(2.5rem, 5.6vw, 4.1rem)"
     fontWeight: 600
-    letterSpacing: "-0.012em"
+    lineHeight: 1.04
+    letterSpacing: "-0.04em"
+  headline:
+    fontFamily: "Geist Variable, system-ui, sans-serif"
+    fontSize: "clamp(2rem, 4vw, 2.6rem)"
+    fontWeight: 600
+    lineHeight: 1.12
+    letterSpacing: "-0.03em"
+  section:
+    fontFamily: "Geist Variable, system-ui, sans-serif"
+    fontSize: "clamp(1.8rem, 3.4vw, 2.4rem)"
+    fontWeight: 600
+    lineHeight: 1.15
+    letterSpacing: "-0.03em"
+  title:
+    fontFamily: "Geist Variable, system-ui, sans-serif"
+    fontSize: "1.6rem"
+    fontWeight: 600
+    lineHeight: 1.25
+    letterSpacing: "-0.022em"
   lead:
-    fontFamily: "Literata Variable, Georgia, Times New Roman, serif"
-    fontSize: "1.24rem"
-    lineHeight: 1.55
-  body:
-    fontFamily: "Literata Variable, Georgia, Times New Roman, serif"
-    fontSize: "1.06rem"
-    lineHeight: 1.72
-  label:
-    fontFamily: "system-ui, -apple-system, Segoe UI, Roboto, sans-serif"
-    fontSize: "0.88rem"
+    fontFamily: "Geist Variable, system-ui, sans-serif"
+    fontSize: "1.16rem"
     fontWeight: 400
+    lineHeight: 1.6
+  body:
+    fontFamily: "Geist Variable, system-ui, sans-serif"
+    fontSize: "1.06rem"
+    fontWeight: 400
+    lineHeight: 1.72
+  ui:
+    fontFamily: "Geist Variable, system-ui, sans-serif"
+    fontSize: "0.94rem"
+    fontWeight: 500
+    lineHeight: 1.4
+  caption:
+    fontFamily: "Geist Variable, system-ui, sans-serif"
+    fontSize: "0.86rem"
+    fontWeight: 400
+    lineHeight: 1.45
   mono:
-    fontFamily: "JetBrains Mono Variable, ui-monospace, SFMono-Regular, Consolas, monospace"
-    fontSize: "0.84rem"
+    fontFamily: "Geist Mono Variable, ui-monospace, SFMono-Regular, Consolas, monospace"
+    fontSize: "0.95em"
+    fontWeight: 600
     fontFeature: "\"liga\" 0, \"calt\" 0"
 rounded:
-  bar: "4px"
-  sm: "8px"
-  control: "10px"
-  card: "12px"
-  panel: "16px"
-  full: "999px"
+  cell: "6px"
+  control: "8px"
+  step-card: "12px"
+  demo: "14px"
+  figure: "16px"
+  section-card: "20px"
+  band: "24px"
+  pill: "999px"
 spacing:
-  xs: "4px"
-  sm: "8px"
-  md: "12px"
-  lg: "18px"
-  xl: "28px"
-  2xl: "48px"
+  gap-xs: "4px"
+  gap-sm: "8px"
+  gap-md: "14px"
+  gap-lg: "20px"
+  gap-xl: "28px"
+  column-gap: "56px"
+  block: "56px"
+  gutter-phone: "16px"
+  touch: "44px"
+  topbar: "64px"
+  topbar-phone: "56px"
+  column: "760px"
+  toc: "220px"
+  tree: "280px"
+  home: "1140px"
 components:
   button-primary:
-    backgroundColor: "{colors.look-fill}"
-    textColor: "{colors.on-look}"
+    backgroundColor: "{colors.accent}"
+    textColor: "{colors.on-accent}"
     rounded: "{rounded.control}"
     height: "44px"
+  button-primary-hover:
+    backgroundColor: "{colors.accent-hover}"
+    textColor: "{colors.on-accent}"
   button-secondary:
     backgroundColor: "{colors.raised}"
-    textColor: "{colors.ink}"
-    rounded: "{rounded.control}"
-    height: "44px"
-  button-done:
-    backgroundColor: "{colors.done-fill}"
-    textColor: "{colors.on-done-fill}"
-    rounded: "{rounded.control}"
-    height: "44px"
-  input:
-    backgroundColor: "{colors.raised}"
     textColor: "{colors.ink-strong}"
     rounded: "{rounded.control}"
     height: "44px"
-  lesson-card:
-    backgroundColor: "{colors.sunken}"
-    textColor: "{colors.ink-strong}"
-    rounded: "{rounded.card}"
-    padding: "14px 18px 16px"
-  callout:
-    backgroundColor: "{colors.sunken}"
-    textColor: "{colors.ink-body}"
-    rounded: "{rounded.card}"
-    padding: "16px 18px 14px"
-  cells-figure:
-    backgroundColor: "{colors.sunken}"
-    rounded: "{rounded.sm}"
-    padding: "16px 16px 12px"
-  array-cell:
-    backgroundColor: "{colors.raised}"
-    textColor: "{colors.ink-strong}"
-    typography: "{typography.mono}"
-    rounded: "{rounded.sm}"
-  array-cell-look:
-    backgroundColor: "{colors.look-fill}"
-    textColor: "{colors.on-look}"
-    rounded: "{rounded.sm}"
-  array-cell-found:
-    backgroundColor: "{colors.done}"
-    textColor: "{colors.on-done}"
-    rounded: "{rounded.sm}"
-  demo:
-    rounded: "{rounded.panel}"
-    padding: "18px"
-  step-badge:
-    backgroundColor: "{colors.look-fill}"
-    textColor: "{colors.on-look}"
-    typography: "{typography.mono}"
-    rounded: "{rounded.full}"
-    height: "28px"
-  quiz:
-    backgroundColor: "{colors.sunken}"
-    rounded: "{rounded.panel}"
-    padding: "18px"
-  quiz-option:
-    backgroundColor: "{colors.raised}"
-    textColor: "{colors.ink}"
-    typography: "{typography.body}"
-    rounded: "{rounded.card}"
-    height: "44px"
-  quiz-letter-right:
-    backgroundColor: "{colors.done}"
-    textColor: "{colors.on-done}"
-    rounded: "{rounded.full}"
-    size: "28px"
-  quiz-letter-wrong:
-    backgroundColor: "{colors.danger}"
-    textColor: "{colors.on-danger}"
-    rounded: "{rounded.full}"
-    size: "28px"
-  lesson-link:
-    textColor: "{colors.ink-strong}"
-    rounded: "{rounded.sm}"
-    padding: "9px 10px 9px 6px"
-  lesson-link-hover:
+  button-secondary-hover:
     backgroundColor: "{colors.hover}"
-  lesson-step:
-    backgroundColor: "{colors.sunken}"
+  button-hero:
+    height: "48px"
+    padding: "0 20px"
+  icon-button:
+    backgroundColor: "transparent"
     textColor: "{colors.ink}"
-    rounded: "{rounded.card}"
-    padding: "12px"
+    rounded: "{rounded.control}"
+    size: "44px"
+  input-search:
+    backgroundColor: "{colors.raised}"
+    textColor: "{colors.ink-strong}"
+    rounded: "{rounded.control}"
+    height: "44px"
+    padding: "0 10px"
+  topnav-link:
+    textColor: "{colors.ink}"
+    rounded: "{rounded.control}"
+    height: "44px"
+    padding: "0 12px"
+  topnav-link-current:
+    textColor: "{colors.accent-ink}"
+  lesson-link:
+    textColor: "{colors.muted}"
+    rounded: "{rounded.control}"
+    height: "40px"
+  lesson-link-active:
+    backgroundColor: "{colors.accent-soft}"
+    textColor: "{colors.accent-ink}"
+  jump-chip:
+    backgroundColor: "{colors.raised}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.pill}"
+    height: "44px"
+    padding: "0 14px"
+  level-chip:
+    backgroundColor: "{colors.accent-soft}"
+    textColor: "{colors.accent-ink}"
+    rounded: "{rounded.pill}"
+    padding: "0 8px"
+  step-card:
+    backgroundColor: "{colors.raised}"
+    textColor: "{colors.ink-strong}"
+    rounded: "{rounded.step-card}"
+    padding: "16px 18px"
+  section-card:
+    backgroundColor: "{colors.raised}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.section-card}"
+    padding: "0 22px 22px"
+  course-lesson:
+    backgroundColor: "{colors.raised}"
+    rounded: "{rounded.step-card}"
+  demo:
+    backgroundColor: "{colors.surface}"
+    rounded: "{rounded.demo}"
+  cell:
+    backgroundColor: "{colors.raised}"
+    textColor: "{colors.ink-strong}"
+    rounded: "{rounded.control}"
+  cell-look:
+    backgroundColor: "{colors.look-fill}"
+    textColor: "{colors.on-look}"
+  cell-done:
+    backgroundColor: "{colors.done}"
+    textColor: "{colors.on-done}"
+  cell-moved:
+    backgroundColor: "{colors.done-fill}"
+  closing-band:
+    backgroundColor: "{colors.surface}"
+    rounded: "{rounded.band}"
+    padding: "clamp(36px, 6vw, 64px) 24px"
 ---
 
 # Design System: Simplified DSA
 
 ## Overview
 
-**Creative North Star: "Margin Notes"**
+**Creative North Star: "Clear Steps"**
 
-A lesson is a page of a good textbook that someone has worked through in pencil. The reading column stays calm: warm paper, a bookish serif at a long-form measure, quiet ink. The frame carries the world: the contents list in the margin, the lesson card under the title, figures of arrays drawn on paper cards, and the demo, which is the hero block of every lesson. Everything the learner should notice is drawn the way a careful note-taker would mark a page: a gold highlight for what is being looked at, a teal tick for what is settled, a faded strike-through for what has been ruled out.
+A lesson is a clean documentation page that happens to teach. The frame is the familiar docs shell: a sticky top bar, a lesson tree on the left, one reading column, an "On this page" list on the right. Nothing in the frame competes with the lesson. White paper (or a near-black night page), Geist for everything, hairline borders, and one blue accent that only ever means "go here" or "do this".
 
-The system ships in two themes from one set of semantic roles. Paper (light) is the default; Night, the project's original warm-dark palette, follows the reader's system setting. Roles never change meaning between themes; only their values do.
+What the learner should notice lives inside the figures and demos, and it is marked in a fixed vocabulary that never changes between lessons or themes: gold for what is being looked at, teal for what is settled, moved or on the path, and faded plus crossed out for what has been ruled out. Blue never enters that vocabulary.
 
-Density is low and patient, built for a beginner on a phone between classes. Depth is paper laid on paper, never glass or glow. Motion is barely there and only for people who have not asked to reduce it.
+The system ships two themes from one set of semantic roles. Light is the default; night follows the system setting until the learner picks one with the theme button (`html[data-theme]`, stored in `localStorage` under `simplified-dsa:theme`, applied by an inline script before first paint). Roles keep their meaning in both themes; only values change. Depth is hairlines and tonal surfaces; the only glow is the soft blue light behind the home hero's drawn step and the closing band.
 
 **Key Characteristics:**
-- Warm paper and dark-brown ink; no pure white, no pure black.
-- Three serif-adjacent voices: Literata to read, Fraunces to title, JetBrains Mono for code and values only, plus a system sans for small labels.
-- One state scale across every figure and demo: look (gold), done (teal), ruled out (faded and crossed out).
-- State is always carried by form or words as well as colour.
-- Paper cards with one soft shadow; demos and quizzes are the largest, roundest cards.
-- An authored line-icon set in the Iconly Light Outline style, always beside words.
+- Docs shell: top bar, lesson tree, 760px column, scroll-spy table of contents at 1200px and up.
+- Geist and Geist Mono, self-hosted via `@fontsource-variable`; no font CDN.
+- One blue accent for navigation and actions; gold and teal are step states only.
+- Ruled out is a form (opacity plus a diagonal strike), never colour alone.
+- Flat, hairline-bordered cards; 44px touch targets throughout.
 
 ## Colors
 
-A warm, low-chroma paper palette with two state accents (gold and teal) and one warning red.
+Zinc neutrals on white (or near-black), one confident blue, and two state hues that belong to the algorithms.
 
 ### Primary
-- **Pencil Gold** (look): the "being looked at" state and the system's focus colour. Focus rings, active pointer labels, the current lesson's ring, live variable values in the tracer. Night value #f1cd86.
-- **Highlighter Gold** (look-fill, with look-line as its edge and on-look as its ink): the filled form of "being looked at". Array cells under inspection (including mid), the current pseudocode line, the step badge, the primary demo button, text selection. Night values #4a3a17 / #b8924a / #fbf0d6.
-- **Soft Highlight** (look-soft): the lightest gold, for waiting or frontier cells in graph demos. Night #33291a.
-- **Burnt Gold Link** (link): body links and the range slider accent. Night #d9b36a.
+- **Action Blue** (`#1d4ed8` light, `#2563eb` night; `--accent`): primary buttons, the skip link, step badges, focus rings, the TOC's current marker, the active lesson's status dot, list markers, range inputs. Hover deepens to `#1e40af` (light) or lightens to `#3b82f6` (night).
+- **Blue Ink** (`#1d4ed8` light, `#93b4ff` night; `--accent-ink`): text in the accent: current top-nav link, active lesson title, current TOC entry, the hero's second line, level chip.
+- **Blue Wash** (`#e0e9ff` light, `#172554` night; `--accent-soft`): the active lesson row and the level chip background.
+- **Link Blue** (`#1d4ed8` light, `#8ab0ff` night; `--link`): inline links, underlined with a 3px offset.
 
-### Secondary
-- **Ledger Teal** (done, with on-done as its ink): moved, done, found, final place, path. Found cells, sorted bars, path cells, the done status dot, the correct quiz chip and mark. Night #4f9c94 / #0e1f1d.
-- **Teal Wash** (done-fill, with on-done-fill as its ink): the filled-but-quiet form of done: moved cells, the "Completed" button, When-to-use-it and Interview-tip callout tags. Night #18332f / #8fd0c8.
-- **Visited Wash** (visited): cells a search has already visited. Night #1f3a36.
-
-### Tertiary
-- **Correction Red** (danger, danger-fill, danger-ink, on-danger): wrong quiz answers, Watch-out callouts, input errors. Night #c4574a / #3a1f1b / #ec9a8f / #fff4f2.
-- **Margin Green** (analogy, analogy-ink): the Analogy callout only. Night #6aa36f / #9bd09f.
+### State colours (not accents)
+- **Look Gold** (`--look` `#8a5e04` / `#fcd34d`, `--look-line` `#d4a12f` / `#b8924a`, `--look-fill` `#fde68a` / `#4a3a17`, `--look-soft` `#fef3c7` / `#33291a`, text `--on-look` `#3b2a04` / `#fef3c7`): the cell, node or line being looked at right now; the frontier in grid searches; the cell pointer.
+- **Done Teal** (`--done` `#0f766e` / `#4f9c94`, `--done-fill` `#ccfbf1` / `#18332f`, `--visited` `#ecfdf9` / `#1f3a36`, `--on-done-fill` `#115e59` / `#8fd0c8`, `--on-done` `#ffffff` / `#0e1f1d`): found, moved, walked, visited, on the path, completed lessons, the hero check row.
+- **Ruled out**: no hue. `opacity: 0.55` plus a 2px diagonal strike in `--faint`.
+- **Danger** (`--danger` `#b91c1c` / `#ef4444`, `--danger-fill` `#fee2e2` / `#3a1f1b`, `--danger-ink` `#b91c1c` / `#fca5a5`): wrong quiz answers and warning callouts only.
+- **Analogy Green** (`#15803d` / `#4ade80`) and **Orange** (`#c2410c` / `#fb923c`): callout tones, used sparingly.
 
 ### Neutral
-- **Paper** (page): the page itself. Night #11110f.
-- **Desk** (surface): the sidebar and the demo base. Night #171612.
-- **Fresh Sheet** (sunken / raised): cards, figures, inputs and buttons sit on this lighter sheet. Night #191711 / #1d1b16.
-- **Code Paper** (code-bg): inline code and code blocks. Night #201d17.
-- **Thumb Mark** (hover): hover fill in the contents list. Night #272318.
-- **Rules** (line-soft, line, line-strong, edge): hairlines from quietest to firmest; edge outlines array cells. Night #2a2721 / #302d26 / #3a352b / #4a4436.
-- **Graphite Fill** (neutral-fill): unsorted bars and walls. Night #5a523f.
-- **Brass Rule** (accent-line): hover edges on quiz options and footer links. Night #7b6842.
-- **Inks** (ink-strong, ink, ink-body, ink-code): headings, UI text, the reading column, code. Night #f5f0e6 / #ece8dd / #ddd5c6 / #eadfc9.
-- **Pencil Greys** (muted, subtle, faint): secondary text, metadata, line numbers and the ruled-out stroke. Night #bdb3a3 / #a99f8d / #8f8676.
+- **Page** (`#ffffff` / `#0b0b0d`; `--page`): the page and the top bar (92% with a blur).
+- **Surface** (`#f8f8f9` / `#111114`; `--surface`): the lesson tree, the lesson header card, demos, the closing band.
+- **Raised** (`#ffffff` / `#18181b`; `--raised`): cards, buttons, inputs, figure cells, the search field.
+- **Code** (`#f4f4f5` / `#18181b`; `--code-bg`) and **Hover** (`#f1f1f3` / `#1f1f23`; `--hover`).
+- **Hairlines**: `--line` `#e4e4e7` / `#27272a` for every border, `--line-soft` `#efeff1` / `#1f1f23`, `--line-strong` `#d4d4d8` / `#3f3f46` for button borders, `--edge` `#a1a1aa` / `#52525b` for hovered borders and figure cells.
+- **Ink**: `--ink-strong` `#09090b` / `#fafafa` headings, `--ink` `#18181b` / `#f4f4f5` UI text, `--ink-body` `#27272a` / `#d4d4d8` reading text, `--muted` `#52525b` / `#a1a1aa` leads and summaries, `--subtle` `#5c5c66` / `#a1a1aa` meta, `--faint` `#6b6b74` / `#8b8b94` indexes and the strike line.
 
 ### Named Rules
-**The Same Meaning Rule.** Gold means "being looked at" and teal means "moved, done, found or on the path" in every figure, demo, legend and list, in both themes. A new demo maps its states onto these roles; it never introduces a new state colour.
+**The Blue Means Go Rule.** `--accent` marks navigation, actions, focus and "you are here". It is never a step state: no blue cell, node, bar or line in a figure or demo.
 
-**The Two Themes, One Role Rule.** Every colour is used through its semantic role, never as a literal hex in a component. Paper is defined on the root; Night redefines the same roles under the dark colour-scheme query.
+**The Fixed Vocabulary Rule.** Gold = being looked at, teal = done or on the path, faded and crossed out = ruled out. Same meaning in every lesson, every demo and both themes.
+
+**The Form Not Hue Rule.** Every state is readable without colour: ruled-out cells carry the strike, done items carry a check, the current line carries a marker.
 
 ## Typography
 
-**Display Font:** Fraunces Variable (with Georgia, serif)
-**Body Font:** Literata Variable (with Georgia, Times New Roman, serif)
-**Label Font:** system UI sans (system-ui, -apple-system, Segoe UI, Roboto)
-**Mono Font:** JetBrains Mono Variable (with ui-monospace, Consolas)
+**Display Font:** Geist Variable (with system-ui, -apple-system, Segoe UI, Roboto)
+**Body Font:** Geist Variable
+**Mono Font:** Geist Mono Variable (with ui-monospace, SFMono-Regular, Consolas)
 
-All three families are self-hosted variable fonts; nothing is fetched from a font CDN.
-
-**Character:** Literata is a reading face made for long screen text; Fraunces gives titles a soft, inked, slightly old-style voice; the system sans keeps small labels quiet and native; JetBrains Mono shows code exactly as typed.
+**Character:** One neutral grotesque at different weights and tight negative tracking for headings; mono for anything typed or indexed. Ligatures are off in code, cells, pointers and badges so `<=` reads as typed.
 
 ### Hierarchy
-- **Display** (Fraunces 620, clamp(2.3rem, 5vw, 3.6rem), line-height 1.04, balanced): the lesson title, the single h1 on every page.
-- **Headline** (Fraunces 560, 1.6rem; 1.5rem for demo headings): lesson sections and the demo panel heading.
-- **Title** (Fraunces 560-600, 1.12rem): h3 and quiz questions; the site title and section names in the contents list also use the display face.
-- **Lead** (Literata, 1.24rem, line-height 1.55; 1.12rem on phones): the one-paragraph promise directly under the h1.
-- **Body** (Literata, 1.06rem, line-height 1.72, column capped at 72ch): the reading column. Callout and figure text step down to 1rem / 1.6.
-- **Label** (system sans, 0.8-0.88rem): lesson metadata, callout tags, legends, button text, counts, status text.
-- **Mono** (JetBrains Mono, 0.84rem; 600 weight in array cells, 700 in the step badge): code, pseudocode, variable names and values, array values, pointer labels.
+- **Display** (600, `clamp(2.5rem, 5.6vw, 4.1rem)`, 1.04, -0.04em): the home hero only. The second line is a block span in `--accent-ink`, a solid colour.
+- **Headline** (600, `clamp(2rem, 4vw, 2.6rem)`, 1.12, -0.03em): lesson h1.
+- **Section** (600, `clamp(1.8rem, 3.4vw, 2.4rem)`, 1.15, -0.03em): home block headings and the closing band.
+- **Title** (600, 1.6rem, 1.25, -0.022em): lesson h2; demo panel h2 at 1.45rem; h3 at 1.12rem; section card title 1.3rem.
+- **Lead** (400, 1.16rem, 1.6, `--muted`): lesson lead and hero lead, max 34rem on home.
+- **Body** (400, 1.06rem, 1.72, `--ink-body`): lesson paragraphs and lists, inside the 760px column.
+- **UI** (500, 0.93-0.96rem): top nav, lesson tree, search, buttons. Section headings in the tree are 600.
+- **Caption** (400, 0.82-0.9rem, `--subtle`/`--muted`): course meta, step-card summaries, footer, TOC (0.9rem).
+- **Mono** (600 in cells, 0.78rem for array indexes): code, cell values, pointers, trace variables, `kbd`.
 
 ### Named Rules
-**The Typed Code Rule.** Mono text never uses ligatures: liga and calt are off on code, array values, pointer labels, the tracer's variables and the step badge, so a beginner reads `<=` and `==` as typed.
-
-**The Mono Is For Values Rule.** JetBrains Mono appears only on code and values. Prose, captions, questions and labels are never set in mono.
+**The One Family Rule.** Geist carries every role; contrast comes from weight (400/500/600), size and tracking, never from a second display face.
 
 ## Layout
 
-A two-column shell on wide screens: a 300px contents sidebar beside a lesson column (main up to 980px, padding 48px with clamp(20px, 5vw, 72px) sides; reading column and demo panel capped at 72ch). From 761px up the sidebar is sticky at full viewport height and scrolls on its own.
+- **Top bar:** sticky, 64px tall (56px on phones), page colour at 92% with `backdrop-filter: saturate(1.4) blur(10px)`, a bottom hairline. Brand, Course map, Lessons, then GitHub and the theme toggle pushed right. Side padding `clamp(16px, 3vw, 32px)`.
+- **Shell:** `280px | 1fr` grid. The lesson tree is sticky under the bar (`top: 64px`, full remaining height) from 761px up. Home drops the tree to a single column.
+- **Lesson column:** main padding `44px clamp(20px, 4vw, 48px) 72px`; content capped at 760px. From 1200px the layout becomes `760px | 220px` with a 56px gap, and the right column holds the sticky "On this page" TOC (`top: 96px`) with scroll-spy. Below 1200px the TOC hides and the lesson header shows a "Jump to" chip list instead.
+- **Home:** max 1140px, centred. Hero padding `clamp(48px, 9vw, 104px) 0 clamp(40px, 6vw, 72px)`; two columns `1.15fr | 1fr` from 900px, stacked below. Blocks are separated by a top hairline and 56px of padding. Section cards: `repeat(auto-fit, minmax(260px, 1fr))`, 20px gap. Course map: `repeat(auto-fill, minmax(300px, 1fr))`, 10px gap.
+- **Phones (760px and down):** one column, the lesson tree folds into a drawer, top nav keeps only the home link, GitHub hides, main padding `24px 16px 56px`.
+- **Rhythm:** gaps of 4, 8, 14, 20, 28 and 56px. Every interactive row is at least 44px tall (tree rows 40px).
 
-At 760px and below the shell becomes one column: the contents list folds into a "Lessons" drawer bar (a native details element, 48px tall, with the current lesson's name truncated beside it), so the lesson starts on the first screen. Main padding becomes 30px 16px. The tracer stacks code above variables, and previous/next links stack. At 480px and below, worked figures tighten (4px cell gap, 38px minimum cell) so seven cells fit inside the card, and the speed control takes its own row.
-
-Spacing is an organic rhythm rather than a strict scale: small gaps of 4-12px inside components, 18px card padding, 26-30px between blocks, 42-48px before major sections and demos. Wide pictures and long pseudocode scroll inside their own panel; the page never scrolls sideways.
-
-**The Calm Column Rule.** The reading column carries no decoration; the frame (sidebar, lesson card, figures, demo, quiz) carries the world.
+### Breakpoints
+- **760px:** phone layout (JS matches `(min-width: 761px)`).
+- **900px:** home hero goes two-column; hero cells grow to 48px.
+- **1200px:** right-hand TOC appears; jump chips hide.
+- **480px:** demo stage tightens its padding to fit seven cells on a 390px phone.
 
 ## Elevation & Depth
 
-Depth is paper laid on paper. Flat tonal layers do most of the work (Paper page, Desk surface, Fresh Sheet cards), and one soft shadow lifts the cards that hold a lesson's working: the lesson card, figures, demo stages, the demo panel and the quiz.
+Flat by default. Surfaces separate by a 1px `--line` hairline and a tonal step (page, surface, raised), not by shadow. Lesson cards, demos, quizzes and callouts carry no shadow. Three exceptions, all on the home page or as hover feedback:
 
 ### Shadow Vocabulary
-- **Paper** (`box-shadow: 0 1px 0 rgb(60 45 20 / 6%), 0 8px 24px -12px rgb(60 45 20 / 22%)`; Night: `0 1px 0 rgb(0 0 0 / 30%), 0 10px 28px -14px rgb(0 0 0 / 60%)`): a sheet resting on the desk. The only elevation in the system.
+- **Hero step glow** (`box-shadow: 0 1px 2px rgb(9 9 11 / 4%), 0 24px 48px -24px color-mix(in srgb, var(--accent) 40%, transparent)`): the drawn binary-search card in the hero, over a `radial-gradient` of 16% accent behind it.
+- **Section card lift** (`box-shadow: 0 18px 40px -26px rgb(9 9 11 / 35%)`): section cards on hover only, with the border moving to `--edge`.
+- **Banner mark** (`box-shadow: 0 10px 24px -12px rgb(0 0 0 / 35%)`): the frosted icon tile on section card banners.
+- **Paper** (`--shadow-paper`): small figure values; night uses a deeper value.
 
 ### Named Rules
-**The One Sheet Rule.** There is exactly one shadow, and it means "a sheet of paper on the page". No hover lifts, no glows, no hard offset shadows.
+**The Hairline First Rule.** Reach for a border and a surface step before a shadow. A shadow is a response to hover or the one hero moment, not a resting state.
 
 ## Shapes
 
-Soft, friendly corners that grow with the container: 4px for bars and grid cells, 8px for array cells, figures and contents-list rows, 10px for demo buttons and inputs, 12px for cards, callouts and quiz options, 16px for the demo and quiz panels. Fully round forms (999px) are reserved for counters and marks: the step badge, quiz letter chips, the Correct / Not this one marks, the level pill and status dots. Borders are 1px hairlines; array cells and the state dots use a firmer 1.5px edge, like a drawn box.
-
-**The Crossed-Out Rule.** Ruled out is a shape, not only a colour: the cell drops to 55% opacity and a 2px diagonal stroke in the faint ink crosses it, the way a note-taker strikes a candidate off.
+Gently rounded, docs-like. Cells 6-8px, controls and tree rows 8px, step cards, quizzes and lesson header 12px, demos 14px, the hero figure 16px, section cards 20px, the closing band 24px. Chips (level, jump links) are full pills. Status dots are circles (18px). Section card banners are three layered SVG wave bands clipped by the card's 20px corner, with a 72px frosted icon tile (18px radius) and a tab cut from the bottom-left corner (16px top-right radius) that carries the lesson count.
 
 ## Components
 
 ### Buttons
-Tactile and plain: a labelled control on paper.
-- **Shape:** gently rounded (10px), minimum 44px tall; icon-only First is 44px square.
-- **Primary** (Play, Mark as complete): highlighter gold fill with a gold edge, dark gold ink, weight 600.
-- **Secondary** (Back, Step, First, reset): fresh-sheet fill, firm hairline edge, ink text, system sans.
-- **Done** ("Completed"): teal wash with deep teal ink and a check icon.
-- **Focus:** a 2px gold outline offset 2px on every interactive element (focus-visible only). Hover changes colour only, in 140ms.
+- **Shape:** 8px radius, 44px minimum height (48px with 20px side padding on the home page).
+- **Primary:** `--accent` fill and border, `--on-accent` text, weight 600; hover moves to `--accent-hover`.
+- **Secondary:** `--raised` fill, `--line-strong` border, `--ink-strong` text, weight 500; hover `--hover` fill and `--edge` border.
+- **Done:** teal-tinted (`--done` 10% over raised, border 45%) with `--on-done-fill` text, for a completed action.
+- **Icon button:** 44px square, transparent, `--hover` on hover.
+- **Focus:** `outline: 2px solid var(--accent); outline-offset: 2px` on every focusable element.
+
+### Chips
+- **Jump to:** pills of `--raised` with a `--line` border, 44px tall; hover shifts the border to `--accent` and the text to `--accent-ink`.
+- **Level:** small pill, `--accent-soft` fill, border 35% accent, `--accent-ink` text.
+
+### Cards / Containers
+- **Lesson header:** 12px, `--surface`, `--line` border, no shadow.
+- **Demo:** 14px, `--surface`, `--line` border; the hero block of each lesson.
+- **Prev / next step cards:** 12px, `--raised`, 16px 18px padding; a small "Previous"/"Next" caption, the lesson title (1.02rem/600) and a one-line summary in `--muted`. Hover turns the border `--accent`.
+- **Section card:** 20px, `--raised`, wave banner 168px (140px on phones), count tab, title, summary, progress meta.
+- **Course lesson:** 12px, `--raised`, status dot, title, summary, meta; hover border `--accent`.
+- **Closing band:** 24px, `--surface` with a 12% accent radial wash from the top, centred heading, line, primary button.
 
 ### Inputs / Fields
-- **Style:** fresh-sheet fill, firm hairline, 10px corners, 44px tall, strong ink. In demos "Your list" sits in its own row with its button and wraps under only when needed.
-- **Error:** the message turns danger ink; it reads as a mistake, not as a result.
+- **Lesson search:** 44px, 8px radius, `--raised`, `--line` border, search icon and a `kbd` hint (`/`; Ctrl/Cmd+K also focuses it). Focus-within turns the border `--accent`.
 
-### Lesson Opener and Lesson Card
-The page opens on the h1 and the lead paragraph, then a margin note: a fresh-sheet card (12px, Paper shadow) holding the section, "Lesson n of m", reading time, a teal-outlined level pill (system sans) and "You will be able to:" goals. The page never opens on admin text.
+### Navigation
+- **Top nav:** 0.95rem links, 8px radius, `--hover` on hover, current page in `--accent-ink` 600.
+- **Lesson tree:** collapsible `<details>` sections that expand in place (chevron rotates from -90deg, 160ms), section count in `--subtle`. Lessons sit on a 1px left rule; each row has an 18px status dot (empty ring, teal with a check when done) and a title in `--muted`. Active row: `--accent-soft` fill, `--accent-ink` title, and a blue ring on the dot.
+- **On this page:** a 1px left rule; links in `--muted`, the current one gets a `--accent` left border and `--accent-ink` text via IntersectionObserver.
+- **Footer:** page colour, top hairline, 1140px wide, `--subtle` note and `--muted` links (44px tall).
 
-### Callouts
-A tinted note, never a side stripe. Each type sets one tone: the card is a 7% tint of it over fresh sheet, the border a 35% mix of it into the hairline. A small tag in the tone's own ink (16% tone background, 6px corners, 0.8rem, weight 700, sentence case) names the type: Analogy (margin green), Key idea (gold), When to use it and Interview tip (teal), Watch out (red).
-
-### Cells Figure
-Arrays drawn on paper: a fresh-sheet card with the Paper shadow, a row of mono value boxes (1.5px edge, 8px corners), gold mono pointer labels above, and a serif caption. State uses the one scale: look = gold fill, found = solid teal, moved = teal wash, ruled out = faded and crossed out.
-
-### Demo Panel (signature)
-The hero block of a lesson. A 16px panel tinted 5% gold over the desk, with the Paper shadow and 18px padding. Inside, in order: toolbar rows (inputs first, then the list row with its button), the stage (a fresh-sheet card that scrolls sideways internally), a colour legend in system sans with 14px swatches that use the same state forms, the step player, the caption and the tracer.
-- **Player:** First, Back, Play/Pause (primary), Step, a speed slider and a step count. Arrow keys work too.
-- **Step badge:** every caption starts with a round highlighter-gold badge holding the step number in mono, like a numbered fold. Screen readers hear "Step n of m".
-- **Tracer:** pseudocode with line numbers beside live variables, both on fresh sheet; the running line is a full highlighter-gold band; variable values are gold mono.
-
-### Quiz
-A 16px fresh-sheet panel with the Paper shadow. The question is in Fraunces. Options are 12px serif rows (min 44px) led by a round letter chip (A, B, C, 28px, 1.5px edge, system sans 700). After an answer the chip fills teal or red and a written pill mark appears at the row's end: "Correct" or "Not this one". Feedback is announced politely.
-
-### Navigation (contents list)
-A quiet table of contents, not a stack of cards. Section rows (44px+, Fraunces 600) with a lesson count; lessons hang off a 1px hairline rule, each with a title and a one-line summary. One 20px status dot per lesson: hollow ring = not yet, gold ring with a gold centre = you are here, solid teal with a white check = done. Hover is the thumb-mark fill; the active row is a 12% gold tint. Below 761px it lives in the Lessons drawer.
-
-### Lesson Footer
-"Mark as complete" (primary, becoming Done once pressed), then previous and next lesson links as two 12px fresh-sheet cards with an arrow icon and label in system sans and the lesson title below.
+### Figure cells (signature)
+- **Default:** 1.5px `--edge` border, 8px radius, `--raised`, Geist Mono 600, tabular numbers; index below in mono 0.78rem `--faint`.
+- **Looking at:** `--look-line` border, `--look-fill`, `--on-look` text.
+- **Found / on the path:** solid `--done` with `--on-done` text. **Moved / walked:** `--done-fill`.
+- **Ruled out:** `opacity: 0.55` plus a 2px diagonal strike in `--faint`.
+- **Motion:** 160ms ease on background, width and height, only under `prefers-reduced-motion: no-preference`.
 
 ### Icons
-An authored set drawn in the Iconly Light Outline style: 24px grid, 1.5px stroke (2.2px when shrunk inside a status dot or on the complete button), round caps and joins, stroke in currentColor, sized at 1.15em. Icons are decorative (aria-hidden) and always sit beside a word, except First, which carries an aria-label.
+An authored 24px outline set (1.5px stroke, round caps and joins, `currentColor`), always `aria-hidden` beside a text label or an `aria-label`.
 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** map every new demo state onto look (gold), done (teal) or ruled out (faded and crossed out), and show it in the legend with the same form.
-- **Do** carry state in form or words as well as colour: the crossed-out cell, the check in the done dot, the gold ring, the "Correct" / "Not this one" marks, the screen-reader step count.
-- **Do** keep text pairs at WCAG AA in both themes (paper ink on page is 13.6:1, faint on page 5.1:1, gold on desk 4.6:1, white on teal 6.0:1).
-- **Do** give every control a 44px target, a visible gold focus ring, and keep the skip link and a single h1 on every page.
-- **Do** gate every transition behind a no-preference reduced-motion query, animate only colour and bar size (140-160ms ease), and never move layout.
-- **Do** draw new icons in the Iconly Light Outline grammar and put a word beside them.
+- **Do** keep gold for "being looked at", teal for "done / on the path" and faded-plus-struck for "ruled out", in every lesson and both themes.
+- **Do** use `--accent` only for navigation, actions, focus and the current location.
+- **Do** define every new colour as a role token with a light value on `:root` and a night value under both `prefers-color-scheme: dark` and `:root[data-theme="dark"]`.
+- **Do** separate surfaces with a `--line` hairline and a tonal step before considering a shadow.
+- **Do** keep interactive targets at 44px and focus rings at 2px `--accent` with a 2px offset.
+- **Do** keep Geist and Geist Mono self-hosted through `@fontsource-variable`.
 
 ### Don't:
-- **Don't** use side-stripe borders on callouts, cards or alerts; tint the whole note instead.
-- **Don't** put eyebrow or kicker labels above headings, and don't use uppercase tracked labels.
-- **Don't** use text glyphs or emoji as icons; use the authored SVG set.
-- **Don't** set prose, captions or questions in mono.
-- **Don't** add a second shadow, a glow or a hard offset shadow.
-- **Don't** introduce a new state colour or let gold and teal swap meanings between demos.
+- **Don't** use blue as a step state in any figure, demo, trace or legend.
+- **Don't** add eyebrow or kicker labels above headings.
+- **Don't** use gradient text; the hero's accent line is a solid `--accent-ink`.
+- **Don't** mark a state by colour alone.
+- **Don't** add resting shadows to lesson cards, demos, quizzes or callouts.
+- **Don't** load fonts or scripts from a CDN.

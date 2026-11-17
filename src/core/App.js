@@ -7,6 +7,17 @@ import { loadCompleted, saveCompleted } from './progress.js';
 const HOME_DESCRIPTION =
   'Free, beginner-first lessons on data structures and algorithms: plain words, every step traced, a demo on every lesson.';
 
+// "Cost Cheat Sheet" → "cost-cheat-sheet", for heading anchors.
+// Tags and entities become spaces (never ''), so no fragments can join up, and
+// the result is only [a-z0-9-] either way.
+const slugify = (html) =>
+  html
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/&[a-z#0-9]+;/g, ' ')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+
 // <details> folds whose open state survives a re-render of the same lesson.
 // The home page shows the product's promise: one real step of a binary search.
 const HOME_FIGURE = [
@@ -18,6 +29,22 @@ const HOME_FIGURE = [
   'note: Step 2 of a binary search for 42. The middle value, 21, was too small, so it and everything left of it are ruled out. Now check the middle of what is left.',
   '```',
 ].join('\n');
+
+// Banner colours for the home section cards (decorative art, not step states).
+const SECTION_ART = [
+  { a: '#bcd3ff', b: '#6d9bff', c: '#2f5fe0', icon: 'cells' },
+  { a: '#ffd9cc', b: '#ff9b7d', c: '#d9532f', icon: 'halve' },
+  { a: '#d9d0ff', b: '#9d86f5', c: '#5b3fd0', icon: 'pointers' },
+];
+
+// Three layered wave bands, coloured by the card's --art-* custom properties.
+const waves = () => `
+  <svg viewBox="0 0 400 160" preserveAspectRatio="none" focusable="false">
+    <rect width="400" height="160" fill="var(--art-a)"/>
+    <path d="M0 70 C70 40 130 95 200 70 S330 40 400 64 V160 H0Z" fill="var(--art-b)" opacity="0.75"/>
+    <path d="M0 104 C80 78 150 128 230 102 S350 80 400 98 V160 H0Z" fill="var(--art-b)"/>
+    <path d="M0 134 C90 112 170 150 260 128 S360 118 400 128 V160 H0Z" fill="var(--art-c)"/>
+  </svg>`;
 
 const FOLDS = ['answer', 'sources', 'language-details'];
 
@@ -42,6 +69,9 @@ export class App {
     this.completed = loadCompleted();
     // Folded parts of the open lesson the learner has expanded (see FOLDS).
     this.openFolds = new Set();
+    // Sidebar sections the learner opened or closed by hand, and the search text.
+    this.openSections = new Map();
+    this.navQuery = '';
     this.activeSectionId = this.sections[0].id;
     this.activeLessonId = this.sections[0].lessons[0].id;
     this.activeLanguageId = this.activeLesson.languageExamples?.[0]?.id ?? null;
@@ -81,26 +111,60 @@ export class App {
     const onLesson = !this.notFound && !this.home;
     const current = onLesson ? `${this.activeSection.title} · ${this.activeLesson.title}` : 'Choose a lesson';
 
-    this.root.innerHTML = `
-      <a class="skip-link" href="#main">Skip to the lesson</a>
-      <div class="app-shell">
+    const sidebar = this.home
+      ? ''
+      : `
         <aside class="lesson-sidebar" aria-label="Course navigation">
-          <div class="sidebar-header">
-            <a class="site-title" href="/" data-home>Simplified DSA</a>
-            <p class="site-tagline">Learn the shape of data first, then the steps that act on it.</p>
-          </div>
           <details class="nav-drawer" ${wide ? 'open' : ''}>
-            <summary><span>Lessons</span><span class="nav-current">${escapeHtml(current)}</span></summary>
+            <summary><span>Lessons</span><span class="nav-current">${escapeHtml(current)}</span>${icon('chevronDown')}</summary>
+            <label class="nav-search">
+              ${icon('search')}
+              <span class="sr-only">Search lessons</span>
+              <input id="lesson-search" type="search" placeholder="Search lessons" autocomplete="off" value="${escapeHtml(this.navQuery)}" />
+              <kbd aria-hidden="true">/</kbd>
+            </label>
             <nav aria-label="Lessons">
               ${this.renderSectionMenu()}
             </nav>
-            <p class="sidebar-footer"><a href="/privacy.html">Privacy</a></p>
+            <p class="nav-empty" hidden>No lesson matches that search.</p>
           </details>
-        </aside>
+        </aside>`;
+
+    this.root.innerHTML = `
+      <a class="skip-link" href="#main">Skip to the lesson</a>
+      <header class="topbar">
+        <div class="topbar-inner">
+          <a class="brand" href="/" data-home>
+            <img src="/icon.png" alt="" width="28" height="28" />
+            <span>Simplified DSA</span>
+          </a>
+          <nav class="topnav" aria-label="Site">
+            <a href="/" data-home ${this.home ? 'aria-current="page"' : ''}>Course map</a>
+            <a href="${lessonPath(this.sections[0].id, this.sections[0].lessons[0].id)}" data-section-id="${this.sections[0].id}" data-lesson-id="${this.sections[0].lessons[0].id}" ${onLesson ? 'aria-current="true"' : ''}>Lessons</a>
+          </nav>
+          <div class="topbar-actions">
+            <a class="icon-button" href="https://github.com/tahmidbintaslim/Simplified-DSA" target="_blank" rel="noreferrer" aria-label="Source code on GitHub">${icon('github')}</a>
+            <button id="theme-toggle" class="icon-button" type="button" data-theme-toggle aria-label="Switch to ${this.isDark ? 'light' : 'dark'} theme">${icon(this.isDark ? 'sun' : 'moon')}</button>
+          </div>
+        </div>
+      </header>
+      <div class="app-shell ${this.home ? 'is-home' : ''}">
+        ${sidebar}
         <main id="main" class="lesson-main" tabindex="-1">
           ${this.notFound ? this.renderNotFound() : this.home ? this.renderHome() : this.renderLesson()}
         </main>
       </div>
+      <footer class="site-footer">
+        <div class="site-footer-inner">
+          <a class="brand" href="/" data-home><img src="/icon.png" alt="" width="22" height="22" /><span>Simplified DSA</span></a>
+          <p>Free, open lessons that show every step. No account, no tracking.</p>
+          <nav aria-label="Footer">
+            <a href="/privacy.html">Privacy</a>
+            <a href="https://github.com/tahmidbintaslim/Simplified-DSA" target="_blank" rel="noreferrer">GitHub</a>
+            <a href="https://dsa.tahmid.space/mcp">Claude connector</a>
+          </nav>
+        </div>
+      </footer>
     `;
     document.title = this.home
       ? 'Simplified DSA | Data Structures and Algorithms'
@@ -112,7 +176,11 @@ export class App {
         'content',
         this.notFound ? 'This page does not exist.' : this.home ? HOME_DESCRIPTION : this.activeLesson.summary,
       );
-    if (onLesson) this.attachDemo();
+    if (onLesson) {
+      this.attachDemo();
+      this.buildToc();
+    }
+    if (!this.home) this.filterLessons();
 
     if (restoreId || hadFocus) {
       // If that element no longer exists, the current lesson link takes focus.
@@ -136,6 +204,11 @@ export class App {
       const languageButton = event.target.closest('[data-language-id]');
       const quizOption = event.target.closest('[data-quiz-option]');
       const completeButton = event.target.closest('[data-complete]');
+
+      if (event.target.closest('[data-theme-toggle]')) {
+        this.toggleTheme();
+        return;
+      }
 
       if (quizOption) {
         this.answerQuiz(quizOption);
@@ -203,11 +276,34 @@ export class App {
       this.selectLanguage(tabs[nextIndex].dataset.languageId, { moveFocus: true });
     });
 
+    this.root.addEventListener('input', (event) => {
+      if (event.target.id !== 'lesson-search') return;
+      this.navQuery = event.target.value;
+      this.filterLessons();
+    });
+
+    // "/" or Ctrl/Cmd+K jumps to lesson search, as on most docs sites.
+    document.addEventListener('keydown', (event) => {
+      const typing = event.target.closest?.('input, textarea, select, [contenteditable="true"]');
+      const shortcut = (event.key === '/' && !typing) || (event.key.toLowerCase() === 'k' && (event.ctrlKey || event.metaKey));
+      const search = this.root.querySelector('#lesson-search');
+      if (!shortcut || !search) return;
+      event.preventDefault();
+      search.closest('details').open = true;
+      search.focus();
+    });
+
     // Remember which folds (answer, sources, languages) are open, so a re-render
     // (a tab click, Mark as complete) keeps them open. "toggle" does not bubble.
     this.root.addEventListener(
       'toggle',
       (event) => {
+        if (event.target.classList?.contains('nav-section')) {
+          // Opening for a search is not the learner's choice; do not remember it.
+          if (this.navQuery.trim()) return;
+          this.openSections.set(event.target.dataset.sectionId, event.target.open);
+          return;
+        }
         const fold = FOLDS.find((name) => event.target.classList?.contains(name));
         if (!fold) return;
         if (event.target.open) this.openFolds.add(fold);
@@ -301,35 +397,27 @@ export class App {
   renderSectionMenu() {
     return this.sections
       .map((section) => {
-        const isActive = !this.home && section.id === this.activeSectionId;
-        const lessons = isActive && !this.home ? this.renderLessonMenu(section) : '';
-        const firstLesson = section.lessons[0];
+        const isActive = !this.notFound && section.id === this.activeSectionId;
+        // Sections expand in place; the active one starts open.
+        const open = this.openSections.get(section.id) ?? isActive;
+        const done = section.lessons.filter((lesson) => this.completed.has(`${section.id}/${lesson.id}`)).length;
 
-        // aria-current="true" marks the current section in the list of
-        // sections; the lesson link below carries aria-current="page".
         return `
-          <section class="nav-section">
-            <a
-              id="section-link-${section.id}"
-              class="section-link ${isActive ? 'is-active' : ''}"
-              href="${lessonPath(section.id, firstLesson.id)}"
-              data-section-id="${section.id}"
-              data-lesson-id="${firstLesson.id}"
-              ${isActive ? 'aria-current="true"' : ''}
-            >
+          <details class="nav-section" data-section-id="${section.id}" ${open ? 'open' : ''}>
+            <summary id="section-link-${section.id}" class="section-link ${isActive ? 'is-active' : ''}">
               <span>${escapeHtml(section.title)}</span>
-              <span>${section.lessons.filter((lesson) => this.completed.has(`${section.id}/${lesson.id}`)).length}/${section.lessons.length}</span>
-            </a>
-            ${lessons}
-          </section>
+              <span class="section-count">${done}/${section.lessons.length}</span>
+              ${icon('chevronDown')}
+            </summary>
+            ${this.renderLessonMenu(section)}
+          </details>
         `;
       })
       .join('');
   }
 
   /**
-   * The lesson menu is shown only for the active section.
-   * This keeps the navigation small while the course grows.
+   * The lessons of one section, with done / here / not yet marks.
    */
   renderLessonMenu(section) {
     return `
@@ -400,17 +488,16 @@ export class App {
     const jumps = [
       this.activeLesson.demo && ['demo-title', 'Demo'],
       /\*\*When to use it:\*\*/.test(markdown) && ['when-to-use', 'When to use it'],
-      /^## Cost Cheat Sheet$/m.test(markdown) && ['cost', 'Cost'],
-      /^## What To Remember$/m.test(markdown) && ['remember', 'Key points'],
-      /^## Practice Prompt$/m.test(markdown) && ['practice', 'Practice'],
+      /^## Cost Cheat Sheet$/m.test(markdown) && ['cost-cheat-sheet', 'Cost'],
+      /^## What To Remember$/m.test(markdown) && ['what-to-remember', 'Key points'],
+      /^## Practice Prompt$/m.test(markdown) && ['practice-prompt', 'Practice'],
     ].filter(Boolean);
     const header = this.renderLessonHeader(jumps);
     const reopen = (html) =>
       FOLDS.reduce((out, fold) => (this.openFolds.has(fold) ? out.replace(`<details class="${fold}">`, `<details class="${fold}" open>`) : out), html);
+    // Every section heading gets an id, for "On this page" and the jump list.
     let article = this.markdownRenderer.render(markdown)
-      .replace('<h2>Cost Cheat Sheet</h2>', '<h2 id="cost">Cost Cheat Sheet</h2>')
-      .replace('<h2>What To Remember</h2>', '<h2 id="remember">What To Remember</h2>')
-      .replace('<h2>Practice Prompt</h2>', '<h2 id="practice">Practice Prompt</h2>')
+      .replace(/<h2>((?!Sources Checked<)[\s\S]*?)<\/h2>/g, (_, text) => `<h2 id="${slugify(text)}">${text}</h2>`)
       .replace('<aside class="callout callout-when-to-use-it">', '<aside class="callout callout-when-to-use-it" id="when-to-use">');
     const opening = /(<h1>[\s\S]*?<\/h1>)<p>([\s\S]*?<\/p>)/;
     article = opening.test(article)
@@ -432,12 +519,20 @@ export class App {
     const inline = article.includes(DEMO_MARKER);
 
     return reopen(`
-      <article class="lesson-content">
-        ${inline ? article.replace(DEMO_MARKER, () => panel) : article}
-      </article>
-      ${inline ? '' : panel}
-      ${this.renderLanguageComparison()}
-      ${this.renderLessonFooter()}
+      <div class="lesson-layout">
+        <div class="lesson-column">
+          <article class="lesson-content">
+            ${inline ? article.replace(DEMO_MARKER, () => panel) : article}
+          </article>
+          ${inline ? '' : panel}
+          ${this.renderLanguageComparison()}
+          ${this.renderLessonFooter()}
+        </div>
+        <nav class="toc" aria-label="On this page">
+          <p>${icon('list')} On this page</p>
+          <ol></ol>
+        </nav>
+      </div>
     `);
   }
 
@@ -448,7 +543,7 @@ export class App {
     const link = (entry, label) =>
       entry
         ? `<a class="lesson-step" href="${lessonPath(entry.section.id, entry.lesson.id)}" data-section-id="${entry.section.id}" data-lesson-id="${entry.lesson.id}">
-            <span>${label}</span><strong>${escapeHtml(entry.lesson.title)}</strong>
+            <span>${label}</span><strong>${escapeHtml(entry.lesson.title)}</strong><small>${escapeHtml(entry.lesson.summary)}</small>
           </a>`
         : '<span></span>';
     const done = this.completed.has(this.activeKey);
@@ -472,6 +567,70 @@ export class App {
         </nav>
       </footer>
     `;
+  }
+
+  /** The theme follows the system until the learner picks one (stored in this browser). */
+  get isDark() {
+    const picked = document.documentElement.dataset.theme;
+    return picked ? picked === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+
+  toggleTheme() {
+    const next = this.isDark ? 'light' : 'dark';
+    document.documentElement.dataset.theme = next;
+    try {
+      localStorage.setItem('simplified-dsa:theme', next);
+    } catch {
+      // Blocked storage: the choice lasts until the page reloads.
+    }
+    this.render({ focusId: 'theme-toggle' });
+  }
+
+  /** Hide lessons that do not match the search; open every section while searching. */
+  filterLessons() {
+    const query = this.navQuery.trim().toLowerCase();
+    let shown = 0;
+    this.root.querySelectorAll('.nav-section').forEach((section) => {
+      let sectionShown = 0;
+      section.querySelectorAll('.lesson-link').forEach((link) => {
+        const match = !query || link.textContent.toLowerCase().includes(query);
+        link.hidden = !match;
+        sectionShown += match ? 1 : 0;
+      });
+      section.hidden = sectionShown === 0;
+      // While searching every section opens; clearing the search restores them.
+      const id = section.dataset.sectionId;
+      section.open = query ? true : (this.openSections.get(id) ?? (!this.notFound && id === this.activeSectionId));
+      shown += sectionShown;
+    });
+    const empty = this.root.querySelector('.nav-empty');
+    if (empty) empty.hidden = shown > 0;
+  }
+
+  /**
+   * "On this page": every h2 in the lesson and demo, with the one being read
+   * marked as the reader scrolls. Built from the rendered page, so it always
+   * matches the headings.
+   */
+  buildToc() {
+    this.tocObserver?.disconnect();
+    const list = this.root.querySelector('.toc ol');
+    if (!list) return;
+    const headings = [...this.root.querySelectorAll('.lesson-main h2[id]')];
+    list.innerHTML = headings
+      .map((h) => `<li><a href="#${h.id}" data-toc="${h.id}">${escapeHtml(h.textContent.replace(/^Try it: /, 'Demo: '))}</a></li>`)
+      .join('');
+    if (typeof IntersectionObserver !== 'function') return;
+    const links = new Map([...list.querySelectorAll('a')].map((a) => [a.dataset.toc, a]));
+    this.tocObserver = new IntersectionObserver(
+      (entries) => {
+        const visible = entries.filter((e) => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
+        if (!visible) return;
+        links.forEach((a, id) => a.toggleAttribute('aria-current', id === visible.target.id));
+      },
+      { rootMargin: '0px 0px -70% 0px' },
+    );
+    headings.forEach((h) => this.tocObserver.observe(h));
   }
 
   get activeKey() {
@@ -529,36 +688,84 @@ export class App {
     const doneCount = all.filter(isDone).length;
     const nextUp = all.find((entry) => !isDone(entry)) ?? all[0];
     const startLabel = doneCount ? `Continue: ${nextUp.lesson.title}` : `Start with ${nextUp.lesson.title}`;
+    const linkTo = (entry) => `href="${lessonPath(entry.section.id, entry.lesson.id)}" data-section-id="${entry.section.id}" data-lesson-id="${entry.lesson.id}"`;
     const lessonLink = (entry) => `
       <li>
-        <a class="course-lesson" href="${lessonPath(entry.section.id, entry.lesson.id)}" data-section-id="${entry.section.id}" data-lesson-id="${entry.lesson.id}">
+        <a class="course-lesson" ${linkTo(entry)}>
           <span class="lesson-status ${isDone(entry) ? 'is-done' : ''}">${isDone(entry) ? `${icon('check')}<span class="sr-only">Completed: </span>` : ''}</span>
           <strong>${escapeHtml(entry.lesson.title)}</strong>
           <span class="lesson-summary">${escapeHtml(entry.lesson.summary)}</span>
           <span class="course-meta">${[entry.lesson.minutes && `${entry.lesson.minutes} min`, entry.lesson.level].filter(Boolean).map(escapeHtml).join(' · ')}</span>
         </a>
       </li>`;
+    // One card per section; it opens the first lesson the learner has not finished.
+    const sectionCard = (section, i) => {
+      const entries = section.lessons.map((lesson) => ({ section, lesson }));
+      const done = entries.filter(isDone).length;
+      const target = entries.find((entry) => !isDone(entry)) ?? entries[0];
+      const art = SECTION_ART[i % SECTION_ART.length];
+      return `
+        <li>
+          <a class="section-card" ${linkTo(target)}>
+            <span class="section-card-art" style="--art-a:${art.a};--art-b:${art.b};--art-c:${art.c}" aria-hidden="true">
+              ${waves()}
+              <span class="section-card-mark">${icon(art.icon)}</span>
+            </span>
+            <span class="section-card-tab">${section.lessons.length} lessons</span>
+            <strong>${escapeHtml(section.title)}</strong>
+            <span class="lesson-summary">${escapeHtml(section.description)}</span>
+            <span class="course-meta">${done ? `${done} of ${section.lessons.length} done` : `Starts with ${escapeHtml(target.lesson.title)}`}</span>
+          </a>
+        </li>`;
+    };
 
     return `
-      <article class="lesson-content home">
-        <h1>See every step of data structures and algorithms</h1>
-        <p class="lead">Free lessons for complete beginners: plain words, a small example traced by hand, and a demo you drive yourself, one step at a time. No account, no tracking.</p>
-        ${this.markdownRenderer.render(HOME_FIGURE)}
-        <p class="home-actions">
-          <a class="demo-button is-primary" href="${lessonPath(nextUp.section.id, nextUp.lesson.id)}" data-section-id="${nextUp.section.id}" data-lesson-id="${nextUp.lesson.id}">${escapeHtml(startLabel)} ${icon('arrowRight')}</a>
-          <span class="home-progress">${doneCount} of ${all.length} lessons done</span>
-        </p>
-        ${this.sections
-          .map(
-            (section) => `
-          <section class="course-section" aria-labelledby="course-${section.id}">
-            <h2 id="course-${section.id}">${escapeHtml(section.title)}</h2>
-            <p>${escapeHtml(section.description)}</p>
-            <ol class="course-list">${section.lessons.map((lesson) => lessonLink({ section, lesson })).join('')}</ol>
-          </section>`,
-          )
-          .join('')}
-      </article>
+      <div class="home">
+        <section class="hero" aria-labelledby="home-title">
+          <div class="hero-text">
+            <h1 id="home-title">See every step.<span>Learn DSA by tracing it.</span></h1>
+            <p class="lead">Free lessons for complete beginners: plain words, a small example traced by hand, and a demo you drive yourself, one step at a time.</p>
+            <p class="home-actions">
+              <a class="demo-button is-primary" ${linkTo(nextUp)}>${escapeHtml(startLabel)} ${icon('arrowRight')}</a>
+              <a class="demo-button" href="#course-map">${icon('list')} Browse all lessons</a>
+            </p>
+            <ul class="hero-checks">
+              <li>${icon('check')} ${all.length} lessons, basics to patterns</li>
+              <li>${icon('check')} A demo you drive in every lesson</li>
+              <li>${icon('check')} No account, no tracking</li>
+            </ul>
+          </div>
+          <div class="hero-figure">${this.markdownRenderer.render(HOME_FIGURE)}</div>
+        </section>
+
+        <section class="home-block" aria-labelledby="sections-title">
+          <h2 id="sections-title">Three parts, one path</h2>
+          <p class="home-block-lead">Start with the shapes data takes, then the steps that act on it, then the patterns interviews reuse.</p>
+          <ol class="section-cards">${this.sections.map(sectionCard).join('')}</ol>
+        </section>
+
+        <section class="home-block" id="course-map" aria-labelledby="map-title" tabindex="-1">
+          <div class="home-block-head">
+            <h2 id="map-title">Course map</h2>
+            <span class="home-progress">${doneCount} of ${all.length} lessons done</span>
+          </div>
+          ${this.sections
+            .map(
+              (section) => `
+            <section class="course-section" aria-labelledby="course-${section.id}">
+              <h3 id="course-${section.id}">${escapeHtml(section.title)}</h3>
+              <ol class="course-list">${section.lessons.map((lesson) => lessonLink({ section, lesson })).join('')}</ol>
+            </section>`,
+            )
+            .join('')}
+        </section>
+
+        <section class="home-closing" aria-labelledby="closing-title">
+          <h2 id="closing-title">Your first lesson takes about ${nextUp.lesson.minutes ?? 12} minutes.</h2>
+          <p>Read it, trace it, then drive the demo yourself. Progress stays in this browser.</p>
+          <a class="demo-button is-primary" ${linkTo(nextUp)}>${escapeHtml(startLabel)} ${icon('arrowRight')}</a>
+        </section>
+      </div>
     `;
   }
 
@@ -637,7 +844,7 @@ export class App {
       <summary>Compare this in ${examples.length} programming languages</summary>
       <section class="language-panel" aria-label="Language comparison">
         <div class="language-panel-header">
-          <h2>Language comparison</h2>
+          <h2 id="language-comparison">Language comparison</h2>
           <p>Same core idea, different syntax, runtime, and memory model.</p>
         </div>
         <div class="language-tabs" role="tablist" aria-label="Programming languages">

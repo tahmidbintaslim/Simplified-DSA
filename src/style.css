@@ -7,64 +7,72 @@
 
 :root {
   /*
-   * Design tokens. "Margin Notes": warm paper by day (default), the original
-   * night palette when the system asks for dark. State roles keep the same
-   * meaning in both: look = gold (being looked at), done = teal (moved, done,
-   * on the path), ruled out = faded and crossed out.
+   * Design tokens. "Clear Steps": a clean white docs world with one blue
+   * accent, and a near-black night theme. The theme follows the system unless
+   * the learner picks one (html[data-theme]). State roles keep their meaning in
+   * both: look = gold (being looked at), done = teal (moved, done, on the
+   * path), ruled out = faded and crossed out. Blue is for navigation and
+   * actions only, never a step state.
    */
-  color-scheme: light dark;
+  color-scheme: light;
 
-  --font-body: "Literata Variable", Georgia, "Times New Roman", serif;
-  --font-display: "Fraunces Variable", Georgia, serif;
-  --font-mono: "JetBrains Mono Variable", ui-monospace, "SFMono-Regular", Consolas, monospace;
-  --font-ui: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-body: "Geist Variable", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-display: "Geist Variable", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "Geist Mono Variable", ui-monospace, "SFMono-Regular", Consolas, monospace;
+  --font-ui: "Geist Variable", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 
-  --page: #f6f1e7;
-  --surface: #efe7d8;
-  --sunken: #fffdf8;
-  --raised: #fffdf8;
-  --code-bg: #efe6d4;
-  --hover: #ebe1cd;
-  --line: #dccfb8;
-  --line-soft: #e7ddcb;
-  --line-strong: #c4b498;
-  --edge: #b5a68d;
-  --neutral-fill: #c9bda8;
-  --accent-line: #b8924a;
+  --page: #ffffff;
+  --surface: #f8f8f9;
+  --sunken: #ffffff;
+  --raised: #ffffff;
+  --code-bg: #f4f4f5;
+  --hover: #f1f1f3;
+  --line: #e4e4e7;
+  --line-soft: #efeff1;
+  --line-strong: #d4d4d8;
+  --edge: #a1a1aa;
+  --neutral-fill: #d4d4d8;
+  --accent-line: #2563eb;
 
-  --ink-strong: #1d1813;
-  --ink: #2a241d;
-  --ink-body: #2c261f;
-  --ink-code: #3b3226;
-  --ink-caption: #2a241d;
-  --muted: #574e40;
-  --subtle: #645a4a;
-  --faint: #6f6553;
+  --ink-strong: #09090b;
+  --ink: #18181b;
+  --ink-body: #27272a;
+  --ink-code: #27272a;
+  --ink-caption: #18181b;
+  --muted: #52525b;
+  --subtle: #5c5c66;
+  --faint: #6b6b74;
+
+  --accent: #1d4ed8;
+  --accent-hover: #1e40af;
+  --accent-soft: #e0e9ff;
+  --accent-ink: #1d4ed8;
+  --on-accent: #ffffff;
+  --link: #1d4ed8;
 
   --look: #8a5e04;
-  --link: #8a5600;
-  --look-line: #c08f2c;
-  --look-fill: #f4d58c;
-  --look-soft: #fbecc6;
-  --on-look: #2b1f04;
+  --look-line: #d4a12f;
+  --look-fill: #fde68a;
+  --look-soft: #fef3c7;
+  --on-look: #3b2a04;
 
-  --done: #0f6f68;
-  --done-fill: #cde8e3;
-  --visited: #e2f1ee;
-  --on-done-fill: #0b4f4a;
+  --done: #0f766e;
+  --done-fill: #ccfbf1;
+  --visited: #ecfdf9;
+  --on-done-fill: #115e59;
   --on-done: #ffffff;
 
-  --danger: #b03a2a;
-  --danger-fill: #f7dcd6;
-  --danger-ink: #9c2c1c;
+  --danger: #b91c1c;
+  --danger-fill: #fee2e2;
+  --danger-ink: #b91c1c;
   --on-danger: #ffffff;
 
-  --analogy: #4b8650;
-  --analogy-ink: #356b3b;
-  --orange: #b4602a;
-  --on-solid: #14110c;
+  --analogy: #15803d;
+  --analogy-ink: #166534;
+  --orange: #c2410c;
+  --on-solid: #09090b;
 
-  --shadow-paper: 0 1px 0 rgb(60 45 20 / 6%), 0 8px 24px -12px rgb(60 45 20 / 22%);
+  --shadow-paper: 0 1px 2px rgb(9 9 11 / 4%), 0 6px 20px -10px rgb(9 9 11 / 12%);
 
   font-family: var(--font-body);
   background: var(--page);
@@ -74,37 +82,44 @@
   -webkit-font-smoothing: antialiased;
 }
 
-/* Night: the original palette, for learners whose system is set to dark. */
+/* Night: follows the system unless the learner picked light. */
 @media (prefers-color-scheme: dark) {
-  :root {
-    --page: #11110f;
-    --surface: #171612;
-    --sunken: #191711;
-    --raised: #1d1b16;
-    --code-bg: #201d17;
-    --hover: #272318;
-    --line: #302d26;
-    --line-soft: #2a2721;
-    --line-strong: #3a352b;
-    --edge: #4a4436;
-    --neutral-fill: #5a523f;
-    --accent-line: #7b6842;
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page: #0b0b0d;
+    --surface: #111114;
+    --sunken: #141417;
+    --raised: #18181b;
+    --code-bg: #18181b;
+    --hover: #1f1f23;
+    --line: #27272a;
+    --line-soft: #1f1f23;
+    --line-strong: #3f3f46;
+    --edge: #52525b;
+    --neutral-fill: #52525b;
+    --accent-line: #3b82f6;
 
-    --ink-strong: #f5f0e6;
-    --ink: #ece8dd;
-    --ink-body: #ddd5c6;
-    --ink-code: #eadfc9;
-    --ink-caption: #f1e6cf;
-    --muted: #bdb3a3;
-    --subtle: #a99f8d;
-    --faint: #8f8676;
+    --ink-strong: #fafafa;
+    --ink: #f4f4f5;
+    --ink-body: #d4d4d8;
+    --ink-code: #e4e4e7;
+    --ink-caption: #f4f4f5;
+    --muted: #a1a1aa;
+    --subtle: #a1a1aa;
+    --faint: #8b8b94;
 
-    --look: #f1cd86;
-    --link: #d9b36a;
+    --accent: #2563eb;
+    --accent-hover: #3b82f6;
+    --accent-soft: #172554;
+    --accent-ink: #93b4ff;
+    --on-accent: #ffffff;
+    --link: #8ab0ff;
+
+    --look: #fcd34d;
     --look-line: #b8924a;
     --look-fill: #4a3a17;
     --look-soft: #33291a;
-    --on-look: #fbf0d6;
+    --on-look: #fef3c7;
 
     --done: #4f9c94;
     --done-fill: #18332f;
@@ -112,18 +127,75 @@
     --on-done-fill: #8fd0c8;
     --on-done: #0e1f1d;
 
-    --danger: #c4574a;
+    --danger: #ef4444;
     --danger-fill: #3a1f1b;
-    --danger-ink: #ec9a8f;
+    --danger-ink: #fca5a5;
     --on-danger: #fff4f2;
 
-    --analogy: #6aa36f;
-    --analogy-ink: #9bd09f;
-    --orange: #c97a3d;
-    --on-solid: #11110f;
+    --analogy: #4ade80;
+    --analogy-ink: #86efac;
+    --orange: #fb923c;
+    --on-solid: #0b0b0d;
 
-    --shadow-paper: 0 1px 0 rgb(0 0 0 / 30%), 0 10px 28px -14px rgb(0 0 0 / 60%);
+    --shadow-paper: 0 1px 2px rgb(0 0 0 / 40%), 0 8px 24px -12px rgb(0 0 0 / 70%);
   }
+}
+
+/* Night, picked by the learner with the theme button. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0b0b0d;
+  --surface: #111114;
+  --sunken: #141417;
+  --raised: #18181b;
+  --code-bg: #18181b;
+  --hover: #1f1f23;
+  --line: #27272a;
+  --line-soft: #1f1f23;
+  --line-strong: #3f3f46;
+  --edge: #52525b;
+  --neutral-fill: #52525b;
+  --accent-line: #3b82f6;
+
+  --ink-strong: #fafafa;
+  --ink: #f4f4f5;
+  --ink-body: #d4d4d8;
+  --ink-code: #e4e4e7;
+  --ink-caption: #f4f4f5;
+  --muted: #a1a1aa;
+  --subtle: #a1a1aa;
+  --faint: #8b8b94;
+
+  --accent: #2563eb;
+  --accent-hover: #3b82f6;
+  --accent-soft: #172554;
+  --accent-ink: #93b4ff;
+  --on-accent: #ffffff;
+  --link: #8ab0ff;
+
+  --look: #fcd34d;
+  --look-line: #b8924a;
+  --look-fill: #4a3a17;
+  --look-soft: #33291a;
+  --on-look: #fef3c7;
+
+  --done: #4f9c94;
+  --done-fill: #18332f;
+  --visited: #1f3a36;
+  --on-done-fill: #8fd0c8;
+  --on-done: #0e1f1d;
+
+  --danger: #ef4444;
+  --danger-fill: #3a1f1b;
+  --danger-ink: #fca5a5;
+  --on-danger: #fff4f2;
+
+  --analogy: #4ade80;
+  --analogy-ink: #86efac;
+  --orange: #fb923c;
+  --on-solid: #0b0b0d;
+
+  --shadow-paper: 0 1px 2px rgb(0 0 0 / 40%), 0 8px 24px -12px rgb(0 0 0 / 70%);
 }
 
 * {
@@ -2455,4 +2527,1012 @@ a.site-title:hover {
   .demo-stage {
     padding-inline: 10px;
   }
+}
+
+/* ======================================================================
+   Clear Steps: a white docs world (top bar, lesson tree, "On this page"),
+   one blue accent for navigation and actions, gold and teal kept for steps.
+   This layer sits last on purpose: it re-skins the components above.
+   ====================================================================== */
+
+body {
+  background: var(--page);
+  color: var(--ink);
+  font-size: 1rem;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+}
+
+a {
+  color: var(--link);
+  text-underline-offset: 3px;
+}
+
+:focus-visible,
+a:focus-visible,
+button:focus-visible,
+summary:focus-visible,
+input:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.lesson-content h1,
+.lesson-content h2,
+.lesson-content h3,
+.language-panel-header h2,
+.home h1,
+.home h2,
+.home h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.022em;
+  text-wrap: balance;
+}
+
+.lesson-content h1 {
+  font-size: clamp(2rem, 4vw, 2.6rem);
+  line-height: 1.12;
+  letter-spacing: -0.03em;
+}
+
+.lesson-content h2 {
+  font-size: 1.6rem;
+  line-height: 1.25;
+}
+
+.lesson-content > p.lead,
+.lesson-content p.lead {
+  color: var(--muted);
+  font-size: 1.16rem;
+  line-height: 1.6;
+}
+
+.skip-link {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+/* --- Buttons: blue for the main action, outlined for the rest. --- */
+.demo-button {
+  border-color: var(--line-strong);
+  border-radius: 8px;
+  background: var(--raised);
+  color: var(--ink-strong);
+  font-weight: 500;
+}
+
+.demo-button:hover {
+  border-color: var(--edge);
+  background: var(--hover);
+}
+
+.demo-button.is-primary {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 600;
+}
+
+.demo-button.is-primary:hover {
+  border-color: var(--accent-hover);
+  background: var(--accent-hover);
+}
+
+.demo-button.is-done {
+  border-color: color-mix(in srgb, var(--done) 45%, var(--line));
+  background: color-mix(in srgb, var(--done) 10%, var(--raised));
+  color: var(--on-done-fill);
+}
+
+.demo-input {
+  border-radius: 8px;
+}
+
+.icon-button {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.icon-button:hover {
+  background: var(--hover);
+}
+
+/* --- Top bar --- */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  border-bottom: 1px solid var(--line);
+  background: color-mix(in srgb, var(--page) 92%, transparent);
+  backdrop-filter: saturate(1.4) blur(10px);
+}
+
+.topbar-inner {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  height: 64px;
+  padding: 0 clamp(16px, 3vw, 32px);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--ink-strong);
+  font-size: 1.12rem;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+}
+
+.brand img {
+  border-radius: 7px;
+}
+
+.topnav {
+  display: flex;
+  gap: 4px;
+}
+
+.topnav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  border-radius: 8px;
+  padding: 0 12px;
+  color: var(--ink);
+  font-size: 0.95rem;
+  text-decoration: none;
+}
+
+.topnav a:hover {
+  background: var(--hover);
+}
+
+.topnav a[aria-current] {
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+
+.topbar-actions {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+}
+
+/* --- Shell: lesson tree | lesson | on this page --- */
+.app-shell {
+  grid-template-columns: 280px minmax(0, 1fr);
+  min-height: calc(100vh - 64px);
+}
+
+.app-shell.is-home {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.lesson-sidebar {
+  border-right: 1px solid var(--line);
+  background: var(--surface);
+  padding: 20px 14px;
+}
+
+.lesson-main {
+  width: 100%;
+  max-width: none;
+  padding: 44px clamp(20px, 4vw, 48px) 72px;
+}
+
+.lesson-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 760px);
+  gap: 56px;
+}
+
+.lesson-column > *,
+.lesson-content,
+.lesson-content .lesson-header,
+.demo-panel,
+.lesson-footer {
+  max-width: none;
+}
+
+.toc {
+  display: none;
+}
+
+@media (min-width: 1200px) {
+  .lesson-layout {
+    grid-template-columns: minmax(0, 760px) 220px;
+  }
+
+  .toc {
+    position: sticky;
+    top: 96px;
+    display: block;
+    align-self: start;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+    font-size: 0.9rem;
+  }
+
+  /* The right column already lists every section. */
+  .lesson-jumps {
+    display: none;
+  }
+}
+
+.toc > p {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 10px;
+  color: var(--subtle);
+}
+
+.toc .icon {
+  width: 16px;
+  height: 16px;
+}
+
+.toc ol {
+  margin: 0;
+  border-left: 1px solid var(--line);
+  padding: 0;
+  list-style: none;
+}
+
+.toc a {
+  display: block;
+  margin-left: -1px;
+  border-left: 1px solid transparent;
+  padding: 6px 0 6px 14px;
+  color: var(--muted);
+  line-height: 1.4;
+  text-decoration: none;
+}
+
+.toc a:hover {
+  color: var(--ink-strong);
+}
+
+.toc a[aria-current] {
+  border-left-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+/* --- Lesson tree --- */
+.nav-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  margin-bottom: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--raised);
+  padding: 0 10px;
+  color: var(--subtle);
+}
+
+.nav-search:focus-within {
+  border-color: var(--accent);
+}
+
+.nav-search .icon {
+  flex: none;
+  width: 18px;
+  height: 18px;
+}
+
+.nav-search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink-strong);
+  font: inherit;
+  font-size: 0.94rem;
+  outline: none;
+}
+
+.nav-search kbd {
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 0 6px;
+  color: var(--subtle);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+}
+
+.nav-empty {
+  margin: 8px 6px;
+  color: var(--subtle);
+  font-size: 0.92rem;
+}
+
+.nav-section + .nav-section {
+  margin-top: 4px;
+}
+
+.nav-section > summary {
+  list-style: none;
+}
+
+.nav-section > summary::-webkit-details-marker {
+  display: none;
+}
+
+.section-link {
+  display: flex;
+  gap: 8px;
+  min-height: 44px;
+  margin: 0;
+  border: 0;
+  border-radius: 8px;
+  padding: 8px 10px;
+  color: var(--ink-strong);
+  font-family: var(--font-ui);
+  font-size: 0.96rem;
+  font-weight: 600;
+}
+
+.section-link > span:first-child {
+  flex: 1;
+}
+
+.section-link .section-count {
+  color: var(--subtle);
+  font-size: 0.84rem;
+  font-weight: 500;
+}
+
+.section-link .icon {
+  width: 16px;
+  height: 16px;
+  color: var(--subtle);
+  transform: rotate(-90deg);
+  transition: transform 160ms ease;
+}
+
+.nav-section[open] > .section-link .icon {
+  transform: none;
+}
+
+.section-link.is-active {
+  background: transparent;
+}
+
+.section-link:hover {
+  background: var(--hover);
+}
+
+.lesson-list {
+  margin: 2px 0 8px 14px;
+  border-left: 1px solid var(--line);
+  padding: 2px 0 2px 8px;
+}
+
+.lesson-link {
+  grid-template-columns: 20px minmax(0, 1fr);
+  align-items: center;
+  min-height: 40px;
+  border-radius: 8px;
+  padding: 7px 8px 7px 6px;
+}
+
+.lesson-link .lesson-summary {
+  display: none;
+}
+
+.lesson-link strong {
+  color: var(--muted);
+  font-size: 0.93rem;
+  font-weight: 500;
+}
+
+.lesson-status {
+  grid-row: auto;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+}
+
+.lesson-status .icon {
+  width: 12px;
+  height: 12px;
+}
+
+.lesson-link:hover {
+  background: var(--hover);
+}
+
+.lesson-link:hover strong {
+  color: var(--ink-strong);
+}
+
+.lesson-link.is-active {
+  background: var(--accent-soft);
+}
+
+.lesson-link.is-active strong {
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+
+.lesson-link.is-active .lesson-status {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 3px var(--accent-soft), inset 0 0 0 10px var(--accent);
+}
+
+.lesson-link.is-active .lesson-status.is-done {
+  box-shadow: 0 0 0 2px var(--accent-soft), 0 0 0 3px var(--accent);
+}
+
+@media (min-width: 761px) {
+  .lesson-sidebar {
+    top: 64px;
+    height: calc(100vh - 64px);
+  }
+}
+
+/* --- Lesson header: meta line, goals, jump list --- */
+.lesson-content .lesson-header {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: none;
+}
+
+.lesson-level {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--line));
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+}
+
+.lesson-goals ::marker,
+.lesson-content ul ::marker {
+  color: var(--accent);
+}
+
+.lesson-jumps a {
+  border-color: var(--line);
+  background: var(--raised);
+}
+
+.lesson-jumps a:hover {
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+/* --- Figures, demos, quizzes: flat white cards with hairlines. --- */
+.cells-figure,
+.demo-stage,
+.quiz,
+.callout,
+.trace-code,
+.trace-vars,
+.table-wrap {
+  box-shadow: none;
+}
+
+.demo {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+  box-shadow: none;
+}
+
+.demo-panel .language-panel-header h2 {
+  font-size: 1.45rem;
+}
+
+.quiz {
+  border-radius: 12px;
+}
+
+.quiz-option {
+  border-radius: 10px;
+}
+
+.step-badge {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+/* --- Lesson ending: previous / next as cards with a line of what comes. --- */
+.lesson-steps {
+  gap: 14px;
+}
+
+.lesson-step {
+  display: grid;
+  gap: 6px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--raised);
+  padding: 16px 18px;
+  color: var(--ink-strong);
+  text-decoration: none;
+}
+
+.lesson-step:hover {
+  border-color: var(--accent);
+  background: var(--raised);
+}
+
+.lesson-step span {
+  color: var(--subtle);
+  font-size: 0.86rem;
+}
+
+.lesson-step strong {
+  font-size: 1.02rem;
+  font-weight: 600;
+}
+
+.lesson-step small {
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.lesson-footer.is-done {
+  border-color: color-mix(in srgb, var(--done) 35%, var(--line));
+  background: color-mix(in srgb, var(--done) 6%, var(--page));
+}
+
+.lesson-footer.is-done .completion-note {
+  font-family: var(--font-ui);
+  font-size: 1.08rem;
+  font-weight: 500;
+}
+
+/* --- Home --- */
+.home {
+  width: min(100%, 1140px);
+  margin: 0 auto;
+}
+
+/* The hero glow may reach past the column, never past the page. */
+.lesson-main:has(.home) {
+  overflow-x: clip;
+}
+
+.lesson-main:has(.home) {
+  padding-top: 0;
+}
+
+.hero {
+  position: relative;
+  display: grid;
+  gap: 40px;
+  align-items: center;
+  padding: clamp(48px, 9vw, 104px) 0 clamp(40px, 6vw, 72px);
+}
+
+.hero::before {
+  /* A soft blue light behind the drawn step. */
+  content: "";
+  position: absolute;
+  inset: 0 -20vw 0 30%;
+  z-index: -1;
+  background: radial-gradient(48% 52% at 62% 50%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 72%);
+  pointer-events: none;
+}
+
+.hero h1 {
+  margin: 0 0 20px;
+  color: var(--ink-strong);
+  font-size: clamp(2.5rem, 5.6vw, 4.1rem);
+  line-height: 1.04;
+  letter-spacing: -0.04em;
+}
+
+.hero h1 span {
+  display: block;
+  color: var(--accent-ink);
+}
+
+.hero .lead {
+  max-width: 34rem;
+  margin: 0 0 28px;
+  color: var(--muted);
+  font-size: 1.16rem;
+  line-height: 1.6;
+}
+
+.home .home-actions {
+  margin: 0 0 22px;
+}
+
+.home .home-actions .demo-button {
+  min-height: 48px;
+  padding: 0 20px;
+}
+
+.hero-checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+  margin: 0;
+  padding: 0;
+  color: var(--muted);
+  font-size: 0.94rem;
+  list-style: none;
+}
+
+.hero-checks li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hero-checks .icon {
+  width: 16px;
+  height: 16px;
+  color: var(--done);
+  stroke-width: 2;
+}
+
+.hero-figure .cells-figure {
+  margin: 0;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--raised);
+  padding: 22px;
+  box-shadow: 0 1px 2px rgb(9 9 11 / 4%), 0 24px 48px -24px color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+.hero-figure .array-row {
+  gap: 6px;
+}
+
+@media (min-width: 900px) {
+  .hero {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  }
+
+  .hero-figure .array-value {
+    width: 48px;
+    height: 48px;
+    font-size: 1.05rem;
+  }
+}
+
+.home-block {
+  padding: 56px 0 8px;
+  border-top: 1px solid var(--line);
+}
+
+.home-block > h2,
+.home-block-head h2 {
+  margin: 0 0 8px;
+  color: var(--ink-strong);
+  font-size: clamp(1.8rem, 3.4vw, 2.4rem);
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+}
+
+.home-block-lead {
+  max-width: 40rem;
+  margin: 0 0 28px;
+  color: var(--muted);
+  font-size: 1.06rem;
+}
+
+.home-block-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 20px;
+  margin-bottom: 20px;
+}
+
+.section-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+  margin: 0 0 48px;
+  padding: 0;
+  list-style: none;
+}
+
+.section-card {
+  display: grid;
+  gap: 6px;
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: var(--raised);
+  padding: 0 22px 22px;
+  color: var(--ink);
+  text-decoration: none;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.section-card:hover {
+  border-color: var(--edge);
+  box-shadow: 0 18px 40px -26px rgb(9 9 11 / 35%);
+}
+
+.section-card-art {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 168px;
+  margin: 0 -22px 0;
+}
+
+.section-card-art svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.section-card-mark {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  border: 1px solid rgb(255 255 255 / 55%);
+  border-radius: 18px;
+  background: rgb(255 255 255 / 28%);
+  color: #ffffff;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 10px 24px -12px rgb(0 0 0 / 35%);
+}
+
+.section-card-mark .icon {
+  width: 34px;
+  height: 34px;
+  stroke-width: 1.6;
+}
+
+/* The lesson count sits on a tab cut out of the banner's bottom-left corner. */
+.section-card-tab {
+  justify-self: start;
+  margin: -34px 0 6px -22px;
+  border-top-right-radius: 16px;
+  background: var(--raised);
+  padding: 10px 18px 6px 22px;
+  position: relative;
+  color: var(--subtle);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.section-card strong {
+  color: var(--ink-strong);
+  font-size: 1.3rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.section-card .lesson-summary {
+  color: var(--muted);
+  font-size: 0.97rem;
+  line-height: 1.5;
+}
+
+.section-card .course-meta {
+  margin-top: 6px;
+}
+
+.course-section {
+  margin: 0 0 28px;
+}
+
+.course-section > h3 {
+  margin: 0 0 12px;
+  color: var(--ink-strong);
+  font-size: 1.1rem;
+}
+
+.course-list {
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 10px;
+}
+
+.course-lesson {
+  height: 100%;
+  border-color: var(--line);
+  border-radius: 12px;
+  background: var(--raised);
+  box-shadow: none;
+}
+
+.course-lesson:hover {
+  border-color: var(--accent);
+}
+
+.course-lesson strong {
+  font-family: var(--font-ui);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.course-lesson .lesson-summary {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.home-progress,
+.course-meta {
+  font-family: var(--font-ui);
+}
+
+.home-closing {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  margin: 48px 0 24px;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background:
+    radial-gradient(60% 120% at 50% 0%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 70%),
+    var(--surface);
+  padding: clamp(36px, 6vw, 64px) 24px;
+  text-align: center;
+}
+
+.home-closing h2 {
+  max-width: 24ch;
+  margin: 0;
+  color: var(--ink-strong);
+  font-size: clamp(1.6rem, 3.4vw, 2.3rem);
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+}
+
+.home-closing p {
+  margin: 0 0 12px;
+  color: var(--muted);
+}
+
+.home-closing .demo-button {
+  min-height: 48px;
+  padding: 0 20px;
+}
+
+/* --- Footer --- */
+.site-footer {
+  border-top: 1px solid var(--line);
+  background: var(--page);
+}
+
+.site-footer-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 28px;
+  width: min(100%, 1140px);
+  margin: 0 auto;
+  padding: 28px clamp(16px, 3vw, 32px);
+}
+
+.site-footer p {
+  flex: 1 1 260px;
+  margin: 0;
+  color: var(--subtle);
+  font-size: 0.92rem;
+}
+
+.site-footer nav {
+  display: flex;
+  gap: 4px 18px;
+  flex-wrap: wrap;
+}
+
+.site-footer nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--muted);
+  font-size: 0.92rem;
+  text-decoration: none;
+}
+
+.site-footer nav a:hover {
+  color: var(--ink-strong);
+}
+
+.sidebar-footer {
+  display: none;
+}
+
+/* --- Phones --- */
+@media (max-width: 760px) {
+  .app-shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .topbar-inner {
+    gap: 8px;
+    height: 56px;
+  }
+
+  .brand span {
+    font-size: 1rem;
+  }
+
+  .topnav a:not([data-home]) {
+    display: none;
+  }
+
+  .topnav {
+    margin-left: auto;
+  }
+
+  .topbar-actions {
+    margin-left: 0;
+  }
+
+  .topbar-actions a {
+    display: none;
+  }
+
+  .lesson-sidebar {
+    background: var(--page);
+    padding: 12px 16px;
+  }
+
+  .nav-drawer > summary {
+    border-color: var(--line);
+    border-radius: 10px;
+    background: var(--surface);
+    font-family: var(--font-ui);
+  }
+
+  .nav-drawer > summary::after {
+    display: none;
+  }
+
+  .nav-drawer > summary .icon {
+    width: 18px;
+    height: 18px;
+    flex: none;
+    color: var(--subtle);
+  }
+
+  .nav-drawer[open] > summary {
+    margin-bottom: 12px;
+  }
+
+  .lesson-main {
+    padding: 24px 16px 56px;
+  }
+
+  .section-card-art {
+    height: 140px;
+  }
+}
+
+/* Controls that are not step states take the accent, not gold. */
+.demo-speed input[type='range'] {
+  accent-color: var(--accent);
+}
+
+.answer > summary::before,
+.sources > summary::before,
+.language-details > summary::before {
+  border-right-color: var(--accent);
+  border-bottom-color: var(--accent);
 }
