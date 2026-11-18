@@ -311,8 +311,12 @@ function memoryLane(root, { lang = 'en' }) {
     }
     if (cell || sizeButton) draw();
   });
-  // Place the arrow once the row has a width (after the widget is attached).
-  if (typeof ResizeObserver === 'function') new ResizeObserver(() => draw({ animate: false })).observe(row);
+  // On resize only the arrow moves; redrawing the cells would steal keyboard focus.
+  const placeArrow = () => {
+    const cell = row.children[index];
+    if (cell) animate(jump, { x: cell.offsetLeft + cell.offsetWidth / 2 - 6 }, { duration: 0 });
+  };
+  if (typeof ResizeObserver === 'function') new ResizeObserver(placeArrow).observe(row);
   draw({ animate: false });
 }
 

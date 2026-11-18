@@ -29,9 +29,9 @@
   "dependencies": {
     "@clerk/localizations": "^4.25.0",
     "@clerk/nextjs": "^7.10.1",
+    "@fontsource-variable/anek-bangla": "^5.3.0",
     "@fontsource-variable/geist": "^5.3.0",
     "@fontsource-variable/geist-mono": "^5.3.0",
-    "@fontsource-variable/noto-sans-bengali": "^5.3.0",
     "@modelcontextprotocol/sdk": "1.32.2",
     "@neondatabase/serverless": "^1.2.1",
     "motion": "^14.14.0",

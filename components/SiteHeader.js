@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import Link from 'next/link';
 import { Show, SignInButton, UserButton } from '@clerk/nextjs';
 import { course, lessonPath } from '../lib/course.js';
@@ -22,14 +23,17 @@ export default function SiteHeader({ lang }) {
         <div className="topbar-actions">
           <LangSwitch lang={lang} />
           <ThemeToggle labels={[t.switchTheme(false), t.switchTheme(true)]} />
-          <Show when="signed-out">
-            <SignInButton mode="redirect">
-              <button type="button" className="demo-button is-primary">{t.signIn}</button>
-            </SignInButton>
-          </Show>
-          <Show when="signed-in">
-            <UserButton />
-          </Show>
+          {/* Only the account button waits for Clerk; the rest of the header renders at once. */}
+          <Suspense fallback={<span className="auth-slot" aria-hidden="true" />}>
+            <Show when="signed-out">
+              <SignInButton mode="redirect">
+                <button type="button" className="demo-button is-primary">{t.signIn}</button>
+              </SignInButton>
+            </Show>
+            <Show when="signed-in">
+              <UserButton />
+            </Show>
+          </Suspense>
         </div>
       </div>
     </header>

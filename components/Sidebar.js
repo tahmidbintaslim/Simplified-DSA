@@ -12,17 +12,12 @@ export default function Sidebar({ lang, activeSection, activeLesson }) {
   const sections = course(lang);
   const [query, setQuery] = useState('');
   const [completed, setCompleted] = useState(() => new Set());
-  const [wide, setWide] = useState(true);
   const search = useRef(null);
 
   useEffect(() => {
     setCompleted(loadCompleted());
     const sync = () => setCompleted(loadCompleted());
     window.addEventListener('progress-change', sync);
-    const mq = matchMedia('(min-width: 761px)');
-    setWide(mq.matches);
-    const onMq = () => setWide(mq.matches);
-    mq.addEventListener('change', onMq);
     // "/" or Ctrl/Cmd+K jumps to lesson search.
     const onKey = (event) => {
       const typing = event.target.closest?.('input, textarea, select, [contenteditable="true"]');
@@ -35,7 +30,6 @@ export default function Sidebar({ lang, activeSection, activeLesson }) {
     document.addEventListener('keydown', onKey);
     return () => {
       window.removeEventListener('progress-change', sync);
-      mq.removeEventListener('change', onMq);
       document.removeEventListener('keydown', onKey);
     };
   }, []);
@@ -47,8 +41,8 @@ export default function Sidebar({ lang, activeSection, activeLesson }) {
 
   return (
     <aside className="lesson-sidebar" aria-label={t.courseNav}>
-      {/* Re-keyed per lesson so the phone drawer folds after a pick. */}
-      <details className="nav-drawer" open={wide || undefined} key={`${wide}:${activeSection}/${activeLesson}`}>
+      {/* Served closed (CSS keeps it visible on wide screens); re-keyed per lesson so the phone drawer folds after a pick. */}
+      <details className="nav-drawer" key={`${activeSection}/${activeLesson}`}>
         <summary>
           <span>{t.lessons}</span>
           <span className="nav-current">{lesson ? `${section.title} · ${lesson.title}` : t.chooseLesson}</span>

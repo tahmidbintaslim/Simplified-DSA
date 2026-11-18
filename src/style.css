@@ -18,7 +18,7 @@
 
   --font-body: "Geist Variable", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-display: "Geist Variable", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-mono: "Geist Mono Variable", ui-monospace, "SFMono-Regular", Consolas, monospace;
+  --font-mono: "Geist Mono Variable", "Anek Bangla Variable", ui-monospace, "SFMono-Regular", Consolas, monospace;
   --font-ui: "Geist Variable", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 
   --page: #ffffff;
@@ -1455,9 +1455,17 @@ button:focus-visible,
 }
 
 /* The lesson list is a <details> drawer: always open on wide screens (the
-   summary is hidden), a "Lessons" bar on phones. */
+   summary is hidden), a "Lessons" bar on phones. It is served closed, and CSS
+   shows its content on wide screens, so nothing flips open after load. */
 .nav-drawer > summary {
   display: none;
+}
+
+@media (min-width: 761px) {
+  .nav-drawer::details-content {
+    content-visibility: visible;
+    display: contents;
+  }
 }
 
 .sidebar-footer a {
@@ -4562,9 +4570,29 @@ input:focus-visible,
 
 /* ---------- Bangla text, language switch, "Go deeper" resources ---------- */
 
+/*
+ * Bangla pages use one family for every script: Anek Bangla draws Bangla and
+ * Latin as a matched pair, so mixed lines ("অ্যারে O(1)") never switch fonts
+ * mid-word. Code keeps Geist Mono (--font-mono), with Anek Bangla for any
+ * Bangla letters inside it.
+ * An element marked lang="en" inside a Bangla page (an untranslated lesson)
+ * switches back to Geist.
+ */
 :lang(bn) {
-  /* Noto Sans Bengali for Bangla letters; Geist still draws Latin and digits. */
-  font-family: "Geist Variable", "Noto Sans Bengali Variable", system-ui, sans-serif;
+  --font-body: "Anek Bangla Variable", system-ui, sans-serif;
+  --font-display: "Anek Bangla Variable", system-ui, sans-serif;
+  --font-ui: "Anek Bangla Variable", system-ui, sans-serif;
+}
+
+:lang(en) {
+  --font-body: "Geist Variable", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-display: "Geist Variable", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-ui: "Geist Variable", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+/* font-family inherits as a resolved value, so re-read the variables where the language changes. */
+[lang] {
+  font-family: var(--font-body);
 }
 
 :lang(bn) .lesson-content,
@@ -4941,4 +4969,11 @@ input:focus-visible,
 .bytes-cell.is-byte {
   font-family: var(--font-mono);
   font-size: 0.85rem;
+}
+
+/* Holds the account button's place while Clerk loads, so the header never shifts. */
+.auth-slot {
+  display: inline-block;
+  width: 32px;
+  height: 32px;
 }

@@ -4,7 +4,7 @@ import { ClerkProvider } from '@clerk/nextjs';
 import { bnIN } from '@clerk/localizations';
 import '@fontsource-variable/geist';
 import '@fontsource-variable/geist-mono';
-import '@fontsource-variable/noto-sans-bengali';
+import '@fontsource-variable/anek-bangla';
 import '../src/style.css';
 import SiteHeader from '../components/SiteHeader.js';
 import SiteFooter from '../components/SiteFooter.js';
@@ -32,9 +32,7 @@ export default async function RootLayout({ children }) {
       <body>
         <ClerkProvider localization={lang === 'bn' ? bnIN : undefined}>
           <a className="skip-link" href="#main">{dict(lang).skip}</a>
-          <Suspense>
-            <SiteHeader lang={lang} />
-          </Suspense>
+          <SiteHeader lang={lang} />
           {children}
           <SiteFooter lang={lang} />
           <Suspense>
