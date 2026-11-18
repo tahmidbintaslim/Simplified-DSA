@@ -9,16 +9,16 @@
       } catch {}
     </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="What Simplified DSA, its Claude plugin and its MCP connector collect: nothing about you." />
+    <meta name="description" content="What Simplified DSA collects: your account, and usage analytics only if you allow them." />
     <link rel="icon" type="image/png" href="/icon.png" />
     <title>Privacy | Simplified DSA</title>
     <style>
       /* Same white/night palette as the lessons (src/style.css tokens). */
-      :root { color-scheme: light dark; --page: #ffffff; --ink: #27272a; --head: #09090b; --link: #1d4ed8; --muted: #5c5c66; --code: #f4f4f5; }
+      :root { color-scheme: light dark; --page: #ffffff; --ink: #27272a; --head: #09090b; --link: #533afd; --muted: #5c5c66; --code: #f4f4f5; }
       @media (prefers-color-scheme: dark) {
-        :root:not([data-theme="light"]) { --page: #0b0b0d; --ink: #d4d4d8; --head: #fafafa; --link: #8ab0ff; --muted: #a1a1aa; --code: #18181b; }
+        :root:not([data-theme="light"]) { --page: #0a0a0a; --ink: #d4d4d8; --head: #fafafa; --link: #8ab0ff; --muted: #a1a1aa; --code: #18181b; }
       }
-      :root[data-theme="dark"] { --page: #0b0b0d; --ink: #d4d4d8; --head: #fafafa; --link: #8ab0ff; --muted: #a1a1aa; --code: #18181b; }
+      :root[data-theme="dark"] { --page: #0a0a0a; --ink: #d4d4d8; --head: #fafafa; --link: #8ab0ff; --muted: #a1a1aa; --code: #18181b; }
       body {
         margin: 0;
         background: var(--page);
@@ -39,28 +39,31 @@
     <main>
       <p><a href="/">← Back to the lessons</a></p>
       <h1>Privacy</h1>
-      <p class="updated">Last updated: 9 November 2026</p>
+      <p class="updated">Last updated: 18 November 2026</p>
 
-      <p>Short version: Simplified DSA does not collect, store, sell or share information about you. There are no accounts, no cookies, no analytics, no ads and no trackers.</p>
+      <p>Short version: Simplified DSA is free. To read the lessons you sign in with a free account. With your permission, we measure how the lessons are used so we can make them better. We never sell your data and we show no ads.</p>
 
-      <h2>The website</h2>
-      <p>The lessons and demos run entirely in your browser. What you type into a demo stays on your device and disappears when you leave the page.</p>
-      <p>The site is hosted on Vercel. Like any web host, Vercel's servers see standard request data (such as your IP address, browser type and the page requested) to deliver the page and protect against abuse. We do not use that data. See <a href="https://vercel.com/legal/privacy-policy">Vercel's privacy policy</a>.</p>
-      <p>Links to sources and documentation open other websites, which have their own privacy policies.</p>
+      <h2>Your account</h2>
+      <p>Accounts are run by <a href="https://clerk.com/legal/privacy">Clerk</a>, our sign-in provider. Clerk stores your email address (and your name and picture if you sign in with Google or GitHub) and keeps your session signed in with a cookie. We use your account only to let you in and to tell learners apart in our usage numbers. You can delete your account at any time from the account menu.</p>
 
-      <h2>The Claude Code plugin and local MCP server</h2>
-      <p>The plugin's server runs on your own computer. It reads the bundled lessons and computes algorithm traces locally. It sends nothing to us or anyone else.</p>
+      <h2>Usage analytics (only if you allow it)</h2>
+      <p>The first time you visit, a banner asks whether we may measure usage. If you choose "Allow", we use <a href="https://posthog.com/privacy">PostHog</a> (EU hosting) to record which pages you open, when you use a demo, your quiz answers (right or wrong) and when you mark a lesson complete. These events are linked to your account's internal ID, not your email. If you choose "No thanks", nothing is sent. You can change your mind by clearing this site's data in your browser.</p>
+      <p>What you type into a demo stays in your browser and is never sent.</p>
 
-      <h2>The remote MCP connector</h2>
-      <p>If you add the connector at <code>https://dsa.tahmid.space/mcp</code> to an AI assistant, the assistant sends tool requests to it, such as "trace merge sort on 5, 2, 9, 1". The connector computes the answer and returns it. It does not store requests, does not ask you to sign in, and does not identify you. Vercel's standard request logs apply, as above.</p>
-      <p>The assistant you use (for example Claude) has its own privacy policy, which covers your conversations.</p>
+      <h2>Stored in your browser</h2>
+      <p>Your lesson progress, theme choice and analytics choice are kept in your browser's local storage.</p>
+
+      <h2>Hosting</h2>
+      <p>The site is hosted on Vercel. Like any web host, Vercel's servers see standard request data (such as your IP address, browser type and the page requested) to deliver the page and protect against abuse. See <a href="https://vercel.com/legal/privacy-policy">Vercel's privacy policy</a>.</p>
+
+      <h2>The Claude Code plugin and the MCP connector</h2>
+      <p>The plugin's server runs on your own computer and sends nothing to us. The public connector at <code>https://dsa.tahmid.space/mcp</code> answers tool requests (such as "trace merge sort on 5, 2, 9, 1") without sign-in and does not store them. Vercel's standard request logs apply. The assistant you use has its own privacy policy.</p>
 
       <h2>Children</h2>
       <p>Simplified DSA is meant for learners aged 13 and older.</p>
 
-      <h2>Changes and contact</h2>
-      <p>If this ever changes, for example if we add analytics, this page will say so before the change goes live. The full history of this page is public in the <a href="https://github.com/tahmidbintaslim/Simplified-DSA/commits/main/public/privacy.html">project repository</a>.</p>
-      <p>Questions: open an issue at <a href="https://github.com/tahmidbintaslim/Simplified-DSA/issues">github.com/tahmidbintaslim/Simplified-DSA/issues</a>.</p>
+      <h2>Your rights and contact</h2>
+      <p>You can ask us to see, correct or delete the data we hold about you. Write to the contact address on <a href="https://tahmid.space">tahmid.space</a>. If this policy changes, this page will say so before the change takes effect.</p>
     </main>
   </body>
 </html>
