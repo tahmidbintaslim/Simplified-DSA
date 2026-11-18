@@ -1,17 +1,19 @@
 import Link from 'next/link';
+import { dict } from '../lib/i18n.js';
 
-export default function SiteFooter() {
+export default function SiteFooter({ lang }) {
+  const t = dict(lang);
   return (
     <footer className="site-footer">
       <div className="site-footer-inner">
-        <Link className="brand" href="/">
+        <Link className="brand" href={`/${lang}`}>
           <img src="/icon.png" alt="" width="22" height="22" />
           <span>Simplified DSA</span>
         </Link>
-        <p>Free lessons that show every step. © {new Date().getFullYear()} Simplified DSA. All rights reserved.</p>
+        <p>{t.footer(new Date().getFullYear())}</p>
         <nav aria-label="Footer">
-          <a href="/privacy.html">Privacy</a>
-          <a href="https://dsa.tahmid.space/mcp">Claude connector</a>
+          <a href="/privacy.html">{t.privacy}</a>
+          <a href="https://dsa.tahmid.space/mcp">{t.connector}</a>
         </nav>
       </div>
     </footer>

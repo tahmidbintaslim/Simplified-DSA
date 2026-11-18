@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { loadCompleted } from '../src/core/progress.js';
 import HeroFigure from './HeroFigure.js';
 import Icon from './Icon.js';
+import { dict } from '../lib/i18n.js';
 
 // Section cards show one real step in the step vocabulary, not decoration.
 const SECTION_FIGURES = [
@@ -28,10 +29,12 @@ function MiniFigure({ values, states, labels, caption }) {
   );
 }
 
-const path = (entry) => `/${entry.section.id}/${entry.lesson.id}`;
+
 
 /** What this is, where to start (or continue), and the whole course as a map. */
-export default function Home({ sections, numbers }) {
+export default function Home({ lang, sections, numbers, children }) {
+  const t = dict(lang).home;
+  const path = (entry) => `/${lang}/${entry.section.id}/${entry.lesson.id}`;
   const [completed, setCompleted] = useState(() => new Set());
   useEffect(() => setCompleted(loadCompleted()), []);
 
@@ -39,7 +42,7 @@ export default function Home({ sections, numbers }) {
   const isDone = ({ section, lesson }) => completed.has(`${section.id}/${lesson.id}`);
   const doneCount = all.filter(isDone).length;
   const nextUp = all.find((entry) => !isDone(entry)) ?? all[0];
-  const startLabel = doneCount ? `Continue: ${nextUp.lesson.title}` : `Start with ${nextUp.lesson.title}`;
+  const startLabel = doneCount ? t.continue(nextUp.lesson.title) : t.start(nextUp.lesson.title);
 
   return (
     <div className="home">
@@ -47,26 +50,26 @@ export default function Home({ sections, numbers }) {
         <div className="hero-haze" aria-hidden="true" />
         <section className="hero" aria-labelledby="home-title">
           <div className="hero-text">
-            <h1 id="home-title">See every step.<span>Learn DSA by tracing it.</span></h1>
-            <p className="lead">Free lessons for complete beginners: plain words, a small example traced by hand, and a demo you drive yourself, one step at a time.</p>
+            <h1 id="home-title">{t.title}<span>{t.titleAccent}</span></h1>
+            <p className="lead">{t.lead}</p>
             <p className="home-actions">
               <Link className="demo-button is-primary" href={path(nextUp)}>{startLabel} <Icon name="arrowRight" /></Link>
-              <a className="demo-button" href="#course-map"><Icon name="list" /> Browse all lessons</a>
+              <a className="demo-button" href="#course-map"><Icon name="list" /> {t.browse}</a>
             </p>
             <ul className="hero-checks">
-              <li><Icon name="check" /> {all.length} lessons, basics to patterns</li>
-              <li><Icon name="check" /> A demo you drive in every lesson</li>
-              <li><Icon name="check" /> Free, with a free account</li>
+              {t.checks(all.length).map((check) => (
+                <li key={check}><Icon name="check" /> {check}</li>
+              ))}
             </ul>
           </div>
-          <HeroFigure />
+          <HeroFigure lang={lang} />
         </section>
       </div>
 
       <section className="home-block home-numbers" aria-labelledby="numbers-title">
         <div className="home-block-head">
-          <h2 id="numbers-title">Small enough to finish.</h2>
-          <p className="home-block-lead">Every number here is counted from the lessons themselves.</p>
+          <h2 id="numbers-title">{t.numbersTitle}</h2>
+          <p className="home-block-lead">{t.numbersLead}</p>
         </div>
         <dl className="numbers-panel">
           {numbers.map(([label, value, note]) => (
@@ -76,8 +79,8 @@ export default function Home({ sections, numbers }) {
       </section>
 
       <section className="home-block" aria-labelledby="sections-title">
-        <h2 id="sections-title">Three parts, one path</h2>
-        <p className="home-block-lead">Start with the shapes data takes, then the steps that act on it, then the patterns interviews reuse.</p>
+        <h2 id="sections-title">{t.partsTitle}</h2>
+        <p className="home-block-lead">{t.partsLead}</p>
         <ol className="section-cards">
           {sections.map((section, i) => {
             const entries = section.lessons.map((lesson) => ({ section, lesson }));
@@ -87,10 +90,10 @@ export default function Home({ sections, numbers }) {
               <li key={section.id}>
                 <Link className="section-card" href={path(target)}>
                   <span className="section-card-art" aria-hidden="true"><MiniFigure {...SECTION_FIGURES[i % SECTION_FIGURES.length]} /></span>
-                  <span className="section-card-tab">{section.lessons.length} lessons</span>
+                  <span className="section-card-tab">{t.lessonsCount(section.lessons.length)}</span>
                   <strong>{section.title}</strong>
                   <span className="lesson-summary">{section.description}</span>
-                  <span className="course-meta">{done ? `${done} of ${section.lessons.length} done` : `Starts with ${target.lesson.title}`}</span>
+                  <span className="course-meta">{done ? t.doneOf(done, section.lessons.length) : t.startsWith(target.lesson.title)}</span>
                 </Link>
               </li>
             );
@@ -100,8 +103,8 @@ export default function Home({ sections, numbers }) {
 
       <section className="home-block" id="course-map" aria-labelledby="map-title" tabIndex={-1}>
         <div className="home-block-head">
-          <h2 id="map-title">Course map</h2>
-          <span className="home-progress">{doneCount} of {all.length} lessons done</span>
+          <h2 id="map-title">{t.mapTitle}</h2>
+          <span className="home-progress">{t.progress(doneCount, all.length)}</span>
         </div>
         {sections.map((section) => (
           <section key={section.id} className="course-section" aria-labelledby={`course-${section.id}`}>
@@ -113,11 +116,11 @@ export default function Home({ sections, numbers }) {
                   <li key={lesson.id}>
                     <Link className="course-lesson" href={path(entry)}>
                       <span className={`lesson-status ${isDone(entry) ? 'is-done' : ''}`}>
-                        {isDone(entry) && (<><Icon name="check" /><span className="sr-only">Completed: </span></>)}
+                        {isDone(entry) && (<><Icon name="check" /><span className="sr-only">{dict(lang).completed}</span></>)}
                       </span>
                       <strong>{lesson.title}</strong>
                       <span className="lesson-summary">{lesson.summary}</span>
-                      <span className="course-meta">{[lesson.minutes && `${lesson.minutes} min`, lesson.level].filter(Boolean).join(' · ')}</span>
+                      <span className="course-meta">{[lesson.minutes && t.min(lesson.minutes), lesson.level].filter(Boolean).join(' · ')}</span>
                     </Link>
                   </li>
                 );
@@ -127,9 +130,11 @@ export default function Home({ sections, numbers }) {
         ))}
       </section>
 
+      {children ? <section className="home-block">{children}</section> : null}
+
       <section className="home-closing" aria-labelledby="closing-title">
-        <h2 id="closing-title">Your first lesson takes about {nextUp.lesson.minutes ?? 12} minutes.</h2>
-        <p>Read it, trace it, then drive the demo yourself. A free account keeps your place.</p>
+        <h2 id="closing-title">{t.closingTitle(nextUp.lesson.minutes ?? 12)}</h2>
+        <p>{t.closingLead}</p>
         <Link className="demo-button is-primary" href={path(nextUp)}>{startLabel} <Icon name="arrowRight" /></Link>
       </section>
     </div>

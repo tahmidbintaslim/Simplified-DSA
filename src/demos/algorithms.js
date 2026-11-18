@@ -525,42 +525,66 @@ export const arrayCode = {
   delete: ['x = a[i]', 'for j from i to n - 2:', '  a[j] = a[j + 1]   // shift left', 'drop the last slot'],
 };
 
-export function arrayInsertFrames(values, i, x) {
+// Captions for the array demo in each language.
+const ARRAY_WORDS = {
+  en: {
+    room: (n) => `Make room: add an empty slot at the end (index ${n}).`,
+    shiftRight: (v, from, to) => `Shift ${v} right, from index ${from} to ${to}.`,
+    put: (x, i, c) => `Put ${x} into the gap at index ${i}. ${c} value${c === 1 ? '' : 's'} shifted right: O(n).`,
+    remove: (x, i) => `Remove ${x} from index ${i}.`,
+    gap: (i) => `That leaves a gap at index ${i}.`,
+    shiftLeft: (v, from, to) => `Shift ${v} left, from index ${from} to ${to}.`,
+    drop: (c) => `Drop the empty last slot. ${c} value${c === 1 ? '' : 's'} shifted left to close the gap: O(n).`,
+  },
+  bn: {
+    room: (n) => `জায়গা বানাও: শেষে একটা খালি ঘর যোগ করো (ইনডেক্স ${n})।`,
+    shiftRight: (v, from, to) => `${v}-কে ডানে সরাও, ইনডেক্স ${from} থেকে ${to}-এ।`,
+    put: (x, i, c) => `ফাঁকা ইনডেক্স ${i}-এ ${x} বসাও। ${c}টি মান ডানে সরেছে: O(n)।`,
+    remove: (x, i) => `ইনডেক্স ${i} থেকে ${x} সরাও।`,
+    gap: (i) => `ইনডেক্স ${i}-এ একটা ফাঁকা ঘর থেকে গেল।`,
+    shiftLeft: (v, from, to) => `${v}-কে বামে সরাও, ইনডেক্স ${from} থেকে ${to}-এ।`,
+    drop: (c) => `শেষের খালি ঘরটা বাদ দাও। ফাঁক বন্ধ করতে ${c}টি মান বামে সরেছে: O(n)।`,
+  },
+};
+
+export function arrayInsertFrames(values, i, x, lang = 'en') {
+  const w = ARRAY_WORDS[lang] ?? ARRAY_WORDS.en;
   const a = [...values, null];
   const n = values.length;
   const moved = [];
   const snap = (line, vars, caption, hit = -1) => ({ values: [...a], hit, moved: [...moved], line, vars, caption });
-  const frames = [snap(0, { n, i, x }, `Make room: add an empty slot at the end (index ${n}).`)];
+  const frames = [snap(0, { n, i, x }, w.room(n))];
   for (let j = n; j > i; j--) {
     a[j] = a[j - 1];
     a[j - 1] = null;
     moved.push(j);
-    frames.push(snap(2, { n, i, x, j }, `Shift ${a[j]} right, from index ${j - 1} to ${j}.`));
+    frames.push(snap(2, { n, i, x, j }, w.shiftRight(a[j], j - 1, j)));
   }
   a[i] = x;
   const count = moved.length;
-  frames.push(snap(3, { n: n + 1, i, x }, `Put ${x} into the gap at index ${i}. ${count} value${count === 1 ? '' : 's'} shifted right: O(n).`, i));
+  frames.push(snap(3, { n: n + 1, i, x }, w.put(x, i, count), i));
   return frames;
 }
 
-export function arrayDeleteFrames(values, i) {
+export function arrayDeleteFrames(values, i, lang = 'en') {
+  const w = ARRAY_WORDS[lang] ?? ARRAY_WORDS.en;
   const a = [...values];
   const n = values.length;
   const x = a[i];
   const moved = [];
   const snap = (line, vars, caption, hit = -1) => ({ values: [...a], hit, moved: [...moved], line, vars, caption });
-  const frames = [snap(0, { n, i, x }, `Remove ${x} from index ${i}.`, i)];
+  const frames = [snap(0, { n, i, x }, w.remove(x, i), i)];
   a[i] = null;
-  frames.push(snap(0, { n, i, x }, `That leaves a gap at index ${i}.`));
+  frames.push(snap(0, { n, i, x }, w.gap(i)));
   for (let j = i; j < n - 1; j++) {
     a[j] = a[j + 1];
     a[j + 1] = null;
     moved.push(j);
-    frames.push(snap(2, { n, i, x, j }, `Shift ${a[j]} left, from index ${j + 1} to ${j}.`));
+    frames.push(snap(2, { n, i, x, j }, w.shiftLeft(a[j], j + 1, j)));
   }
   a.pop();
   const count = moved.length;
-  frames.push(snap(3, { n: n - 1, i }, `Drop the empty last slot. ${count} value${count === 1 ? '' : 's'} shifted left to close the gap: O(n).`));
+  frames.push(snap(3, { n: n - 1, i }, w.drop(count)));
   return frames;
 }
 

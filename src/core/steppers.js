@@ -11,7 +11,10 @@ import { cellHtml, motionRow, motionRowHtml } from '../demos/motion.js';
  *
  * `memory` (a Map) keeps each figure's step across re-renders of the lesson.
  */
-export function hydrateSteppers(root, memory) {
+const ENGLISH = { back: 'Back', next: 'Next', step: (k, n) => `Step ${k} of ${n}`, label: 'Worked example step', previous: 'Previous step' };
+
+// `words` (from lib/i18n.js dict(lang).stepper) translates the controls.
+export function hydrateSteppers(root, memory, words = ENGLISH) {
   root.querySelectorAll('.cells-steps').forEach((block, figureIndex) => {
     const frames = [...block.querySelectorAll('.cells-step')].map((figure) => {
       const pointers = {};
@@ -31,11 +34,11 @@ export function hydrateSteppers(root, memory) {
         ${motionRowHtml()}
         <figcaption aria-live="polite"></figcaption>
         <div class="cells-steps-controls">
-          <button type="button" class="demo-button" data-stepper="prev" aria-label="Previous step">Back</button>
-          <label class="demo-scrub"><span class="sr-only">Worked example step</span>
+          <button type="button" class="demo-button" data-stepper="prev" aria-label="${words.previous}">${words.back}</button>
+          <label class="demo-scrub"><span class="sr-only">${words.label}</span>
             <input type="range" min="1" max="${total}" step="1" value="1" data-stepper="scrub" />
           </label>
-          <button type="button" class="demo-button is-primary" data-stepper="next">Next</button>
+          <button type="button" class="demo-button is-primary" data-stepper="next">${words.next}</button>
           <span class="cells-steps-count" aria-hidden="true"></span>
         </div>
       </figure>`,
@@ -59,7 +62,7 @@ export function hydrateSteppers(root, memory) {
       );
       caption.innerHTML = frame.note;
       scrub.value = String(k + 1);
-      scrub.setAttribute('aria-valuetext', `Step ${k + 1} of ${total}`);
+      scrub.setAttribute('aria-valuetext', words.step(k + 1, total));
       scrub.style.setProperty('--progress', `${(k / (total - 1)) * 100}%`);
       count.textContent = `${k + 1} / ${total}`;
       prev.disabled = k === 0;

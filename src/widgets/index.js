@@ -1,6 +1,6 @@
 import { animate, stagger } from 'motion';
 import { binarySearchVariant } from '../demos/algorithms.js';
-import { reduceMotion, SPRING } from '../demos/motion.js';
+import { identityKeys, patchRow, reduceMotion, SPRING } from '../demos/motion.js';
 import { escapeHtml } from '../utils/markdown.js';
 
 /**
@@ -231,8 +231,268 @@ function bugLab(root) {
   run();
 }
 
+
+/* ---------- Memory lane: why array[i] is one jump, not a search ---------- */
+
+const MEMORY_WORDS = {
+  en: {
+    goal: 'Six values sit side by side in memory, starting at address 1000. Pick an index and watch the computer find it.',
+    size: 'Each value takes',
+    bytes: (b) => `${b} bytes`,
+    index: 'Index',
+    address: 'address',
+    result: (i, addr) => `One multiplication and one addition land on address ${addr}. It never looked at the ${i} slot${i === 1 ? '' : 's'} before it, so reading is O(1) whether the array holds 6 values or 6 million.`,
+    first: 'Index 0 is the start address itself. That is why counting starts at 0: the index is how many slots to skip.',
+  },
+  bn: {
+    goal: 'ছয়টি মান মেমরিতে পাশাপাশি বসে আছে, ঠিকানা 1000 থেকে শুরু। একটা ইনডেক্স বেছে নাও আর দেখো কম্পিউটার কীভাবে সেটা খুঁজে পায়।',
+    size: 'প্রতিটি মান নেয়',
+    bytes: (b) => `${b} বাইট`,
+    index: 'ইনডেক্স',
+    address: 'ঠিকানা',
+    result: (i, addr) => `একটা গুণ আর একটা যোগেই পৌঁছে গেল ঠিকানা ${addr}-এ। আগের ${i}টি ঘরের একটাও দেখতে হয়নি, তাই অ্যারেতে ৬টি মান থাকুক বা ৬০ লাখ, পড়া O(1)।`,
+    first: 'ইনডেক্স 0 মানে শুরুর ঠিকানাটাই। এজন্যই গোনা শুরু হয় 0 থেকে: ইনডেক্স মানে কয়টি ঘর টপকাতে হবে।',
+  },
+};
+
+function memoryLane(root, { lang = 'en' }) {
+  const w = MEMORY_WORDS[lang] ?? MEMORY_WORDS.en;
+  const values = [7, 12, 3, 25, 18, 9];
+  const BASE = 1000;
+  let size = 4;
+  let index = 3;
+
+  root.innerHTML = `
+    <p class="widget-goal">${w.goal}</p>
+    <div class="widget-actions">
+      <span class="memory-label">${w.size}</span>
+      ${[4, 8].map((b) => `<button type="button" class="demo-button" data-size="${b}" aria-pressed="${b === size}">${w.bytes(b)}</button>`).join('')}
+    </div>
+    <div class="memory-lane">
+      <span class="memory-jump" aria-hidden="true"></span>
+      <div class="memory-row" role="group" aria-label="${w.index}"></div>
+    </div>
+    <p class="memory-formula" aria-live="polite"></p>
+    <p class="widget-message"></p>
+  `;
+  const row = root.querySelector('.memory-row');
+  const jump = root.querySelector('.memory-jump');
+  const formula = root.querySelector('.memory-formula');
+  const message = root.querySelector('.widget-message');
+
+  const draw = ({ animate: moving = true } = {}) => {
+    row.innerHTML = values
+      .map(
+        (value, i) => `<button type="button" class="memory-cell ${i === index ? 'is-hit' : ''}" data-index="${i}" aria-pressed="${i === index}" style="flex-grow:${size}">
+          <span class="memory-value">${value}</span>
+          <span class="memory-index">[${i}]</span>
+          <span class="memory-address">${BASE + i * size}</span>
+        </button>`,
+      )
+      .join('');
+    const addr = BASE + index * size;
+    formula.innerHTML = `${w.address} = <span class="f-base">${BASE}</span> + <span class="f-index">${index}</span> × <span class="f-size">${size}</span> = <strong>${addr}</strong>`;
+    message.textContent = index === 0 ? w.first : w.result(index, addr);
+    // The arrow flies straight to the cell: one jump, no walk.
+    const cell = row.children[index];
+    const target = { x: cell.offsetLeft + cell.offsetWidth / 2 - 6 };
+    if (moving && !reduceMotion()) animate(jump, target, SPRING);
+    else animate(jump, target, { duration: 0 });
+    play(cell, { scale: [1.12, 1] });
+  };
+
+  root.addEventListener('click', (event) => {
+    const cell = event.target.closest('[data-index]');
+    const sizeButton = event.target.closest('[data-size]');
+    if (cell) index = Number(cell.dataset.index);
+    if (sizeButton) {
+      size = Number(sizeButton.dataset.size);
+      root.querySelectorAll('[data-size]').forEach((b) => b.setAttribute('aria-pressed', String(b === sizeButton)));
+    }
+    if (cell || sizeButton) draw();
+  });
+  // Place the arrow once the row has a width (after the widget is attached).
+  if (typeof ResizeObserver === 'function') new ResizeObserver(() => draw({ animate: false })).observe(row);
+  draw({ animate: false });
+}
+
+/* ---------- Shift cost: where you insert decides how much moves ---------- */
+
+const SHIFT_WORDS = {
+  en: {
+    goal: 'Eight values, no gaps allowed. Click a gap between cells to insert 99 there.',
+    gap: (k) => `Insert at index ${k}`,
+    result: (k, moved) => `Inserting at index ${k} moved ${moved} value${moved === 1 ? '' : 's'}. ${moved === 0 ? 'The end is free: nothing is in the way.' : moved === 8 ? 'The front is the worst case: every value had to move.' : 'Everything after the gap had to step right.'} Click the row to try another spot.`,
+    chart: 'Values moved for each insert position',
+    reset: 'Reset',
+    start: 'Try the front, then the end. The bars below fill in as you try positions.',
+  },
+  bn: {
+    goal: 'আটটি মান, মাঝে কোনো ফাঁক রাখা যাবে না। দুই ঘরের মাঝের ফাঁকে ক্লিক করে সেখানে 99 বসাও।',
+    gap: (k) => `ইনডেক্স ${k}-এ বসাও`,
+    result: (k, moved) => `ইনডেক্স ${k}-এ বসাতে ${moved}টি মান সরাতে হলো। ${moved === 0 ? 'শেষ মাথা ফাঁকা: কেউ পথ আটকে নেই।' : moved === 8 ? 'সামনে বসানোই সবচেয়ে খারাপ: সব মান সরাতে হয়েছে।' : 'ফাঁকের পরের সবাইকে এক ঘর ডানে সরতে হয়েছে।'} আরেকটা জায়গা চেষ্টা করতে সারিতে ক্লিক করো।`,
+    chart: 'কোন অবস্থানে বসালে কয়টি মান সরে',
+    reset: 'আবার শুরু',
+    start: 'প্রথমে সামনে, তারপর শেষে চেষ্টা করো। যত অবস্থান চেষ্টা করবে, নিচের বারগুলো ভরতে থাকবে।',
+  },
+};
+
+function shiftCost(root, { lang = 'en' }) {
+  const w = SHIFT_WORDS[lang] ?? SHIFT_WORDS.en;
+  const START = [4, 8, 15, 16, 23, 42, 51, 60];
+  const keys = identityKeys();
+  const tried = new Set();
+  let values = [...START];
+  let inserted = -1;
+
+  root.innerHTML = `
+    <div class="widget-head">
+      <p class="widget-goal">${w.goal}</p>
+      <div class="widget-actions"><button type="button" class="demo-button" data-act="reset">${w.reset}</button></div>
+    </div>
+    <div class="shift-stage"><div class="array-row shift-row"></div></div>
+    <p class="widget-message" aria-live="polite">${w.start}</p>
+    <figure class="shift-chart" aria-label="${w.chart}">
+      <div class="shift-bars"></div>
+      <figcaption>${w.chart}</figcaption>
+    </figure>
+  `;
+  const row = root.querySelector('.shift-row');
+  const message = root.querySelector('.widget-message');
+  const bars = root.querySelector('.shift-bars');
+
+  const draw = () => {
+    // Gap buttons come out first: patchRow keeps unkeyed children as anchors.
+    row.querySelectorAll('.shift-gap').forEach((gap) => gap.remove());
+    const ids = keys(values);
+    // Cells keep their identity, so a shift is each value sliding one slot right.
+    patchRow(
+      row,
+      values.map((value, i) => ({
+        key: ids[i],
+        className: `array-cell ${i === inserted ? 'is-hit' : inserted >= 0 && i > inserted ? 'is-moved' : ''}`,
+        html: `<span class="array-value">${value}</span><span class="array-index">${i}</span>`,
+      })),
+      { enter: { y: -28 } },
+    );
+    // Gap buttons sit between cells (only before an insert, so the row stays readable).
+    if (inserted < 0) {
+      [...row.querySelectorAll('[data-key]')].forEach((cell, k) => cell.insertAdjacentHTML('beforebegin', `<button type="button" class="shift-gap" data-gap="${k}" aria-label="${w.gap(k)}"></button>`));
+      row.insertAdjacentHTML('beforeend', `<button type="button" class="shift-gap" data-gap="${values.length}" aria-label="${w.gap(values.length)}"></button>`);
+    }
+    bars.innerHTML = Array.from({ length: START.length + 1 }, (_, k) => {
+      const moved = START.length - k;
+      return `<span class="shift-bar ${tried.has(k) ? 'is-tried' : ''} ${k === inserted ? 'is-now' : ''}" style="--h:${(moved / START.length) * 100}%"><span class="shift-bar-fill"></span><span class="shift-bar-label">${k}</span></span>`;
+    }).join('');
+  };
+
+  root.addEventListener('click', (event) => {
+    const gap = event.target.closest('[data-gap]');
+    if (gap) {
+      const k = Number(gap.dataset.gap);
+      values = [...START];
+      values.splice(k, 0, 99);
+      inserted = k;
+      tried.add(k);
+      message.textContent = w.result(k, START.length - k);
+      draw();
+      play(bars.querySelector('.is-now .shift-bar-fill'), { scaleY: [0, 1] });
+      return;
+    }
+    if (event.target.closest('[data-act="reset"]')) {
+      values = [...START];
+      inserted = -1;
+      message.textContent = w.start;
+      draw();
+    }
+  });
+  // After each insert, the next click on the row starts a fresh try.
+  row.addEventListener('click', (event) => {
+    if (inserted >= 0 && !event.target.closest('[data-gap]')) {
+      values = [...START];
+      inserted = -1;
+      draw();
+    }
+  });
+  draw();
+}
+
+/* ---------- Characters and bytes: what "length" really counts ---------- */
+
+const BYTES_WORDS = {
+  en: {
+    goal: 'Type any text. The same string, counted three ways.',
+    label: 'Text',
+    seen: 'What you see (characters)',
+    points: 'Code points (what Python len() counts)',
+    bytes: 'Bytes in UTF-8 (what is stored)',
+    note: (g, c, b) =>
+      g === c && c === b
+        ? `Plain English letters: one character, one code point, one byte each. Easy mode.`
+        : `${g} character${g === 1 ? '' : 's'} on screen, ${c} code point${c === 1 ? '' : 's'}, ${b} bytes in memory. Indexing a string by position can split a character in half, so slice text carefully.`,
+  },
+  bn: {
+    goal: 'যেকোনো লেখা লেখো। একই স্ট্রিং, তিনভাবে গোনা।',
+    label: 'লেখা',
+    seen: 'যা চোখে দেখো (অক্ষর)',
+    points: 'কোড পয়েন্ট (Python len() যা গোনে)',
+    bytes: 'UTF-8-এ বাইট (যা আসলে জমা থাকে)',
+    note: (g, c, b) =>
+      g === c && c === b
+        ? `সাধারণ ইংরেজি অক্ষর: প্রতিটি অক্ষর মানে একটা কোড পয়েন্ট, একটা বাইট। সহজ ব্যাপার।`
+        : `পর্দায় ${g}টি অক্ষর, ${c}টি কোড পয়েন্ট, মেমরিতে ${b} বাইট। "বা" দেখতে একটা অক্ষর, কিন্তু ভেতরে ব-এর সাথে া কার জোড়া। তাই অবস্থান ধরে স্ট্রিং কাটলে অক্ষর ভেঙে যেতে পারে।`,
+  },
+};
+
+function stringBytes(root, { lang = 'en' }) {
+  const w = BYTES_WORDS[lang] ?? BYTES_WORDS.en;
+  const presets = ['code', 'café', 'বাংলা', '👋🏽'];
+  root.innerHTML = `
+    <p class="widget-goal">${w.goal}</p>
+    <div class="widget-actions">
+      <label class="bytes-input">${w.label} <input class="demo-input" type="text" maxlength="12" value="${lang === 'bn' ? 'বাংলা' : 'café'}" /></label>
+      ${presets.map((p) => `<button type="button" class="demo-button" data-text="${p}">${p}</button>`).join('')}
+    </div>
+    <div class="bytes-rows"></div>
+    <p class="widget-message" aria-live="polite"></p>
+  `;
+  const input = root.querySelector('input');
+  const rows = root.querySelector('.bytes-rows');
+  const message = root.querySelector('.widget-message');
+  const encoder = new TextEncoder();
+  const segmenter = typeof Intl.Segmenter === 'function' ? new Intl.Segmenter(lang, { granularity: 'grapheme' }) : null;
+
+  const draw = () => {
+    const text = input.value;
+    const graphemes = segmenter ? [...segmenter.segment(text)].map((s) => s.segment) : Array.from(text);
+    const points = Array.from(text);
+    const bytes = [...encoder.encode(text)];
+    const cells = (items, cls) => items.map((item) => `<span class="bytes-cell ${cls}">${escapeHtml(item)}</span>`).join('');
+    const hex = (b) => b.toString(16).toUpperCase().padStart(2, '0');
+    const name = (cp) => `U+${cp.codePointAt(0).toString(16).toUpperCase().padStart(4, '0')}`;
+    rows.innerHTML = `
+      <div class="bytes-row"><p>${w.seen} <strong>${graphemes.length}</strong></p><div class="bytes-cells">${cells(graphemes, 'is-seen')}</div></div>
+      <div class="bytes-row"><p>${w.points} <strong>${points.length}</strong></p><div class="bytes-cells">${points.map((p) => `<span class="bytes-cell is-point"><span>${escapeHtml(p)}</span><small>${name(p)}</small></span>`).join('')}</div></div>
+      <div class="bytes-row"><p>${w.bytes} <strong>${bytes.length}</strong></p><div class="bytes-cells">${cells(bytes.map(hex), 'is-byte')}</div></div>`;
+    message.textContent = w.note(graphemes.length, points.length, bytes.length);
+    play([...rows.querySelectorAll('.bytes-cell')], { opacity: [0, 1], y: [6, 0] }, { ...SPRING, delay: stagger(0.015) });
+  };
+
+  root.addEventListener('click', (event) => {
+    const preset = event.target.closest('[data-text]');
+    if (!preset) return;
+    input.value = preset.dataset.text;
+    draw();
+  });
+  input.addEventListener('input', draw);
+  draw();
+}
+
 export const widgets = {
   'guess-game': guessGame,
   halving,
   'bug-lab': bugLab,
+  'memory-lane': memoryLane,
+  'shift-cost': shiftCost,
+  'string-bytes': stringBytes,
 };

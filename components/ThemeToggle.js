@@ -6,7 +6,8 @@ const KEY = 'simplified-dsa:theme';
 const systemDark = () => matchMedia('(prefers-color-scheme: dark)').matches;
 
 /** Follows the system until the learner picks a theme (kept in this browser). */
-export default function ThemeToggle() {
+// labels: [label when light, label when dark], in the page language.
+export default function ThemeToggle({ labels = ['Switch to dark theme', 'Switch to light theme'] }) {
   const [dark, setDark] = useState(false);
   useEffect(() => {
     const picked = document.documentElement.dataset.theme;
@@ -23,7 +24,7 @@ export default function ThemeToggle() {
     setDark(!dark);
   };
   return (
-    <button id="theme-toggle" className="icon-button" type="button" onClick={toggle} aria-label={`Switch to ${dark ? 'light' : 'dark'} theme`}>
+    <button id="theme-toggle" className="icon-button" type="button" onClick={toggle} aria-label={labels[dark ? 1 : 0]}>
       <Icon name={dark ? 'sun' : 'moon'} />
     </button>
   );
