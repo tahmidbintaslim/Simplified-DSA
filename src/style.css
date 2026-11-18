@@ -4239,3 +4239,262 @@ input:focus-visible,
 .is-pickable:focus-visible > .array-value {
   background: var(--accent-soft);
 }
+
+/* ---------- Widgets: one idea each, in the reading ---------- */
+
+.widget {
+  margin: 28px 0;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+  padding: 18px;
+}
+
+.widget-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  margin-bottom: 14px;
+}
+
+.widget-goal {
+  flex: 1 1 260px;
+  margin: 0;
+  color: var(--ink-strong);
+}
+
+.widget-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.widget-message {
+  min-height: 1.6em;
+  margin: 14px 0 0;
+  color: var(--ink-body);
+  font-weight: 500;
+}
+
+/* Guess game: face-down cards you turn over. */
+.guess-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  perspective: 600px;
+}
+
+.guess-card {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  min-width: 44px;
+  border: 0;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  font: inherit;
+}
+
+.guess-face {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 52px;
+  border: 1.5px solid var(--accent);
+  border-radius: 8px;
+  background: repeating-linear-gradient(135deg, var(--accent-soft) 0 6px, var(--raised) 6px 12px);
+  color: var(--accent-ink);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  transition: background-color 200ms ease, border-color 200ms ease, opacity 200ms ease;
+}
+
+.guess-card:hover:not(:disabled) .guess-face {
+  border-width: 2px;
+  background: var(--accent-soft);
+}
+
+.guess-card.is-open .guess-face {
+  border-color: var(--look-line);
+  background: var(--look-fill);
+  color: var(--on-look);
+}
+
+.guess-card.is-found .guess-face {
+  border-color: var(--done);
+  background: var(--done);
+  color: var(--on-done);
+}
+
+.guess-card.is-out .guess-face {
+  border-color: var(--line-strong);
+  background: var(--raised);
+  color: var(--faint);
+  opacity: 0.55;
+  background-image: linear-gradient(to top right, transparent calc(50% - 1px), var(--faint) calc(50% - 1px), var(--faint) calc(50% + 1px), transparent calc(50% + 1px));
+}
+
+.guess-card:disabled {
+  cursor: default;
+}
+
+/* Halving: a list shrinking by half per check. */
+.widget-slider {
+  display: grid;
+  gap: 8px;
+  color: var(--muted);
+  font-family: var(--font-ui);
+}
+
+.widget-slider output {
+  color: var(--ink-strong);
+  font-weight: 600;
+}
+
+.widget-slider input {
+  width: 100%;
+  min-height: 44px;
+  accent-color: var(--accent);
+}
+
+.halving-rows {
+  display: grid;
+  gap: 4px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.halving-rows li {
+  display: grid;
+  grid-template-columns: 5em 1fr 8.5em;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-ui);
+  font-size: 0.86rem;
+}
+
+.halving-label {
+  color: var(--subtle);
+}
+
+.halving-track {
+  height: 10px;
+  border-radius: 999px;
+  background: var(--line-soft);
+}
+
+.halving-bar {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+}
+
+.halving-count {
+  color: var(--ink-strong);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+/* Bug lab: switches, the code they change, and what happens. */
+.bug-switches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+  margin-bottom: 12px;
+}
+
+.bug-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  cursor: pointer;
+}
+
+.bug-switch input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--danger);
+}
+
+.bug-code {
+  margin: 0 0 12px;
+}
+
+.bug-code mark {
+  border-radius: 3px;
+  background: var(--danger-fill);
+  color: var(--danger-ink);
+}
+
+.bug-in {
+  color: var(--muted);
+}
+
+.widget [aria-pressed="true"] {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+}
+
+.bug-trace {
+  display: grid;
+  gap: 4px;
+  margin: 12px 0 0;
+  padding-left: 1.4em;
+  font-size: 0.95rem;
+}
+
+.bug-trace .is-repeat {
+  color: var(--danger-ink);
+}
+
+.bug-result {
+  margin: 12px 0 0;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-weight: 500;
+}
+
+.bug-result.is-ok {
+  background: color-mix(in srgb, var(--done) 10%, var(--raised));
+  color: var(--on-done-fill);
+}
+
+.bug-result.is-bad {
+  background: var(--danger-fill);
+  color: var(--danger-ink);
+}
+
+/* Deep dives: optional asides for the curious. */
+.deep-dive {
+  margin: 22px 0;
+  border: 1px dashed var(--line-strong);
+  border-radius: 12px;
+  padding: 0 16px;
+}
+
+.deep-dive > summary {
+  min-height: 44px;
+  padding: 12px 0;
+  color: var(--ink-strong);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.deep-dive[open] > summary {
+  border-bottom: 1px solid var(--line-soft);
+}
+
+@media (max-width: 760px) {
+  .halving-rows li {
+    grid-template-columns: 4.6em 1fr 8em;
+    gap: 8px;
+  }
+}

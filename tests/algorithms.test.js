@@ -198,3 +198,18 @@ test('identity keys follow values, even when the caller mutates its array in pla
   const [a, b] = swap([4, 4, 1]);
   assert.deepEqual(swap([1, 4, 4]).slice(1), [a, b]);
 });
+
+test('bug lab: the correct search always finds; each classic bug fails in its own way', async () => {
+  const { binarySearchVariant } = await import('../src/demos/algorithms.js');
+  const values = [3, 9, 14, 21, 30];
+  for (const target of [...values, 10, 99, 1]) {
+    const ok = binarySearchVariant(values, target);
+    assert.equal(ok.result, values.includes(target) ? 'found' : 'not-found', `correct search for ${target}`);
+  }
+  // lo < hi skips the last candidate: 30 ends as the only value left and is never checked.
+  assert.equal(binarySearchVariant(values, 30, { strict: true }).result, 'missed');
+  // hi = mid never shrinks once lo == hi and the value there is too big.
+  assert.equal(binarySearchVariant(values, 10, { hiMid: true }).result, 'stuck');
+  // Both bugs together still find the middle value on the first check.
+  assert.equal(binarySearchVariant(values, 14, { strict: true, hiMid: true }).result, 'found');
+});

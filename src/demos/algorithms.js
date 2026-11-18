@@ -664,3 +664,31 @@ export function prefixSumFrames(values, l, r) {
   });
   return frames;
 }
+
+/* ---------- Binary search with the two classic bugs (for the bug lab) ---------- */
+
+/**
+ * Binary search with switchable edges, to show what each "small" choice does.
+ * strict: loop while lo < hi (bug) instead of lo <= hi.
+ * hiMid: shrink with hi = mid (bug) instead of hi = mid - 1.
+ * Returns { steps: [{ lo, hi, mid }], result } where result is 'found',
+ * 'not-found' (correct miss), 'missed' (the value is there but was skipped)
+ * or 'stuck' (the range stopped shrinking: an infinite loop).
+ */
+export function binarySearchVariant(values, target, { strict = false, hiMid = false } = {}) {
+  let lo = 0;
+  let hi = values.length - 1;
+  const steps = [];
+  const seen = new Set();
+  while (strict ? lo < hi : lo <= hi) {
+    const key = `${lo},${hi}`;
+    if (seen.has(key)) return { steps, result: 'stuck', index: -1 };
+    seen.add(key);
+    const mid = Math.floor((lo + hi) / 2);
+    steps.push({ lo, hi, mid });
+    if (values[mid] === target) return { steps, result: 'found', index: mid };
+    if (values[mid] < target) lo = mid + 1;
+    else hi = hiMid ? mid : mid - 1;
+  }
+  return { steps, result: values.includes(target) ? 'missed' : 'not-found', index: -1, lo, hi };
+}

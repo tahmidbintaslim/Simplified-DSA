@@ -463,3 +463,32 @@ test('the binary-search demo never starts on a one-step search', async () => {
     await page.close();
   }
 });
+
+test('lesson widgets: the guess game plays, halving counts, the bug lab breaks, and widgets survive a re-render', async () => {
+  const { page, errors } = await open('/algorithms/binary-search');
+  const game = page.locator('.widget-guess-game');
+  await game.locator('[data-act="watch"]').click();
+  await page.waitForTimeout(6500); // binary search needs at most 5 flips of 16 cards, 1.1s apart
+  assert.match(await game.locator('.widget-message').textContent(), /^Found \d+ in [1-5] guess/);
+  assert.equal(await game.locator('.guess-card.is-found').count(), 1);
+
+  assert.match(await page.textContent('.widget-halving .widget-message'), /1,000,000 values, at most 20 checks/);
+
+  const lab = page.locator('.widget-bug-lab');
+  await lab.locator('[data-bug="strict"]').check();
+  await lab.locator('[data-target="30"]').click();
+  assert.match(await lab.locator('.bug-result').textContent(), /^Missed! 30 is in the list/);
+  assert.match(await lab.locator('.bug-code').textContent(), /while lo < hi:/);
+  await lab.locator('[data-bug="strict"]').uncheck();
+  await lab.locator('[data-bug="hiMid"]').check();
+  await lab.locator('[data-target="10"]').click();
+  assert.match(await lab.locator('.bug-result').textContent(), /^Stuck!/);
+
+  // Mark complete re-renders the lesson; the widget keeps its state.
+  await page.click('#complete-button');
+  assert.match(await page.locator('.widget-bug-lab .bug-result').textContent(), /^Stuck!/);
+  await page.click('.deep-dive > summary');
+  assert.match(await page.textContent('.deep-dive'), /lo \+ \(hi - lo\) \/\/ 2/);
+  assert.deepEqual(errors, []);
+  await page.close();
+});

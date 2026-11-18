@@ -112,3 +112,15 @@ test('back-to-back cells figures of the same length become one worked-example st
   assert.doesNotMatch(r.render(['```cells', 'values: 1 2', '```', '', '```cells', 'values: 1 2 3', '```'].join('\n')), /cells-steps/);
   assert.doesNotMatch(r.render(['```cells', 'values: 1 2', '```', '', 'Then:', '', '```cells', 'values: 1 2', '```'].join('\n')), /cells-steps/);
 });
+
+test('widget blocks become escaped placeholders; deep-dive blocks fold', async () => {
+  const { MarkdownRenderer } = await import('../src/utils/markdown.js');
+  const r = new MarkdownRenderer();
+  assert.equal(
+    r.render(['```widget', 'guess-game', 'cards: 16', '```'].join('\n')),
+    '<div data-widget="guess-game" data-config="{&quot;cards&quot;:&quot;16&quot;}"></div>',
+  );
+  assert.match(r.render(['```widget', '<x>', '```'].join('\n')), /data-widget="&lt;x&gt;"/);
+  const dive = r.render(['```deep-dive', 'title: Why **overflow**?', 'Big numbers wrap.', '```'].join('\n'));
+  assert.match(dive, /^<details class="deep-dive"><summary>Why <strong>overflow<\/strong>\?<\/summary><p>Big numbers wrap\.<\/p><\/details>$/);
+});

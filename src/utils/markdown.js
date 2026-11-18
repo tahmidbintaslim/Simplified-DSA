@@ -110,6 +110,19 @@ function renderSteps(steps) {
   return `<div class="cells-steps" data-steps="${steps.length}">${frames}</div>`;
 }
 
+/**
+ * ```widget block: a placeholder the lesson page fills with a live widget
+ * from src/widgets (see App.attachWidgets).
+ *
+ *   guess-game
+ *   cards: 16
+ */
+function renderWidget(lines) {
+  const [name = '', ...settings] = lines.map((line) => line.trim()).filter(Boolean);
+  const config = Object.fromEntries(settings.map((line) => line.match(/^([\w-]+):\s*(.*)$/)?.slice(1) ?? []).filter((pair) => pair.length));
+  return `<div data-widget="${escapeHtml(name)}" data-config="${escapeHtml(JSON.stringify(config))}"></div>`;
+}
+
 function renderTable(rows) {
   const cells = (row) =>
     row
@@ -199,6 +212,14 @@ export class MarkdownRenderer {
           }
           else if (kind === 'quiz') html.push(renderQuiz(body));
           else if (kind === 'demo') html.push(DEMO_MARKER);
+          // A small interactive widget placed in the reading, Josh Comeau style:
+          // first line is its name, then optional "key: value" settings.
+          else if (kind === 'widget') html.push(renderWidget(body));
+          // A collapsible aside for readers who want more ("title: …" first).
+          else if (kind === 'deep-dive') {
+            const title = body[0]?.startsWith('title:') ? body.shift().slice(6).trim() : 'Deep dive';
+            html.push(`<details class="deep-dive"><summary>${inlineMarkdown(title)}</summary>${this.render(body.join('\n'))}</details>`);
+          }
           // An answer to a practice prompt stays folded until the learner has tried.
           else if (kind === 'answer') html.push(`<details class="answer"><summary>Show the answer</summary>${this.render(body.join('\n'))}</details>`);
           else if (body.length) html.push(`<pre><code>${escapeHtml(body.join('\n'))}</code></pre>`);

@@ -259,3 +259,35 @@ The Claude Code plugin ships its own copy of the lessons and a bundled MCP serve
 ```bash
 pnpm build:plugin
 ```
+
+## Teach Like An Explainer: Widgets And Deep Dives
+
+Lessons follow a "play first, then name it" order, inspired by Josh Comeau's interactive explainers:
+
+1. **A hook you can play** at the top, before any theory (the Binary Search lesson opens with a card-guessing game).
+2. **One small widget per idea**, placed right where that idea is explained, not one big demo at the end.
+3. **Break it on purpose**: a switch that turns on the classic bug, so learners watch it fail.
+4. **Optional depth** in a collapsible deep dive.
+5. **The sandbox last**: the lesson's full demo (```demo).
+
+Place a widget with a fenced block: the first line is its name, then optional `key: value` settings.
+
+````markdown
+```widget
+guess-game
+cards: 16
+```
+````
+
+Widgets live in `src/widgets/index.js` (`guess-game`, `halving`, `bug-lab` so far). Add one there and register it in `widgets`.
+
+A deep dive folds away until opened:
+
+````markdown
+```deep-dive
+title: Deep dive: why some code writes `lo + (hi - lo) // 2`
+Any Markdown here.
+```
+````
+
+Back-to-back ```cells figures of the same length become one worked example with Back, a slider and Next, so write a worked example as a sequence of figures.

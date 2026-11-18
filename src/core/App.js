@@ -5,6 +5,7 @@ import { DEMO_MARKER, escapeHtml, MarkdownRenderer } from '../utils/markdown.js'
 import { icon } from '../utils/icons.js';
 import { loadCompleted, saveCompleted } from './progress.js';
 import { hydrateSteppers } from './steppers.js';
+import { widgets } from '../widgets/index.js';
 import { inView } from 'motion';
 import { patchRow, reduceMotion, revealOnScroll } from '../demos/motion.js';
 
@@ -183,6 +184,7 @@ export class App {
       );
     if (onLesson) {
       this.attachDemo();
+      this.attachWidgets();
       hydrateSteppers(this.root.querySelector('.lesson-content'), this.stepperMemory);
       revealOnScroll(this.root.querySelector('.lesson-content'), this.revealed);
       this.buildToc();
@@ -954,6 +956,31 @@ export class App {
       demos[this.activeLesson.demo].mount(this.demoElement);
     }
     slot.replaceWith(this.demoElement);
+  }
+
+  /**
+   * Fill each ```widget placeholder with its live widget. Like the demo, a
+   * widget is mounted once per lesson visit and then moved into each new
+   * render, so a re-render (a tab click, Mark complete) keeps its state.
+   */
+  attachWidgets() {
+    const key = lessonPath(this.activeSectionId, this.activeLessonId);
+    if (this.widgetKey !== key) {
+      this.widgetKey = key;
+      this.widgetElements = [];
+    }
+    this.root.querySelectorAll('[data-widget]').forEach((slot, i) => {
+      let element = this.widgetElements[i];
+      if (!element) {
+        const mount = widgets[slot.dataset.widget];
+        if (!mount) return slot.remove();
+        element = document.createElement('figure');
+        element.className = `widget widget-${slot.dataset.widget}`;
+        mount(element, JSON.parse(slot.dataset.config || '{}'));
+        this.widgetElements[i] = element;
+      }
+      slot.replaceWith(element);
+    });
   }
 
   /**
