@@ -19,25 +19,46 @@ import { escapeHtml } from '../utils/markdown.js';
  * cell (click, or Tab and Enter), and only then does the step play, with a
  * line saying whether the guess was right and why.
  */
-export function createPlayer(root, onFrame, { predict } = {}) {
+export const PLAYER_WORDS = {
+  en: {
+    first: 'First step', back: 'Back', play: 'Play', pause: 'Pause', step: 'Step', speed: 'Speed', predictFirst: 'Predict first',
+    justShow: 'Just show me', stepLabel: 'Step', pseudocode: 'Pseudocode', variables: 'Variables',
+    stepOf: (k, n) => `Step ${k} of ${n}`, count: (k, n) => `Step ${k} / ${n}`,
+    predict: (q) => `Predict: ${q} Pick a cell.`, pickCell: (i) => `Pick cell ${i}`,
+    itWas: (a, why) => `It was cell ${a}. ${why}`, right: (a, why) => `Right: cell ${a}. ${why}`,
+    wrong: (p, a, why) => `You picked cell ${p}; it was cell ${a}. ${why}`,
+  },
+  bn: {
+    first: 'প্রথম ধাপ', back: 'পেছনে', play: 'চালাও', pause: 'থামাও', step: 'ধাপ', speed: 'গতি', predictFirst: 'আগে আন্দাজ করো',
+    justShow: 'শুধু দেখাও', stepLabel: 'ধাপ', pseudocode: 'সিউডোকোড', variables: 'ভেরিয়েবল',
+    stepOf: (k, n) => `${n}টির মধ্যে ${k} নম্বর ধাপ`, count: (k, n) => `ধাপ ${k} / ${n}`,
+    predict: (q) => `আন্দাজ করো: ${q} একটা ঘর বেছে নাও।`, pickCell: (i) => `${i} নম্বর ঘর বেছে নাও`,
+    itWas: (a, why) => `উত্তর ছিল ${a} নম্বর ঘর। ${why}`, right: (a, why) => `ঠিক: ${a} নম্বর ঘর। ${why}`,
+    wrong: (p, a, why) => `তুমি ${p} বেছেছিলে; উত্তর ছিল ${a}। ${why}`,
+  },
+};
+
+// `lang` picks the control words (PLAYER_WORDS); the frames bring their own captions.
+export function createPlayer(root, onFrame, { predict, lang = 'en' } = {}) {
+  const w = PLAYER_WORDS[lang] ?? PLAYER_WORDS.en;
   root.insertAdjacentHTML(
     'beforeend',
     `
     <div class="demo-player">
       <div class="player-buttons">
-        <button type="button" class="demo-button" data-player="first" aria-label="First step">${icon('first')}</button>
-        <button type="button" class="demo-button" data-player="back">${icon('back')} Back</button>
-        <button type="button" class="demo-button is-primary" data-player="play">${icon('play')} Play</button>
-        <button type="button" class="demo-button" data-player="next">Step ${icon('next')}</button>
+        <button type="button" class="demo-button" data-player="first" aria-label="${w.first}">${icon('first')}</button>
+        <button type="button" class="demo-button" data-player="back">${icon('back')} ${w.back}</button>
+        <button type="button" class="demo-button is-primary" data-player="play">${icon('play')} ${w.play}</button>
+        <button type="button" class="demo-button" data-player="next">${w.step} ${icon('next')}</button>
       </div>
-      <label class="demo-speed">Speed
+      <label class="demo-speed">${w.speed}
         <input type="range" min="1" max="10" value="5" data-player="speed" />
       </label>
-      ${predict ? '<label class="predict-toggle"><input type="checkbox" data-player="predict" /> Predict first</label>' : ''}
+      ${predict ? `<label class="predict-toggle"><input type="checkbox" data-player="predict" /> ${w.predictFirst}</label>` : ''}
     </div>
-    ${predict ? '<div class="predict-card" hidden><p class="predict-question" aria-live="polite"></p><button type="button" class="demo-button" data-player="reveal">Just show me</button></div>' : ''}
+    ${predict ? `<div class="predict-card" hidden><p class="predict-question" aria-live="polite"></p><button type="button" class="demo-button" data-player="reveal">${w.justShow}</button></div>` : ''}
     <div class="demo-timeline">
-      <label class="demo-scrub"><span class="sr-only">Step</span>
+      <label class="demo-scrub"><span class="sr-only">${w.stepLabel}</span>
         <input type="range" min="1" max="1" value="1" step="1" data-player="scrub" />
       </label>
       <span class="demo-count" aria-hidden="true"></span>
@@ -45,11 +66,11 @@ export function createPlayer(root, onFrame, { predict } = {}) {
     <p class="demo-caption" aria-live="polite"></p>
     <div class="trace" hidden>
       <div class="trace-code">
-        <p class="trace-title">Pseudocode</p>
+        <p class="trace-title">${w.pseudocode}</p>
         <ol class="trace-lines"></ol>
       </div>
       <div class="trace-vars">
-        <p class="trace-title">Variables</p>
+        <p class="trace-title">${w.variables}</p>
         <dl class="trace-var-list"></dl>
       </div>
     </div>
@@ -77,12 +98,12 @@ export function createPlayer(root, onFrame, { predict } = {}) {
     onFrame(frame);
     // The visible counter is aria-hidden, so screen readers hear the step in the caption.
     // A numbered step badge, like a numbered fold in a diagram; screen readers get the words.
-    caption.innerHTML = `<span class="step-badge" aria-hidden="true">${index + 1}</span><span class="sr-only">Step ${index + 1} of ${frames.length}. </span>${escapeHtml(frame.caption)}`;
-    count.textContent = `Step ${index + 1} / ${frames.length}`;
+    caption.innerHTML = `<span class="step-badge" aria-hidden="true">${index + 1}</span><span class="sr-only">${w.stepOf(index + 1, frames.length)}. </span>${escapeHtml(frame.caption)}`;
+    count.textContent = w.count(index + 1, frames.length);
     // The timeline: drag through every step, like scrubbing a video.
     scrub.max = String(frames.length);
     scrub.value = String(index + 1);
-    scrub.setAttribute('aria-valuetext', `Step ${index + 1} of ${frames.length}: ${frame.caption}`);
+    scrub.setAttribute('aria-valuetext', `${w.stepOf(index + 1, frames.length)}: ${frame.caption}`);
     scrub.style.setProperty('--progress', frames.length > 1 ? `${(index / (frames.length - 1)) * 100}%` : '100%');
     // The first frame can draw before the demo is attached and laid out; centre after layout too.
     keepActiveCellInView();
@@ -105,7 +126,7 @@ export function createPlayer(root, onFrame, { predict } = {}) {
   const stop = () => {
     clearInterval(timer);
     timer = null;
-    playButton.innerHTML = `${icon('play')} Play`;
+    playButton.innerHTML = `${icon('play')} ${w.play}`;
     // Announce captions again once playback stops; during play they change too fast.
     caption.setAttribute('aria-live', 'polite');
   };
@@ -120,7 +141,7 @@ export function createPlayer(root, onFrame, { predict } = {}) {
 
   const play = () => {
     if (index >= frames.length - 1) index = -1; // Replay from the start.
-    playButton.innerHTML = `${icon('pause')} Pause`;
+    playButton.innerHTML = `${icon('pause')} ${w.pause}`;
     caption.setAttribute('aria-live', 'off');
     timer = setInterval(() => {
       // Stop when the learner has moved to another lesson or reached the end.
@@ -150,12 +171,12 @@ export function createPlayer(root, onFrame, { predict } = {}) {
     awaiting = { answer };
     predictCard.hidden = false;
     predictCard.classList.remove('is-right', 'is-wrong');
-    predictQuestion.textContent = `Predict: ${predict.question(frames[index], next)} Pick a cell.`;
+    predictQuestion.textContent = w.predict(predict.question(frames[index], next));
     pickable().forEach((cell, i) => {
       cell.classList.add('is-pickable');
       cell.tabIndex = 0;
       cell.setAttribute('role', 'button');
-      cell.setAttribute('aria-label', `Pick cell ${i}`);
+      cell.setAttribute('aria-label', w.pickCell(i));
     });
     return true;
   };
@@ -171,7 +192,7 @@ export function createPlayer(root, onFrame, { predict } = {}) {
     predictCard.classList.toggle('is-right', picked !== null && right);
     predictCard.classList.toggle('is-wrong', picked !== null && !right);
     predictQuestion.textContent =
-      picked === null ? `It was cell ${answer}. ${why}` : right ? `Right: cell ${answer}. ${why}` : `You picked cell ${picked}; it was cell ${answer}. ${why}`;
+      picked === null ? w.itWas(answer, why) : right ? w.right(answer, why) : w.wrong(picked, answer, why);
   };
   const stepOrAsk = () => {
     if (awaiting) return;

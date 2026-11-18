@@ -11,7 +11,9 @@
     "test": "node --test \"tests/**/*.test.js\"",
     "mcp": "node mcp/server.js",
     "build:plugin": "node scripts/build-plugin.js",
-    "test:e2e": "next build && node --test e2e/site.test.js"
+    "test:e2e": "next build && node --test e2e/site.test.js",
+    "db:migrate": "node scripts/db.js migrate",
+    "db:seed": "node scripts/db.js seed"
   },
   "keywords": [],
   "author": "Tahmid Bin Taslim Rafi",
@@ -25,10 +27,13 @@
     "vite": "^8.3.8"
   },
   "dependencies": {
+    "@clerk/localizations": "^4.25.0",
     "@clerk/nextjs": "^7.10.1",
+    "@fontsource-variable/anek-bangla": "^5.3.0",
     "@fontsource-variable/geist": "^5.3.0",
     "@fontsource-variable/geist-mono": "^5.3.0",
     "@modelcontextprotocol/sdk": "1.32.2",
+    "@neondatabase/serverless": "^1.2.1",
     "motion": "^14.14.0",
     "next": "16.4.6",
     "posthog-js": "^1.450.0",

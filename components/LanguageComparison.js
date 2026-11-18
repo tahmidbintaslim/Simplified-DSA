@@ -1,8 +1,10 @@
 'use client';
 import { useRef, useState } from 'react';
+import { dict } from '../lib/i18n.js';
 
 /** The same idea in several languages, as ARIA tabs (arrows, Home, End). */
-export default function LanguageComparison({ examples }) {
+export default function LanguageComparison({ lang, examples }) {
+  const t = dict(lang).languages;
   const [active, setActive] = useState(examples[0].id);
   const tabs = useRef({});
   const example = examples.find((e) => e.id === active) ?? examples[0];
@@ -20,13 +22,13 @@ export default function LanguageComparison({ examples }) {
 
   return (
     <details className="language-details">
-      <summary>Compare this in {examples.length} programming languages</summary>
-      <section className="language-panel" aria-label="Language comparison">
+      <summary>{t.summary(examples.length)}</summary>
+      <section className="language-panel" aria-label={t.title}>
         <div className="language-panel-header">
-          <h2 id="language-comparison">Language comparison</h2>
-          <p>Same core idea, different syntax, runtime, and memory model.</p>
+          <h2 id="language-comparison">{t.title}</h2>
+          <p>{t.lead}</p>
         </div>
-        <div className="language-tabs" role="tablist" aria-label="Programming languages" onKeyDown={onKeyDown}>
+        <div className="language-tabs" role="tablist" aria-label={t.tabs} onKeyDown={onKeyDown}>
           {examples.map((e) => (
             <button
               key={e.id}
@@ -51,9 +53,9 @@ export default function LanguageComparison({ examples }) {
           </div>
           <pre><code>{example.code}</code></pre>
           <dl>
-            <div><dt>Runtime</dt><dd>{example.runtime}</dd></div>
-            <div><dt>Memory note</dt><dd>{example.memoryNote}</dd></div>
-            <div><dt>Source</dt><dd><a href={example.sourceUrl} target="_blank" rel="noreferrer">{example.sourceName}</a></dd></div>
+            <div><dt>{t.runtime}</dt><dd>{example.runtime}</dd></div>
+            <div><dt>{t.memory}</dt><dd>{example.memoryNote}</dd></div>
+            <div><dt>{t.source}</dt><dd><a href={example.sourceUrl} target="_blank" rel="noreferrer">{example.sourceName}</a></dd></div>
           </dl>
         </div>
       </section>

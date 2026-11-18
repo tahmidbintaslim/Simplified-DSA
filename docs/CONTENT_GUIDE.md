@@ -291,3 +291,17 @@ Any Markdown here.
 ````
 
 Back-to-back ```cells figures of the same length become one worked example with Back, a slider and Next, so write a worked example as a sequence of figures.
+
+## Bangla lessons
+
+A Bangla lesson lives at `src/content/bn/<section>/<lesson>.md`. Until that file exists, `/bn/...` shows the English lesson under a notice. Titles, summaries and goals for the sidebar and home page are in `src/content/bn/curriculum.js`.
+
+- Write it in natural Bangla, not word for word. Keep terms students search for (array, stack, Big O, `O(n)`) as they are used in Bangla CS classes.
+- Give the standard sections their ids, so the jump list and "On this page" find them: `## খরচের হিসাব {#cost-cheat-sheet}`, `## মনে রাখো {#what-to-remember}`, `## অনুশীলনী {#practice-prompt}`, `## যেসব উৎস দেখা হয়েছে {#sources}`.
+- Callout labels in Bangla share the English styles: `উপমা` (Analogy), `মূল ধারণা` (Key idea), `সাবধান` (Watch out), `কখন ব্যবহার করবে` (When to use it), `ইন্টারভিউ টিপ` (Interview tip).
+- Quiz and figure syntax stays in English (`Q:`, `Why not:`, `Why:`, `values:`, `note:`); only the text after it is Bangla.
+- Widgets and demos take the page language: add a `bn` entry to their word list when you translate one.
+
+## Outside resources
+
+The "Go deeper" panel reads the `resources` table. Add a resource to `db/resources.js` (our own one-line notes in both languages, never copied text), then run `pnpm db:seed`. `tests/i18n.test.js` checks every entry and that each lesson has at least one.

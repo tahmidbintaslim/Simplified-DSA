@@ -83,14 +83,17 @@ The project has two learning goals. The app covers a small part of the first one
 | Analytics | PostHog, loaded only after the learner allows it (consent banner) |
 | Styling | Hand-written CSS on design tokens: Stripe-style light theme, Vercel Geist dark theme. Tailwind v4 for the reset only |
 | Animation | Motion (motion.dev) springs for demos, worked examples and widgets |
+| Languages | English (`/en/...`) and Bangla (`/bn/...`). Interface text in `lib/i18n.js`; Bangla lessons in `src/content/bn/`, falling back to English until translated |
 | Content | Markdown lessons in `src/content/`, rendered on the server |
+| Database | Neon Postgres (`@neondatabase/serverless`): curated resource library, synced progress, quiz attempts. Schema in `db/schema.sql` |
 | AI tutor | MCP server (`mcp/server.js`), served at `/mcp` and bundled in the Claude Code plugin |
 | Tests | Node's test runner; Playwright with `@clerk/testing` for the browser suite |
 | Hosting | Vercel |
 
 ## Architecture
 
-- `app/[section]/[lesson]/page.js` checks the Clerk session (signed out → `/sign-in`), reads the lesson Markdown and builds the article HTML on the server (`lib/lessons.js`).
+- `proxy.js` sends `/` to `/en` or `/bn` (cookie, then browser language) and moves old `/section/lesson` links under `/en`.
+- `app/[lang]/[section]/[lesson]/page.js` checks the Clerk session (signed out → `/sign-in`), reads the lesson Markdown and builds the article HTML on the server (`lib/lessons.js`).
 - `components/LessonView.js` mounts the live parts into that article on the client: the demo, widgets, scrubbable worked examples, quizzes and "On this page".
 - `proxy.js` runs Clerk's middleware on every request. `app/mcp/route.js` is the public MCP connector.
 - `components/Analytics.js` asks for consent, then sends `lesson_viewed`, `demo_used`, `quiz_answered` and `lesson_completed` to PostHog, identified by Clerk user id.
@@ -107,6 +110,8 @@ Create `.env.local` (never commit it) with:
 ```bash
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
 CLERK_SECRET_KEY=sk_test_...
+# Optional: Neon Postgres. Without it there is no resources panel and progress stays in the browser.
+DATABASE_URL=postgresql://...
 # Optional: analytics. Without it nothing is tracked.
 NEXT_PUBLIC_POSTHOG_KEY=phc_...
 NEXT_PUBLIC_POSTHOG_HOST=https://eu.i.posthog.com
@@ -124,6 +129,8 @@ Open http://localhost:3000/. Each lesson lives at `/<section>/<lesson>`, for exa
 ### Test
 
 ```bash
+pnpm db:migrate  # create tables (safe to re-run)
+pnpm db:seed     # load the resource library from db/resources.js
 pnpm test        # unit tests
 pnpm test:e2e    # builds, then runs the browser suite signed in as the Clerk test user
 ```

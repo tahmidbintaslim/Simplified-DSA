@@ -1,27 +1,23 @@
 'use client';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
-import { curriculum as sections } from '../src/content/curriculum.js';
-
-const lessonPath = (sectionId, lessonId) => `/${sectionId}/${lessonId}`;
+import { course, lessonPath } from '../lib/course.js';
+import { dict } from '../lib/i18n.js';
 import { loadCompleted } from '../src/core/progress.js';
 import Icon from './Icon.js';
 
 /** Searchable, collapsible lesson tree. On phones it folds into a "Lessons" bar. */
-export default function Sidebar({ activeSection, activeLesson }) {
+export default function Sidebar({ lang, activeSection, activeLesson }) {
+  const t = dict(lang);
+  const sections = course(lang);
   const [query, setQuery] = useState('');
   const [completed, setCompleted] = useState(() => new Set());
-  const [wide, setWide] = useState(true);
   const search = useRef(null);
 
   useEffect(() => {
     setCompleted(loadCompleted());
     const sync = () => setCompleted(loadCompleted());
     window.addEventListener('progress-change', sync);
-    const mq = matchMedia('(min-width: 761px)');
-    setWide(mq.matches);
-    const onMq = () => setWide(mq.matches);
-    mq.addEventListener('change', onMq);
     // "/" or Ctrl/Cmd+K jumps to lesson search.
     const onKey = (event) => {
       const typing = event.target.closest?.('input, textarea, select, [contenteditable="true"]');
@@ -34,7 +30,6 @@ export default function Sidebar({ activeSection, activeLesson }) {
     document.addEventListener('keydown', onKey);
     return () => {
       window.removeEventListener('progress-change', sync);
-      mq.removeEventListener('change', onMq);
       document.removeEventListener('keydown', onKey);
     };
   }, []);
@@ -45,21 +40,21 @@ export default function Sidebar({ activeSection, activeLesson }) {
   let shown = 0;
 
   return (
-    <aside className="lesson-sidebar" aria-label="Course navigation">
-      {/* Re-keyed per lesson so the phone drawer folds after a pick. */}
-      <details className="nav-drawer" open={wide || undefined} key={`${wide}:${activeSection}/${activeLesson}`}>
+    <aside className="lesson-sidebar" aria-label={t.courseNav}>
+      {/* Served closed (CSS keeps it visible on wide screens); re-keyed per lesson so the phone drawer folds after a pick. */}
+      <details className="nav-drawer" key={`${activeSection}/${activeLesson}`}>
         <summary>
-          <span>Lessons</span>
-          <span className="nav-current">{lesson ? `${section.title} · ${lesson.title}` : 'Choose a lesson'}</span>
+          <span>{t.lessons}</span>
+          <span className="nav-current">{lesson ? `${section.title} · ${lesson.title}` : t.chooseLesson}</span>
           <Icon name="chevronDown" />
         </summary>
         <label className="nav-search">
           <Icon name="search" />
-          <span className="sr-only">Search lessons</span>
-          <input ref={search} id="lesson-search" type="search" placeholder="Search lessons" autoComplete="off" value={query} onChange={(e) => setQuery(e.target.value)} />
+          <span className="sr-only">{t.searchLessons}</span>
+          <input ref={search} id="lesson-search" type="search" placeholder={t.searchLessons} autoComplete="off" value={query} onChange={(e) => setQuery(e.target.value)} />
           <kbd aria-hidden="true">/</kbd>
         </label>
-        <nav aria-label="Lessons">
+        <nav aria-label={t.lessons}>
           {sections.map((s) => {
             const matches = s.lessons.filter((l) => !q || `${l.title} ${l.summary}`.toLowerCase().includes(q));
             shown += matches.length;
@@ -77,9 +72,9 @@ export default function Sidebar({ activeSection, activeLesson }) {
                     const active = s.id === activeSection && l.id === activeLesson;
                     const isDone = completed.has(`${s.id}/${l.id}`);
                     return (
-                      <Link key={l.id} id={`lesson-link-${s.id}-${l.id}`} className={`lesson-link ${active ? 'is-active' : ''}`} href={lessonPath(s.id, l.id)} aria-current={active ? 'page' : undefined}>
+                      <Link key={l.id} id={`lesson-link-${s.id}-${l.id}`} className={`lesson-link ${active ? 'is-active' : ''}`} href={lessonPath(lang, s.id, l.id)} aria-current={active ? 'page' : undefined}>
                         <span className={`lesson-status ${isDone ? 'is-done' : ''}`}>
-                          {isDone && (<><Icon name="check" /><span className="sr-only">Completed: </span></>)}
+                          {isDone && (<><Icon name="check" /><span className="sr-only">{t.completed}</span></>)}
                         </span>
                         <strong>{l.title}</strong>
                         <span className="lesson-summary">{l.summary}</span>
@@ -91,7 +86,7 @@ export default function Sidebar({ activeSection, activeLesson }) {
             );
           })}
         </nav>
-        {shown === 0 && <p className="nav-empty">No lesson matches that search.</p>}
+        {shown === 0 && <p className="nav-empty">{t.noMatch}</p>}
       </details>
     </aside>
   );

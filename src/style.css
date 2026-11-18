@@ -18,7 +18,7 @@
 
   --font-body: "Geist Variable", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-display: "Geist Variable", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-mono: "Geist Mono Variable", ui-monospace, "SFMono-Regular", Consolas, monospace;
+  --font-mono: "Geist Mono Variable", "Anek Bangla Variable", ui-monospace, "SFMono-Regular", Consolas, monospace;
   --font-ui: "Geist Variable", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 
   --page: #ffffff;
@@ -1455,9 +1455,17 @@ button:focus-visible,
 }
 
 /* The lesson list is a <details> drawer: always open on wide screens (the
-   summary is hidden), a "Lessons" bar on phones. */
+   summary is hidden), a "Lessons" bar on phones. It is served closed, and CSS
+   shows its content on wide screens, so nothing flips open after load. */
 .nav-drawer > summary {
   display: none;
+}
+
+@media (min-width: 761px) {
+  .nav-drawer::details-content {
+    content-visibility: visible;
+    display: contents;
+  }
 }
 
 .sidebar-footer a {
@@ -4558,4 +4566,414 @@ input:focus-visible,
 .consent-actions {
   display: flex;
   gap: 8px;
+}
+
+/* ---------- Bangla text, language switch, "Go deeper" resources ---------- */
+
+/*
+ * Bangla pages use one family for every script: Anek Bangla draws Bangla and
+ * Latin as a matched pair, so mixed lines ("অ্যারে O(1)") never switch fonts
+ * mid-word. Code keeps Geist Mono (--font-mono), with Anek Bangla for any
+ * Bangla letters inside it.
+ * An element marked lang="en" inside a Bangla page (an untranslated lesson)
+ * switches back to Geist.
+ */
+:lang(bn) {
+  --font-body: "Anek Bangla Variable", system-ui, sans-serif;
+  --font-display: "Anek Bangla Variable", system-ui, sans-serif;
+  --font-ui: "Anek Bangla Variable", system-ui, sans-serif;
+}
+
+:lang(en) {
+  --font-body: "Geist Variable", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-display: "Geist Variable", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-ui: "Geist Variable", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+/* font-family inherits as a resolved value, so re-read the variables where the language changes. */
+[lang] {
+  font-family: var(--font-body);
+}
+
+:lang(bn) .lesson-content,
+:lang(bn) .lesson-content p,
+:lang(bn) .lesson-content li {
+  /* Bangla conjuncts and vowel signs need a little more height than Latin. */
+  line-height: 1.85;
+}
+
+:lang(bn) h1,
+:lang(bn) h2,
+:lang(bn) h3 {
+  letter-spacing: 0;
+  line-height: 1.35;
+}
+
+.lang-switch {
+  display: inline-flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--ink);
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.lang-switch:hover {
+  background: var(--hover);
+}
+
+.lesson-fallback {
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  border: 1px solid var(--look-line);
+  border-radius: 8px;
+  background: var(--look-soft);
+  color: var(--ink);
+  font-size: 0.95rem;
+}
+
+.resources {
+  margin: 40px 0 8px;
+  padding-top: 28px;
+  border-top: 1px solid var(--line);
+}
+
+.resources h2 {
+  margin: 0 0 6px;
+  color: var(--ink-strong);
+  font-size: clamp(1.4rem, 2.4vw, 1.75rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.resources-lead {
+  margin: 0 0 20px;
+  color: var(--muted);
+}
+
+.resources-track h3 {
+  margin: 24px 0 10px;
+  color: var(--ink-strong);
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.resources-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.resource-card {
+  display: grid;
+  gap: 4px;
+  height: 100%;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--raised);
+  color: var(--ink-body);
+  text-decoration: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.resource-card:hover {
+  border-color: var(--accent-line);
+  box-shadow: var(--shadow-paper);
+}
+
+.resource-card strong {
+  color: var(--ink-strong);
+}
+
+.resource-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  color: var(--faint);
+  font-size: 0.78rem;
+}
+
+.resource-lang {
+  padding: 0 6px;
+  border-radius: 4px;
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+
+.resource-lang.is-bn {
+  background: var(--done-fill);
+  color: var(--on-done-fill);
+}
+
+.resource-author {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.resource-note {
+  font-size: 0.92rem;
+}
+
+/* ---------- Arrays widgets: memory lane, shift cost, characters vs bytes ---------- */
+
+.memory-label {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.memory-lane {
+  position: relative;
+  margin: 28px 0 8px;
+}
+
+.memory-jump {
+  position: absolute;
+  top: -22px;
+  left: 0;
+  width: 12px;
+  height: 16px;
+  background: var(--accent);
+  clip-path: polygon(0 0, 100% 0, 100% 55%, 50% 100%, 0 55%);
+}
+
+.memory-row {
+  display: flex;
+  gap: 4px;
+}
+
+.memory-cell {
+  display: grid;
+  flex: 1 1 0;
+  justify-items: center;
+  gap: 2px;
+  min-width: 0;
+  padding: 10px 2px 8px;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  background: var(--raised);
+  color: var(--ink);
+  cursor: pointer;
+  font: inherit;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.memory-cell:hover {
+  border-color: var(--accent-line);
+}
+
+.memory-cell.is-hit {
+  border-color: var(--look-line);
+  background: var(--look-fill);
+  color: var(--on-look);
+}
+
+.memory-value {
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.memory-index,
+.memory-address {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--faint);
+}
+
+.memory-cell.is-hit .memory-index,
+.memory-cell.is-hit .memory-address {
+  color: inherit;
+}
+
+.memory-formula {
+  margin: 16px 0 0;
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+.memory-formula .f-index {
+  color: var(--look);
+  font-weight: 700;
+}
+
+.memory-formula .f-size {
+  color: var(--accent-ink);
+  font-weight: 700;
+}
+
+.shift-stage {
+  overflow-x: auto;
+  padding: 18px 0 8px;
+}
+
+.shift-row {
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+.shift-gap {
+  flex: 0 0 auto;
+  width: 14px;
+  height: 52px;
+  margin: 0 -2px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+  position: relative;
+}
+
+.shift-gap::after {
+  content: "+";
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--accent);
+  font-weight: 700;
+  opacity: 0.35;
+  transition: opacity 0.15s;
+}
+
+.shift-gap:hover,
+.shift-gap:focus-visible {
+  background: var(--accent-soft);
+}
+
+.shift-gap:hover::after,
+.shift-gap:focus-visible::after {
+  opacity: 1;
+}
+
+.shift-chart {
+  margin: 12px 0 0;
+}
+
+.shift-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  height: 96px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.shift-bar {
+  position: relative;
+  display: flex;
+  flex: 1 1 0;
+  align-items: flex-end;
+  height: 100%;
+}
+
+.shift-bar-fill {
+  width: 100%;
+  height: max(3px, var(--h));
+  border-radius: 4px 4px 0 0;
+  background: var(--line);
+  transform-origin: bottom;
+  transition: background 0.2s;
+}
+
+.shift-bar.is-tried .shift-bar-fill {
+  background: var(--done);
+}
+
+.shift-bar.is-now .shift-bar-fill {
+  background: var(--look-line);
+}
+
+.shift-bar-label {
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--faint);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+}
+
+.shift-chart figcaption {
+  margin-top: 26px;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.bytes-input {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bytes-input .demo-input {
+  width: 9em;
+}
+
+.bytes-rows {
+  display: grid;
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.bytes-row p {
+  margin: 0 0 6px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.bytes-row strong {
+  color: var(--ink-strong);
+  font-family: var(--font-mono);
+}
+
+.bytes-cells {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.bytes-cell {
+  display: inline-grid;
+  justify-items: center;
+  min-width: 34px;
+  padding: 6px 6px;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  background: var(--raised);
+  color: var(--ink);
+  font-size: 1.05rem;
+}
+
+.bytes-cell small {
+  color: var(--faint);
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+}
+
+.bytes-cell.is-seen {
+  border-color: var(--look-line);
+  background: var(--look-soft);
+}
+
+.bytes-cell.is-byte {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+}
+
+/* Holds the account button's place while Clerk loads, so the header never shifts. */
+.auth-slot {
+  display: inline-block;
+  width: 32px;
+  height: 32px;
 }

@@ -56,8 +56,8 @@ const legend = (items) =>
     .join('')}</ul>`;
 
 // Status lines double as error messages; errors are styled and announced.
-const setStatus = (el, text, { error = false, keptPrevious = error } = {}) => {
-  el.textContent = keptPrevious ? `${text} The demo still shows the previous values.` : text;
+const setStatus = (el, text, { error = false, keptPrevious = error, kept = 'The demo still shows the previous values.' } = {}) => {
+  el.textContent = keptPrevious ? `${text} ${kept}` : text;
   el.classList.toggle('is-error', error);
 };
 
@@ -71,21 +71,49 @@ const readList = (input, { min = 1, max = 99, count = 20 } = {}) => {
 
 /* ---------- Arrays: insert and delete shift values ---------- */
 
-function mountArray(root) {
+const ARRAY_UI = {
+  en: {
+    value: 'Value', index: 'Index', read: 'Read [i]', insert: 'Insert at i', del: 'Delete at i', append: 'Append',
+    keyHit: 'the value you asked for', keyMoved: 'shifted to make room or close the gap', keyGap: 'empty slot',
+    full: (max) => `The demo holds at most ${max} values. Delete one first.`,
+    badIndex: (last) => `Index must be a whole number from 0 to ${last}.`,
+    readCaption: (i, v) => `array[${i}] is ${v}. One address calculation, no scan: O(1).`,
+    appended: (v, i) => `Appended ${v} at index ${i}. Nothing moved: O(1).`,
+    moved: (m) => `${m} value${m === 1 ? '' : 's'} moved. Step through to watch each one.`,
+    start: 'Pick an operation. Watch how many values have to move.',
+    hint: 'Read and Append move nothing. Insert and Delete shift every value after i.',
+    kept: 'The demo still shows the previous values.',
+  },
+  bn: {
+    value: 'মান', index: 'ইনডেক্স', read: '[i] পড়ো', insert: 'i-তে যোগ করো', del: 'i থেকে মোছো', append: 'শেষে যোগ করো',
+    keyHit: 'যে মানটি চেয়েছ', keyMoved: 'জায়গা করতে বা ফাঁক বন্ধ করতে সরেছে', keyGap: 'খালি ঘর',
+    full: (max) => `ডেমোতে সর্বোচ্চ ${max}টি মান রাখা যায়। আগে একটা মোছো।`,
+    badIndex: (last) => `ইনডেক্স হতে হবে 0 থেকে ${last}-এর মধ্যে একটি পূর্ণসংখ্যা।`,
+    readCaption: (i, v) => `array[${i}] হলো ${v}। একটা ঠিকানার হিসাব, কোনো খোঁজাখুঁজি নেই: O(1)।`,
+    appended: (v, i) => `ইনডেক্স ${i}-এ ${v} যোগ হলো। কিছুই সরেনি: O(1)।`,
+    moved: (m) => `${m}টি মান সরেছে। প্রতিটি ধাপে ধাপে দেখো।`,
+    start: 'একটা কাজ বেছে নাও। দেখো কয়টি মান সরাতে হয়।',
+    hint: 'পড়া আর শেষে যোগ করায় কিছু সরে না। যোগ আর মোছায় i-এর পরের সব মান সরে।',
+    kept: 'ডেমোতে আগের মানগুলোই দেখানো হচ্ছে।',
+  },
+};
+
+function mountArray(root, { lang = 'en' } = {}) {
+  const w = ARRAY_UI[lang] ?? ARRAY_UI.en;
   let values = [4, 8, 15, 16, 42];
   const MAX = 10;
 
   root.innerHTML = `
     <div class="demo-controls">
-      <label>Value <input class="demo-input" type="number" value="23" data-field="value" /></label>
-      <label>Index <input class="demo-input" type="number" value="2" min="0" data-field="index" /></label>
-      <button type="button" class="demo-button" data-op="read">Read [i]</button>
-      <button type="button" class="demo-button" data-op="insert">Insert at i</button>
-      <button type="button" class="demo-button" data-op="delete">Delete at i</button>
-      <button type="button" class="demo-button" data-op="append">Append</button>
+      <label>${w.value} <input class="demo-input" type="number" value="23" data-field="value" /></label>
+      <label>${w.index} <input class="demo-input" type="number" value="2" min="0" data-field="index" /></label>
+      <button type="button" class="demo-button" data-op="read">${w.read}</button>
+      <button type="button" class="demo-button" data-op="insert">${w.insert}</button>
+      <button type="button" class="demo-button" data-op="delete">${w.del}</button>
+      <button type="button" class="demo-button" data-op="append">${w.append}</button>
     </div>
     ${motionStageHtml()}
-    ${legend([['hit', 'the value you asked for'], ['moved', 'shifted to make room or close the gap'], ['gap', 'empty slot']])}
+    ${legend([['hit', w.keyHit], ['moved', w.keyMoved], ['gap', w.keyGap]])}
     <p class="bs-compare arr-status" aria-live="polite"></p>
   `;
 
@@ -106,7 +134,7 @@ function mountArray(root) {
       })),
       { pointers: { i: hit >= 0 ? hit : null, j: vars?.j ?? null } },
     );
-  });
+  }, { lang });
 
   // One-step operations still go through the player, so every demo reads the same way.
   const single = (caption, hit, line = 0) => [{ values: [...values], hit, moved: [], line, vars: { n: values.length }, caption }];
@@ -119,32 +147,32 @@ function mountArray(root) {
     const last = values.length - (op === 'insert' ? 0 : 1);
 
     if ((op === 'insert' || op === 'append') && values.length >= MAX) {
-      return setStatus(status, `The demo holds at most ${MAX} values. Delete one first.`, { error: true });
+      return setStatus(status, w.full(MAX), { error: true, kept: w.kept });
     }
     if (op !== 'append' && (index === null || index < 0 || index > last)) {
-      return setStatus(status, `Index must be a whole number from 0 to ${last}.`, { error: true });
+      return setStatus(status, w.badIndex(last), { error: true, kept: w.kept });
     }
 
     let frames;
     if (op === 'read') {
-      frames = single(`array[${index}] is ${values[index]}. One address calculation, no scan: O(1).`, index);
+      frames = single(w.readCaption(index, values[index]), index);
     } else if (op === 'append') {
       values.push(value);
-      frames = single(`Appended ${value} at index ${values.length - 1}. Nothing moved: O(1).`, values.length - 1);
+      frames = single(w.appended(value, values.length - 1), values.length - 1);
     } else if (op === 'insert') {
-      frames = arrayInsertFrames(values, index, value);
+      frames = arrayInsertFrames(values, index, value, lang);
       values.splice(index, 0, value);
     } else {
-      frames = arrayDeleteFrames(values, index);
+      frames = arrayDeleteFrames(values, index, lang);
       values.splice(index, 1);
     }
     const moved = frames.at(-1).moved.length;
-    setStatus(status, `${moved} value${moved === 1 ? '' : 's'} moved. Step through to watch each one.`);
+    setStatus(status, w.moved(moved));
     player.load(frames, arrayCode[op]);
   });
 
-  player.load(single('Pick an operation. Watch how many values have to move.', -1), arrayCode.read);
-  setStatus(status, 'Read and Append move nothing. Insert and Delete shift every value after i.');
+  player.load(single(w.start, -1), arrayCode.read);
+  setStatus(status, w.hint);
 }
 
 /* ---------- Linked lists: walk the pointers ---------- */
@@ -1187,66 +1215,79 @@ export const demos = {
   'array-ops': {
     title: 'Insert, delete and read',
     intro: 'Change the array and count how many values move.',
+    bn: { title: 'ইনসার্ট, ডিলিট আর পড়া', intro: 'অ্যারে বদলাও আর গুনে দেখো কয়টি মান সরে।' },
     mount: mountArray,
   },
   'linked-list': {
     title: 'Follow the pointers',
     intro: 'Insert at the head and at the tail, then search. Watch how far each operation walks.',
+    bn: { title: 'পয়েন্টার ধরে এগোও', intro: 'head আর tail-এ যোগ করো, তারপর খোঁজো। দেখো প্রতিটি কাজে কতদূর হাঁটতে হয়।' },
     mount: mountLinkedList,
   },
   'stack-queue': {
     title: 'Last in or first in?',
     intro: 'Push and enqueue the same values, then remove one from each side.',
+    bn: { title: 'শেষে ঢুকে আগে, নাকি আগে ঢুকে আগে?', intro: 'একই মান push আর enqueue করো, তারপর দুই দিক থেকে একটা করে সরাও।' },
     mount: mountStackQueue,
   },
   'hash-table': {
     title: 'Hash a key into a bucket',
     intro: 'Type a key to see the hash arithmetic and the bucket it lands in.',
+    bn: { title: 'কী-কে বাকেটে ফেলো', intro: 'একটা কী লেখো; হ্যাশের হিসাব আর কোন বাকেটে পড়ল দেখো।' },
     mount: mountHashTable,
   },
   bst: {
     title: 'Build and search a tree',
     intro: 'Insert values and search for them. Then try sorted inserts to see the tree degrade.',
+    bn: { title: 'ট্রি বানাও আর খোঁজো', intro: 'মান যোগ করো আর খোঁজো। তারপর সাজানো ক্রমে যোগ করে দেখো ট্রি কীভাবে বেঁকে যায়।' },
     mount: mountBst,
   },
   growth: {
     title: 'Growth rates side by side',
     intro: 'Change n and compare how many steps each shape needs.',
+    bn: { title: 'বৃদ্ধির হার পাশাপাশি', intro: 'n বদলাও আর তুলনা করো কোন ধরনে কত ধাপ লাগে।' },
     mount: mountGrowth,
   },
   'binary-search': {
     title: 'Halve the search range',
     intro: 'Step through each comparison. Grey values are ruled out.',
+    bn: { title: 'খোঁজার পরিসর অর্ধেক করো', intro: 'প্রতিটি তুলনা ধাপে ধাপে দেখো। ধূসর মানগুলো বাদ পড়েছে।' },
     mount: mountBinarySearch,
   },
   sorting: {
     title: 'Watch a sort run',
     intro: 'Pick an algorithm and step through every compare and swap. Highlighted bars are being compared.',
+    bn: { title: 'সর্ট চলতে দেখো', intro: 'একটা অ্যালগরিদম বেছে নাও, প্রতিটি তুলনা আর অদলবদল ধাপে ধাপে দেখো।' },
     mount: mountSorting,
   },
   'grid-traversal': {
     title: 'Breadth-first vs depth-first',
     intro: 'Same grid, same start and goal. The only change is a queue versus a stack.',
+    bn: { title: 'ব্রেডথ-ফার্স্ট বনাম ডেপথ-ফার্স্ট', intro: 'একই গ্রিড, একই শুরু আর লক্ষ্য। পার্থক্য শুধু কিউ বনাম স্ট্যাক।' },
     mount: mountGridTraversal,
   },
   'two-pointers': {
     title: 'Squeeze from both ends',
     intro: 'Watch L and R close in on the target. Every grey value is ruled out for good.',
+    bn: { title: 'দুই দিক থেকে চেপে আনো', intro: 'দেখো L আর R কীভাবে লক্ষ্যের দিকে এগোয়। প্রতিটি ধূসর মান চিরতরে বাদ।' },
     mount: mountTwoPointers,
   },
   'sliding-window': {
     title: 'Slide the window',
     intro: 'Each slide adds the value that enters and subtracts the one that leaves.',
+    bn: { title: 'উইন্ডো সরাও', intro: 'প্রতিবার সরালে ঢোকা মানটি যোগ হয় আর বেরোনো মানটি বাদ যায়।' },
     mount: mountSlidingWindow,
   },
   'fast-slow': {
     title: 'Fast and slow pointers',
     intro: 'Slow steps one node, fast steps two. On a loop they must meet; on a plain list fast falls off the end.',
+    bn: { title: 'ফাস্ট ও স্লো পয়েন্টার', intro: 'স্লো এক ঘর যায়, ফাস্ট দুই ঘর। লুপ থাকলে তারা মিলবেই; না থাকলে ফাস্ট শেষ মাথা পেরিয়ে যায়।' },
     mount: mountFastSlow,
   },
   'prefix-sums': {
     title: 'Build once, ask in O(1)',
     intro: 'Build the running totals, then answer a range sum with one subtraction.',
+    bn: { title: 'একবার বানাও, O(1)-এ জিজ্ঞেস করো', intro: 'চলতি যোগফল বানাও, তারপর এক বিয়োগে রেঞ্জের যোগফল বের করো।' },
     mount: mountPrefixSums,
   },
 };

@@ -54,9 +54,10 @@ function renderCells(lines) {
 
   const cells = values
     .map((value, i) => {
-      const state = found.has(i) ? 'is-found' : highlight.has(i) ? 'is-hit' : done.has(i) ? 'is-moved' : dim.has(i) ? 'is-out' : '';
+      // "_" is an empty slot (a gap waiting to be filled).
+      const state = value === '_' ? 'is-gap' : found.has(i) ? 'is-found' : highlight.has(i) ? 'is-hit' : done.has(i) ? 'is-moved' : dim.has(i) ? 'is-out' : '';
       const label = labels[i] ? `<span class="cell-pointer">${escapeHtml(labels[i].join(' '))}</span>` : '';
-      return `<div class="array-cell ${state}"><span class="array-value">${escapeHtml(value)}</span><span class="array-index">${i}</span>${label}</div>`;
+      return `<div class="array-cell ${state}"><span class="array-value">${value === '_' ? '' : escapeHtml(value)}</span><span class="array-index">${i}</span>${label}</div>`;
     })
     .join('');
   const note = fields.note ? `<figcaption>${inlineMarkdown(fields.note)}</figcaption>` : '';
@@ -141,12 +142,21 @@ function renderTable(rows) {
  * Callouts are blockquotes that start with a bold label, e.g.
  * "> **Analogy:** A hash table is like a coat check." The label picks the style.
  */
+// Bangla callout labels share the English styles.
+const CALLOUT_STYLES = {
+  'উপমা': 'analogy',
+  'মূল ধারণা': 'key-idea',
+  'সাবধান': 'watch-out',
+  'কখন ব্যবহার করবে': 'when-to-use-it',
+  'ইন্টারভিউ টিপ': 'interview-tip',
+};
+
 function renderCallout(lines) {
   const text = lines.join(' ');
   const match = text.match(/^\*\*([^*]+?):?\*\*:?\s*(.*)$/);
   const label = match?.[1] ?? '';
   const body = match ? match[2] : text;
-  return `<aside class="callout callout-${slug(label) || 'note'}">${
+  return `<aside class="callout callout-${CALLOUT_STYLES[label] ?? (slug(label) || 'note')}">${
     label ? `<strong class="callout-label">${escapeHtml(label)}</strong>` : ''
   }<p>${inlineMarkdown(body)}</p></aside>`;
 }
@@ -162,6 +172,11 @@ function renderCallout(lines) {
  * Everything is escaped before formatting, so lesson text cannot inject HTML.
  */
 export class MarkdownRenderer {
+  // `lang` picks the built-in words ("Show the answer", "Deep dive").
+  constructor({ lang = 'en' } = {}) {
+    this.words = lang === 'bn' ? { answer: 'উত্তর দেখো', deepDive: 'আরও গভীরে' } : { answer: 'Show the answer', deepDive: 'Deep dive' };
+  }
+
   render(markdown) {
     const lines = markdown.trim().split('\n');
     const html = [];
@@ -217,11 +232,11 @@ export class MarkdownRenderer {
           else if (kind === 'widget') html.push(renderWidget(body));
           // A collapsible aside for readers who want more ("title: …" first).
           else if (kind === 'deep-dive') {
-            const title = body[0]?.startsWith('title:') ? body.shift().slice(6).trim() : 'Deep dive';
+            const title = body[0]?.startsWith('title:') ? body.shift().slice(6).trim() : this.words.deepDive;
             html.push(`<details class="deep-dive"><summary>${inlineMarkdown(title)}</summary>${this.render(body.join('\n'))}</details>`);
           }
           // An answer to a practice prompt stays folded until the learner has tried.
-          else if (kind === 'answer') html.push(`<details class="answer"><summary>Show the answer</summary>${this.render(body.join('\n'))}</details>`);
+          else if (kind === 'answer') html.push(`<details class="answer"><summary>${this.words.answer}</summary>${this.render(body.join('\n'))}</details>`);
           else if (body.length) html.push(`<pre><code>${escapeHtml(body.join('\n'))}</code></pre>`);
           fence = null;
         } else {

@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
 import posthog from 'posthog-js';
+import { dict } from '../lib/i18n.js';
 
 /**
  * Product analytics with PostHog, only after the learner agrees (kept in this
@@ -26,7 +27,8 @@ const readConsent = () => {
   }
 };
 
-export default function Analytics() {
+export default function Analytics({ lang }) {
+  const t = dict(lang).consent;
   const [consent, setConsent] = useState('unknown');
   const { user } = useUser();
   const pathname = usePathname();
@@ -59,13 +61,13 @@ export default function Analytics() {
 
   if (!KEY || consent !== 'ask') return null;
   return (
-    <div className="consent-banner" role="region" aria-label="Analytics consent">
+    <div className="consent-banner" role="region" aria-label={t.region}>
       <p>
-        We would like to measure how lessons are used (pages, demo use, quiz answers) to improve them. <a href="/privacy.html">Privacy</a>
+        {t.text} <a href="/privacy.html">{dict(lang).privacy}</a>
       </p>
       <div className="consent-actions">
-        <button type="button" className="demo-button" onClick={() => choose('no')}>No thanks</button>
-        <button type="button" className="demo-button is-primary" onClick={() => choose('yes')}>Allow</button>
+        <button type="button" className="demo-button" onClick={() => choose('no')}>{t.no}</button>
+        <button type="button" className="demo-button is-primary" onClick={() => choose('yes')}>{t.yes}</button>
       </div>
     </div>
   );

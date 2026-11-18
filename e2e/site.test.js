@@ -12,7 +12,7 @@ import * as playwright from 'playwright';
 import { clerk, clerkSetup } from '@clerk/testing/playwright';
 import { loadLessons } from '../mcp/server.js';
 
-const lessons = loadLessons().map((lesson) => `/${lesson.section}/${lesson.id}`);
+const lessons = loadLessons().map((lesson) => `/en/${lesson.section}/${lesson.id}`);
 let server;
 let browser;
 let base;
@@ -25,7 +25,8 @@ before(async () => {
   // The production build, as Vercel runs it (`pnpm test:e2e` builds first).
   const port = 4180 + Math.floor(Math.random() * 500);
   base = `http://localhost:${port}`;
-  server = spawn('node_modules/.bin/next', ['start', '-p', String(port)], { stdio: 'ignore' });
+  // No database: progress stays in the browser, so tests never depend on an account's saved state.
+  server = spawn('node_modules/.bin/next', ['start', '-p', String(port)], { stdio: 'ignore', env: { ...process.env, DATABASE_URL: '' } });
   for (let i = 0; i < 100; i++) {
     if (await fetch(base).then((r) => r.ok, () => false)) break;
     await new Promise((resolve) => setTimeout(resolve, 200));
@@ -59,7 +60,9 @@ const open = async (path, { width = 1280, init, signedOut = false, ...options } 
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
   if (init) await page.addInitScript(init);
-  await page.goto(`${base}${path}`);
+  // Paths in these tests are English pages: '/' is /en, '/algorithms/x' is /en/algorithms/x.
+  const url = /^\/(en|bn)(\/|$)/.test(path) ? path : `/en${path === '/' ? '' : path}`;
+  await page.goto(`${base}${url}`);
   return { page, errors };
 };
 
@@ -84,7 +87,7 @@ test('every lesson renders its title, demo, quizzes and footer without errors', 
 });
 
 test('no lesson scrolls sideways on a 390px phone', async () => {
-  for (const path of lessons) {
+  for (const path of [...lessons, '/bn', '/bn/data-structures/arrays-and-strings']) {
     const { page } = await open(path, { width: 390 });
     const width = await page.evaluate(() => document.documentElement.scrollWidth);
     assert.ok(width <= 390, `${path} is ${width}px wide`);
@@ -128,7 +131,7 @@ test('progress survives a reload and Next opens the next lesson at the top', asy
   assert.match(await page.textContent('#complete-button'), /Completed/);
   await page.locator('.lesson-step:last-child').scrollIntoViewIfNeeded();
   await page.click('.lesson-step:last-child');
-  await page.waitForURL('**/data-structures/binary-search-trees');
+  await page.waitForURL('**/en/data-structures/binary-search-trees');
   await page.waitForSelector('.lesson-content h1');
   assert.equal(await page.evaluate(() => window.scrollY), 0);
   await page.close();
@@ -198,7 +201,7 @@ test('on a phone the lesson starts on the first screen and the list folds into a
   await page.click('.nav-drawer > summary');
   assert.equal(await page.isVisible('#lesson-link-algorithms-binary-search'), true);
   await page.click('#lesson-link-algorithms-sorting');
-  await page.waitForURL('**/algorithms/sorting');
+  await page.waitForURL('**/en/algorithms/sorting');
   await page.waitForSelector('#lesson-link-algorithms-sorting', { state: 'hidden' });
   assert.equal(await page.isVisible('#lesson-link-algorithms-sorting'), false);
   await page.close();
@@ -255,7 +258,7 @@ test('home shows the course map and a start button; lessons end with a folded an
   assert.match(await page.textContent('main h1'), /See every step/);
   assert.equal(await page.locator('.course-lesson').count(), lessons.length);
   await page.click('.home-actions .demo-button');
-  await page.waitForURL('**/data-structures/arrays-and-strings');
+  await page.waitForURL('**/en/data-structures/arrays-and-strings');
   await page.waitForSelector('#complete-button');
 
   // The practice answer and the sources start folded.
@@ -270,7 +273,7 @@ test('home shows the course map and a start button; lessons end with a folded an
   assert.notEqual(await page.locator('details.language-details').getAttribute('open'), null);
 
   await page.click('#complete-button');
-  assert.match(await page.textContent('.completion-note'), /Lesson done\. You have finished 1 of \d+ lessons\. Up next: Linked Lists\./);
+  assert.match(await page.textContent('.completion-note'), /Lesson done\. You have finished \d+ of \d+ lessons\. Up next: Linked Lists\./);
   // Marking complete re-renders the page; the answer the learner opened stays open.
   assert.notEqual(await page.locator('details.answer').getAttribute('open'), null);
   assert.deepEqual(errors, []);
@@ -301,7 +304,7 @@ test('critique 2: home links, jump list, stepped array insert, settled quiz', as
 
   // The site title goes home; home shows the drawn step and only section links.
   await page.click('.topbar .brand');
-  await page.waitForURL(`${base}/`);
+  await page.waitForURL(`${base}/en`);
   await page.waitForSelector('.hero-figure .array-cell');
   assert.equal(await page.locator('.hero-figure .array-cell').count(), 7);
   assert.equal(await page.locator('.lesson-sidebar .lesson-link').count(), 0);
@@ -310,7 +313,7 @@ test('critique 2: home links, jump list, stepped array insert, settled quiz', as
 
   const missing = await open('/nope/nothing');
   await missing.page.click('.home-actions a');
-  await missing.page.waitForURL(`${base}/`);
+  await missing.page.waitForURL(`${base}/en`);
   await missing.page.close();
 });
 
@@ -328,7 +331,7 @@ test('docs shell: search filters the lesson tree, sections expand in place, them
 
   // A section header expands in place instead of navigating.
   await page.click('#section-link-patterns');
-  assert.equal(new URL(page.url()).pathname, '/algorithms/binary-search');
+  assert.equal(new URL(page.url()).pathname, '/en/algorithms/binary-search');
   assert.equal(await page.isVisible('#lesson-link-patterns-two-pointers'), true);
 
   // "On this page" lists the headings, including the demo.
@@ -521,9 +524,9 @@ test('lesson widgets: the guess game plays, halving counts, the bug lab breaks, 
 test('auth: home is public; a signed-out visitor to a lesson is sent to sign in and the connector stays public', async () => {
   const { page } = await open('/', { signedOut: true });
   assert.match(await page.textContent('main h1'), /See every step/);
-  await page.goto(`${base}/algorithms/binary-search`);
+  await page.goto(`${base}/bn/algorithms/binary-search`);
   assert.equal(new URL(page.url()).pathname, '/sign-in');
-  assert.equal(new URL(page.url()).searchParams.get('redirect_url'), '/algorithms/binary-search');
+  assert.equal(new URL(page.url()).searchParams.get('redirect_url'), '/bn/algorithms/binary-search');
   await page.close();
   const mcp = await fetch(`${base}/mcp`, {
     method: 'POST',
@@ -531,4 +534,54 @@ test('auth: home is public; a signed-out visitor to a lesson is sent to sign in 
     body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'tools/list' }),
   });
   assert.equal(mcp.status, 200);
+});
+
+test('languages: / follows the browser, old links move under /en, the switch keeps the lesson, Bangla renders in Bangla', async () => {
+  const toBangla = await fetch(`${base}/`, { redirect: 'manual', headers: { 'accept-language': 'bn-BD,bn;q=0.9,en;q=0.8' } });
+  assert.equal(new URL(toBangla.headers.get('location'), base).pathname, '/bn');
+  const toEnglish = await fetch(`${base}/`, { redirect: 'manual', headers: { 'accept-language': 'en-US' } });
+  assert.equal(new URL(toEnglish.headers.get('location'), base).pathname, '/en');
+  const old = await fetch(`${base}/algorithms/big-o`, { redirect: 'manual' });
+  assert.equal(old.status, 308);
+  assert.equal(new URL(old.headers.get('location'), base).pathname, '/en/algorithms/big-o');
+
+  const { page, errors } = await open('/bn/data-structures/arrays-and-strings');
+  assert.equal(await page.getAttribute('html', 'lang'), 'bn');
+  assert.match(await page.textContent('main h1'), /অ্যারে ও স্ট্রিং/);
+  assert.match(await page.textContent('.toc'), /খরচের হিসাব/);
+  // The jump list finds the same sections by id in both languages.
+  assert.equal(await page.locator('.lesson-jumps a[href="#cost-cheat-sheet"]').count(), 1);
+  // The demo speaks Bangla too.
+  assert.match(await page.textContent('.demo-panel [data-op="insert"]'), /যোগ করো/);
+  // A lesson not yet translated says so and shows the English text.
+  await page.goto(`${base}/bn/algorithms/sorting`);
+  assert.equal(await page.locator('.lesson-fallback').count(), 1);
+  assert.match(await page.textContent('.lesson-content h1'), /Sorting/);
+  // The switch opens the same lesson in English.
+  await page.click('.lang-switch');
+  await page.waitForURL('**/en/algorithms/sorting');
+  assert.equal(await page.getAttribute('html', 'lang'), 'en');
+  assert.deepEqual(errors, []);
+  await page.close();
+});
+
+test('arrays widgets: the address arrow jumps to any index, inserting at the front moves everything, Bangla text counts three ways', async () => {
+  const { page, errors } = await open('/data-structures/arrays-and-strings');
+  await page.click('.memory-cell[data-index="3"]');
+  assert.match(await page.textContent('.memory-formula'), /1000 \+ 3 × 4 = 1012/);
+  await page.click('[data-size="8"]');
+  assert.match(await page.textContent('.memory-formula'), /1000 \+ 3 × 8 = 1024/);
+
+  await page.click('.shift-gap[data-gap="0"]');
+  assert.match(await page.textContent('.widget-shift-cost .widget-message'), /moved 8 values/);
+  await page.click('.shift-row .array-cell');
+  await page.click('.shift-gap[data-gap="8"]');
+  assert.match(await page.textContent('.widget-shift-cost .widget-message'), /moved 0 values/);
+  assert.equal(await page.locator('.shift-bar.is-tried').count(), 2);
+
+  await page.click('.widget-string-bytes [data-text="বাংলা"]');
+  const counts = await page.locator('.bytes-row strong').allTextContents();
+  assert.deepEqual(counts.slice(1), ['5', '15']); // code points, UTF-8 bytes
+  assert.deepEqual(errors, []);
+  await page.close();
 });
