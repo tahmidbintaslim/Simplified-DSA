@@ -1,22 +1,29 @@
 # Binary Search
 
-Binary search finds a value in a sorted list by looking at the middle, throwing away the half that cannot contain it, and repeating. It finds any value among a million in about 20 checks.
+Binary search finds a value in a sorted list by looking at the middle, throwing away the half that cannot contain it, and repeating. It finds any value among a million in about 20 checks. Before any of that, though, let's play a game.
+
+```widget
+guess-game
+cards: 16
+```
+
+How did you do? Most people start somewhere sensible, then drift to the edges. The cards were **sorted**, so every card you turned over told you more than just "not this one": it told you which side the answer was on. The best strategy, every single time, is to turn over the card in the **middle** of whatever is left. Press "Watch binary search play" to see it.
 
 > **Analogy:** Looking up a word in a paper dictionary. You open near the middle, see that your word comes later, and ignore the whole first half. Then you split the rest. You never read page by page.
 
 ## The Core Idea
 
-Keep track of the part of the list that could still hold the target, using two positions:
+That game is binary search. To write it as code, we keep track of the part of the list that could still hold the target, using two positions:
 
 - `lo`: the first index still in play,
 - `hi`: the last index still in play,
 - `mid`: the index halfway between them, the one you check.
 
-> **Key idea:** It only works on **sorted** data. Sorting is what tells you which half to throw away.
+> **Key idea:** It only works on **sorted** data. Sorting is what tells you which half to throw away. On a shuffled list, turning over a card tells you nothing about its neighbours.
 
 ## Worked Example
 
-Find `30` in `[3, 9, 14, 21, 30, 42, 57]`.
+Find `30` in `[3, 9, 14, 21, 30, 42, 57]`. Step through it with Next, or drag the slider.
 
 ```cells
 values: 3 9 14 21 30 42 57
@@ -51,15 +58,15 @@ Q: Same list. You search for 10, which is not in it. After checking 21 (go left)
 Why: With lo=2 and hi=2, mid is 2 (value 14). 14 > 10, so hi = mid - 1 = 1. Now lo (2) is greater than hi (1), so nothing is left to check.
 ```
 
-Step through a search and watch the code and the variables change together. Try a target that is missing, or type your own list.
+## Why It Is So Fast
 
-```demo
+Here is the part that feels like a magic trick. Every check throws away **half** of what is left. Halving is brutal: drag the slider up to a million and count how few rows it takes to get down to one value.
+
+```widget
+halving
 ```
 
-## Brute Force vs Binary Search
-
-- **Linear search** checks values one by one: up to `n` checks.
-- **Binary search** halves the range each time: about `log₂ n` checks.
+That is what `O(log n)` means: the number of steps grows with the number of times you can halve `n`, not with `n` itself. Double the list, and binary search needs just **one** more check.
 
 | Values | Linear search (worst) | Binary search (worst) |
 | --- | --- | --- |
@@ -75,6 +82,13 @@ Q: About how many checks does binary search need for a sorted list of 1,000,000 
   Why not: That is half the list, about what a plain scan needs. Binary search throws away half of what is left with every check.
 * 20
 Why: Each check halves the range. 2 to the power 20 is just over a million, so about 20 halvings leave one value.
+```
+
+## Try It
+
+Now drive the real thing. Step through a search and watch the code and the variables change together. Switch on "Predict first" to guess each `mid` before it is revealed, try a target that is missing, or type your own list.
+
+```demo
 ```
 
 ## The Code
@@ -93,7 +107,22 @@ def binary_search(values, target):
     return -1              # lo passed hi: not found
 ```
 
-> **Watch out:** Most binary search bugs live at the edges. Use `lo <= hi` (not `<`) or you skip the last candidate. Use `mid + 1` and `mid - 1` (not `mid`) or the range can stop shrinking and loop forever.
+Seven lines, and two of them are famous for breaking. Binary search is easy to describe and surprisingly easy to get wrong: the bugs hide in the tiny details at the edges. So let's break it on purpose. Flip a switch, pick a target, and watch what happens.
+
+```widget
+bug-lab
+```
+
+Search for `30` with the first switch on: the loop stops while `30` is the only value left, before ever looking at it. Then turn that switch off, turn the second one on, and search for `10`: `hi` lands on a value that is too big and never moves again. Both bugs pass most tests, which is exactly why they survive into interviews.
+
+> **Watch out:** Use `lo <= hi` (not `<`), or you skip the last candidate. Use `mid + 1` and `mid - 1` (not `mid`), or the range can stop shrinking and loop forever.
+
+```deep-dive
+title: Deep dive: why some code writes `lo + (hi - lo) // 2`
+In Python, integers grow as big as they need to, so `(lo + hi) // 2` is always fine. In languages with fixed-size integers (Java, C, C++), `lo + hi` can be larger than the biggest number an `int` can hold when the list has more than about a billion items. The sum wraps around to a negative number, and `mid` points at nonsense.
+
+`lo + (hi - lo) // 2` gives the same middle without ever adding two big numbers together. This exact bug sat in Java's own library binary search for nearly a decade before anyone noticed.
+```
 
 > **When to use it:** The data is sorted (or can be sorted once and searched many times), or the problem asks for "the first position where something becomes true". Binary search also works on answers: "what is the smallest speed that finishes in time?"
 
@@ -128,3 +157,4 @@ Search for `60`:
 
 - [CP-Algorithms: Binary Search](https://cp-algorithms.com/num_methods/binary_search.html)
 - [Python bisect](https://docs.python.org/3/library/bisect.html)
+- [Google Research: Nearly All Binary Searches and Mergesorts are Broken (2006)](https://research.google/blog/extra-extra-read-all-about-it-nearly-all-binary-searches-and-mergesorts-are-broken/)
