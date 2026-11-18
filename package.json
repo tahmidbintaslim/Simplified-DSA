@@ -21,7 +21,8 @@
     "@clerk/testing": "^2.3.1",
     "@tailwindcss/postcss": "^4.3.5",
     "playwright": "1.64.1",
-    "tailwindcss": "^4.3.0"
+    "tailwindcss": "^4.3.0",
+    "vite": "^8.3.8"
   },
   "dependencies": {
     "@clerk/nextjs": "^7.10.1",
