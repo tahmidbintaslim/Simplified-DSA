@@ -2,32 +2,38 @@
   "name": "simplified-dsa",
   "version": "1.0.0",
   "private": true,
-  "description": "Beginner data structures and algorithms lessons in Markdown, with one array example compared across 10 languages. Built with Vite and vanilla JavaScript.",
+  "description": "Simplified DSA: beginner-first data structures and algorithms, taught with interactive visual explainers. Next.js.",
   "packageManager": "pnpm@11.1.3",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
     "test": "node --test \"tests/**/*.test.js\"",
     "mcp": "node mcp/server.js",
     "build:plugin": "node scripts/build-plugin.js",
-    "test:e2e": "vite build && node --test \"e2e/**/*.test.js\""
+    "test:e2e": "next build && node --test e2e/site.test.js"
   },
   "keywords": [],
   "author": "Tahmid Bin Taslim Rafi",
-  "license": "(MIT AND CC-BY-4.0)",
+  "license": "UNLICENSED",
   "type": "module",
   "devDependencies": {
-    "@tailwindcss/vite": "^4.3.0",
+    "@clerk/testing": "^2.3.1",
+    "@tailwindcss/postcss": "^4.3.5",
     "playwright": "1.64.1",
     "tailwindcss": "^4.3.0",
-    "vite": "^8.3.5"
+    "vite": "^8.3.8"
   },
   "dependencies": {
+    "@clerk/nextjs": "^7.10.1",
     "@fontsource-variable/geist": "^5.3.0",
     "@fontsource-variable/geist-mono": "^5.3.0",
     "@modelcontextprotocol/sdk": "1.32.2",
     "motion": "^14.14.0",
+    "next": "16.4.6",
+    "posthog-js": "^1.450.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
     "zod": "4.6.7"
   }
 }

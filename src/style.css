@@ -7,8 +7,8 @@
 
 :root {
   /*
-   * Design tokens. "Clear Steps": a clean white docs world with one blue
-   * accent, and a near-black night theme. The theme follows the system unless
+   * Design tokens. Light follows Stripe (navy ink, indigo #533afd accent);
+   * dark follows Vercel Geist (#0a0a0a, gray scale, blue-700 accent). The theme follows the system unless
    * the learner picks one (html[data-theme]). State roles keep their meaning in
    * both: look = gold (being looked at), done = teal (moved, done, on the
    * path), ruled out = faded and crossed out. Blue is for navigation and
@@ -22,33 +22,33 @@
   --font-ui: "Geist Variable", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 
   --page: #ffffff;
-  --surface: #f8f8f9;
+  --surface: #f8fafd;
   --sunken: #ffffff;
   --raised: #ffffff;
-  --code-bg: #f4f4f5;
-  --hover: #f1f1f3;
-  --line: #e4e4e7;
-  --line-soft: #efeff1;
-  --line-strong: #d4d4d8;
-  --edge: #a1a1aa;
-  --neutral-fill: #d4d4d8;
-  --accent-line: #2563eb;
+  --code-bg: #f6f9fc;
+  --hover: #f0f4f9;
+  --line: #e5edf5;
+  --line-soft: #ecf1f6;
+  --line-strong: #d4dee9;
+  --edge: #95a4ba;
+  --neutral-fill: #d4dee9;
+  --accent-line: #533afd;
 
-  --ink-strong: #09090b;
-  --ink: #18181b;
-  --ink-body: #27272a;
-  --ink-code: #27272a;
-  --ink-caption: #18181b;
-  --muted: #52525b;
-  --subtle: #5c5c66;
-  --faint: #6b6b74;
+  --ink-strong: #061b31;
+  --ink: #0d253d;
+  --ink-body: #3c4f69;
+  --ink-code: #273951;
+  --ink-caption: #061b31;
+  --muted: #50617a;
+  --subtle: #50617a;
+  --faint: #64748d;
 
-  --accent: #1d4ed8;
-  --accent-hover: #1e40af;
-  --accent-soft: #e0e9ff;
-  --accent-ink: #1d4ed8;
+  --accent: #533afd;
+  --accent-hover: #4032c8;
+  --accent-soft: #e8e9ff;
+  --accent-ink: #4032c8;
   --on-accent: #ffffff;
-  --link: #1d4ed8;
+  --link: #533afd;
 
   --look: #8a5e04;
   --look-line: #d4a12f;
@@ -72,12 +72,12 @@
   --orange: #c2410c;
   --on-solid: #09090b;
 
-  --shadow-paper: 0 1px 2px rgb(9 9 11 / 4%), 0 6px 20px -10px rgb(9 9 11 / 12%);
+  --shadow-paper: 0 2px 8px #003b890d, 0 5px 14px #00377014;
 
   /* The home hero's search beam: a column of light on the middle cell. */
   --beam-core: #ffffff;
-  --beam-glow: #3b82f6;
-  --beam-haze: rgb(59 130 246 / 22%);
+  --beam-glow: #665efd;
+  --beam-haze: rgb(83 58 253 / 20%);
 
   font-family: var(--font-body);
   background: var(--page);
@@ -91,34 +91,34 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
-    --page: #0b0b0d;
-    --surface: #111114;
-    --sunken: #141417;
-    --raised: #18181b;
-    --code-bg: #18181b;
-    --hover: #1f1f23;
-    --line: #27272a;
-    --line-soft: #1f1f23;
-    --line-strong: #3f3f46;
-    --edge: #52525b;
-    --neutral-fill: #52525b;
-    --accent-line: #3b82f6;
+    --page: #0a0a0a;
+    --surface: #000000;
+    --sunken: #0a0a0a;
+    --raised: #1a1a1a;
+    --code-bg: #1a1a1a;
+    --hover: #1f1f1f;
+    --line: #2e2e2e;
+    --line-soft: #1f1f1f;
+    --line-strong: #454545;
+    --edge: #878787;
+    --neutral-fill: #454545;
+    --accent-line: #0090ff;
 
-    --ink-strong: #fafafa;
-    --ink: #f4f4f5;
-    --ink-body: #d4d4d8;
-    --ink-code: #e4e4e7;
-    --ink-caption: #f4f4f5;
-    --muted: #a1a1aa;
-    --subtle: #a1a1aa;
-    --faint: #8b8b94;
+    --ink-strong: #ededed;
+    --ink: #ededed;
+    --ink-body: #a1a1a1;
+    --ink-code: #ededed;
+    --ink-caption: #ededed;
+    --muted: #a1a1a1;
+    --subtle: #a1a1a1;
+    --faint: #8f8f8f;
 
-    --accent: #1d4ed8;
-    --accent-hover: #2563eb;
-    --accent-soft: #172554;
-    --accent-ink: #93b4ff;
+    --accent: #0071f6;
+    --accent-hover: #005fd8;
+    --accent-soft: #022248;
+    --accent-ink: #50a8ff;
     --on-accent: #ffffff;
-    --link: #8ab0ff;
+    --link: #50a8ff;
 
     --look: #fcd34d;
     --look-line: #b8924a;
@@ -142,44 +142,44 @@
     --orange: #fb923c;
     --on-solid: #0b0b0d;
 
-    --shadow-paper: 0 1px 2px rgb(0 0 0 / 40%), 0 8px 24px -12px rgb(0 0 0 / 70%);
+    --shadow-paper: 0 0 0 1px #ffffff25, 0 2px 2px #00000052, 0 8px 8px -8px #00000029;
     --beam-core: #ffffff;
-    --beam-glow: #3b82f6;
-    --beam-haze: rgb(37 99 235 / 42%);
+    --beam-glow: #0090ff;
+    --beam-haze: rgb(0 144 255 / 35%);
   }
 }
 
 /* Night, picked by the learner with the theme button. */
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --page: #0b0b0d;
-  --surface: #111114;
-  --sunken: #141417;
-  --raised: #18181b;
-  --code-bg: #18181b;
-  --hover: #1f1f23;
-  --line: #27272a;
-  --line-soft: #1f1f23;
-  --line-strong: #3f3f46;
-  --edge: #52525b;
-  --neutral-fill: #52525b;
-  --accent-line: #3b82f6;
+  --page: #0a0a0a;
+  --surface: #000000;
+  --sunken: #0a0a0a;
+  --raised: #1a1a1a;
+  --code-bg: #1a1a1a;
+  --hover: #1f1f1f;
+  --line: #2e2e2e;
+  --line-soft: #1f1f1f;
+  --line-strong: #454545;
+  --edge: #878787;
+  --neutral-fill: #454545;
+  --accent-line: #0090ff;
 
-  --ink-strong: #fafafa;
-  --ink: #f4f4f5;
-  --ink-body: #d4d4d8;
-  --ink-code: #e4e4e7;
-  --ink-caption: #f4f4f5;
-  --muted: #a1a1aa;
-  --subtle: #a1a1aa;
-  --faint: #8b8b94;
+  --ink-strong: #ededed;
+  --ink: #ededed;
+  --ink-body: #a1a1a1;
+  --ink-code: #ededed;
+  --ink-caption: #ededed;
+  --muted: #a1a1a1;
+  --subtle: #a1a1a1;
+  --faint: #8f8f8f;
 
-  --accent: #1d4ed8;
-  --accent-hover: #2563eb;
-  --accent-soft: #172554;
-  --accent-ink: #93b4ff;
+  --accent: #0071f6;
+  --accent-hover: #005fd8;
+  --accent-soft: #022248;
+  --accent-ink: #50a8ff;
   --on-accent: #ffffff;
-  --link: #8ab0ff;
+  --link: #50a8ff;
 
   --look: #fcd34d;
   --look-line: #b8924a;
@@ -203,10 +203,10 @@
   --orange: #fb923c;
   --on-solid: #0b0b0d;
 
-  --shadow-paper: 0 1px 2px rgb(0 0 0 / 40%), 0 8px 24px -12px rgb(0 0 0 / 70%);
+  --shadow-paper: 0 0 0 1px #ffffff25, 0 2px 2px #00000052, 0 8px 8px -8px #00000029;
     --beam-core: #ffffff;
-    --beam-glow: #3b82f6;
-    --beam-haze: rgb(37 99 235 / 42%);
+    --beam-glow: #0090ff;
+    --beam-haze: rgb(0 144 255 / 35%);
 }
 
 * {
@@ -3128,6 +3128,8 @@ input:focus-visible,
 .hero {
   position: relative;
   display: grid;
+  /* minmax(0, …): a wide figure scrolls inside its card instead of widening the page. */
+  grid-template-columns: minmax(0, 1fr);
   gap: 40px;
   align-items: center;
   padding: clamp(48px, 9vw, 104px) 0 clamp(40px, 6vw, 72px);
@@ -4497,4 +4499,63 @@ input:focus-visible,
     grid-template-columns: 4.6em 1fr 8em;
     gap: 8px;
   }
+}
+
+/* ---------- Sign-in pages and the analytics consent banner ---------- */
+
+.auth-page {
+  display: grid;
+  justify-items: center;
+  gap: 24px;
+  padding: 56px 16px 80px;
+  min-height: 70vh;
+}
+
+.auth-intro {
+  max-width: 440px;
+  text-align: center;
+}
+
+.auth-intro h1 {
+  margin: 0 0 8px;
+  color: var(--ink-strong);
+  font-size: 1.75rem;
+  letter-spacing: -0.02em;
+}
+
+.auth-intro p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.consent-banner {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  left: 16px;
+  z-index: 50;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 20px;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--raised);
+  box-shadow: var(--shadow-paper);
+  color: var(--ink-body);
+  font-size: 0.9rem;
+}
+
+.consent-banner p {
+  margin: 0;
+  flex: 1 1 320px;
+}
+
+.consent-actions {
+  display: flex;
+  gap: 8px;
 }

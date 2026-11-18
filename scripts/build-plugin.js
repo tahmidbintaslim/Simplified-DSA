@@ -5,6 +5,8 @@
  * server and its dependencies are bundled into one file and the lesson
  * Markdown is copied next to it. Run with `pnpm build:plugin` and commit the
  * result; CI fails if the committed bundle is out of date.
+ *
+ * Vite stays a dev dependency only for this bundle; the site builds with Next.js.
  */
 import { cpSync, rmSync } from 'node:fs';
 import { build } from 'vite';

@@ -5,17 +5,15 @@
 Beginner lessons on data structures and algorithms, with one array example compared across 10 programming languages.
 
 [![CI](https://github.com/tahmidbintaslim/Simplified-DSA/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/tahmidbintaslim/Simplified-DSA/actions/workflows/ci.yml)
-[![Code: MIT](https://img.shields.io/badge/code-MIT-blue)](./LICENSE)
-[![Lessons: CC BY 4.0](https://img.shields.io/badge/lessons-CC%20BY%204.0-lightgrey)](./LICENSE-CONTENT)
+[![License: proprietary](https://img.shields.io/badge/license-proprietary-lightgrey)](./LICENSE)
 [![Last commit](https://img.shields.io/github/last-commit/tahmidbintaslim/Simplified-DSA/main)](https://github.com/tahmidbintaslim/Simplified-DSA/commits/main)
 [![Live demo](https://img.shields.io/website?url=https%3A%2F%2Fdsa.tahmid.space&label=live%20demo)](https://dsa.tahmid.space)
-[![GitHub stars](https://img.shields.io/github/stars/tahmidbintaslim/Simplified-DSA?style=flat)](https://github.com/tahmidbintaslim/Simplified-DSA/stargazers)
 
-**[Live demo](https://dsa.tahmid.space)** · [Quick start](#quick-start) · [Contributing](#contributing)
+**[Live demo](https://dsa.tahmid.space)** · [Quick start](#quick-start)
 
 </div>
 
-Beginner lessons on data structures and algorithms, written in Markdown, with one array example compared across 10 programming languages. Built with Vite and plain JavaScript.
+Beginner lessons on data structures and algorithms, written in Markdown, with one array example compared across 10 programming languages. Built with Next.js, React and Clerk. Free to use with a free account; the source is closed.
 
 **Live demo:** [dsa.tahmid.space](https://dsa.tahmid.space). It is an early learning project with 13 lessons, each with an interactive demo.
 
@@ -30,8 +28,6 @@ Beginner lessons on data structures and algorithms, written in Markdown, with on
 You need Node.js 22.14 or newer and pnpm 11 (`corepack enable`). Details are in [Prerequisites](#prerequisites).
 
 ```bash
-git clone https://github.com/tahmidbintaslim/Simplified-DSA.git
-cd Simplified-DSA
 pnpm install --frozen-lockfile
 pnpm dev        # http://localhost:3000/
 pnpm test       # unit tests
@@ -82,33 +78,22 @@ The project has two learning goals. The app covers a small part of the first one
 
 | Area | Choice |
 | --- | --- |
-| Build tool and dev server | Vite 8 |
-| UI | Plain JavaScript (ES modules and one `App` class), hand-written CSS |
-| CSS reset | Tailwind CSS v4, used only for its base reset (preflight). Class scanning is off (`source(none)`), so it generates no utility classes |
-| Content | Markdown files, imported as text with Vite's `?raw` suffix |
-| Tests | Node's built-in test runner (`node --test`) |
-| Package manager | pnpm 11 (pinned in `package.json` `packageManager`) |
+| Framework | Next.js 16 (App Router) with React 19 |
+| Sign-in | Clerk (`@clerk/nextjs`). The home page is public; every lesson needs an account |
+| Analytics | PostHog, loaded only after the learner allows it (consent banner) |
+| Styling | Hand-written CSS on design tokens: Stripe-style light theme, Vercel Geist dark theme. Tailwind v4 for the reset only |
+| Animation | Motion (motion.dev) springs for demos, worked examples and widgets |
+| Content | Markdown lessons in `src/content/`, rendered on the server |
+| AI tutor | MCP server (`mcp/server.js`), served at `/mcp` and bundled in the Claude Code plugin |
+| Tests | Node's test runner; Playwright with `@clerk/testing` for the browser suite |
 | Hosting | Vercel |
-
-There is no framework, no backend and no runtime dependency. The production bundle is about 19 KB of JavaScript (7 KB gzipped) and 9 KB of CSS.
 
 ## Architecture
 
-The site is one HTML page with no server code. `App` reads the lesson registry, picks a lesson from the URL and renders it into `#app`.
-
-```mermaid
-flowchart LR
-  md["Lesson Markdown<br/>data-structures/, algorithms/"] -->|"?raw import"| registry["curriculum.js<br/>lesson registry"]
-  langs["languageExamples.js<br/>10 language tabs"] --> registry
-  registry --> app["App.js<br/>state, render, events"]
-  router["router.js<br/>resolvePath, lessonPath"] --> app
-  app --> renderer["markdown.js<br/>escape, then format"]
-  app -->|"pushState, popstate"| url["Browser URL"]
-```
-
-- `src/core/router.js` turns a pathname into a section and lesson that exist. It has no DOM access, so the tests import it directly.
-- `src/core/App.js` keeps the active section, lesson and language, re-renders on change, and restores keyboard focus after each render.
-- On Vercel, `vercel.json` rewrites every path to `index.html`, so a lesson URL works on refresh.
+- `app/[section]/[lesson]/page.js` checks the Clerk session (signed out → `/sign-in`), reads the lesson Markdown and builds the article HTML on the server (`lib/lessons.js`).
+- `components/LessonView.js` mounts the live parts into that article on the client: the demo, widgets, scrubbable worked examples, quizzes and "On this page".
+- `proxy.js` runs Clerk's middleware on every request. `app/mcp/route.js` is the public MCP connector.
+- `components/Analytics.js` asks for consent, then sends `lesson_viewed`, `demo_used`, `quiz_answered` and `lesson_completed` to PostHog, identified by Clerk user id.
 
 ## Getting started
 
@@ -117,13 +102,19 @@ flowchart LR
 - Node.js 22.14 or newer (CI uses Node 22). pnpm 11 needs Node 22.13+, and 22.14 is the first 22.x release whose bundled Corepack can verify pnpm 11's signature.
 - pnpm 11. Run `corepack enable` once and Corepack uses the version pinned in `package.json`. Node 25 and newer no longer bundle Corepack, so run `npm install -g corepack` first.
 
-No environment variables are needed. The app has no backend, API keys or `.env` file.
+Create `.env.local` (never commit it) with:
+
+```bash
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
+CLERK_SECRET_KEY=sk_test_...
+# Optional: analytics. Without it nothing is tracked.
+NEXT_PUBLIC_POSTHOG_KEY=phc_...
+NEXT_PUBLIC_POSTHOG_HOST=https://eu.i.posthog.com
+```
 
 ### Install and run
 
 ```bash
-git clone https://github.com/tahmidbintaslim/Simplified-DSA.git
-cd Simplified-DSA
 pnpm install --frozen-lockfile
 pnpm dev
 ```
@@ -133,32 +124,15 @@ Open http://localhost:3000/. Each lesson lives at `/<section>/<lesson>`, for exa
 ### Test
 
 ```bash
-pnpm test
+pnpm test        # unit tests
+pnpm test:e2e    # builds, then runs the browser suite signed in as the Clerk test user
 ```
 
-### Build and preview
-
-```bash
-pnpm build     # writes the production site to dist/
-pnpm preview   # serves dist/ at http://localhost:4173/
-```
-
-CI (`.github/workflows/ci.yml`) runs `pnpm install --frozen-lockfile`, `pnpm test` and `pnpm build` on every push and pull request to `main`.
+The browser suite signs in as `e2e+clerk_test@example.com` (override with `E2E_CLERK_USER_EMAIL`), a user in the Clerk development instance, so it needs the Clerk keys in its environment. In CI they come from the repository secrets `CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY`.
 
 ## Deployment
 
-The site is deployed on Vercel through its GitHub integration:
-
-- Every push to `main` deploys to production at [dsa.tahmid.space](https://dsa.tahmid.space).
-- Other branches and pull requests get preview deployments.
-
-`vercel.json` sets the build command (`pnpm run build`), the output directory (`dist`) and the rewrite to `index.html`. To make a preview deployment by hand:
-
-```bash
-pnpm dlx vercel deploy -y --target preview
-```
-
-Use production deploys only when the team agrees.
+Vercel deploys `main` to production at [dsa.tahmid.space](https://dsa.tahmid.space); pull requests get preview deployments. The Vercel project needs the same environment variables as `.env.local`, with Clerk production keys for production.
 
 ## AI tutor
 
@@ -181,7 +155,7 @@ Then try:
 
 - `/simplified-dsa:trace merge 5 2 9 1`: exact steps, then why it costs what it costs.
 - `/simplified-dsa:quiz hash-tables`: five questions, one at a time.
-- `/simplified-dsa:explain-cost src/core/router.js`: the Big O of real code and the line that sets it.
+- `/simplified-dsa:explain-cost src/demos/algorithms.js`: the Big O of real code and the line that sets it.
 - Or just ask "teach me binary search trees" and the `dsa-tutor` skill takes over.
 
 The plugin runs the server with the `node` on your machine (Node 18 or newer).
@@ -203,33 +177,27 @@ pnpm mcp
 ## Project structure
 
 ```text
+app/
+  layout.js                Shell: Clerk provider, header, footer, consent banner
+  page.js                  Public home page
+  [section]/[lesson]/      A lesson (sign-in required)
+  sign-in/, sign-up/       Clerk sign-in pages
+  mcp/route.js             Public MCP connector
+components/                React components: LessonView, Sidebar, Home, HeroFigure, Analytics…
+lib/lessons.js             Finds lessons and builds the article HTML on the server
+proxy.js                   Clerk middleware
 src/
-  main.js                  Browser entry point
-  style.css                App styles
-  core/
-    App.js                 App state, rendering and events
-    router.js              Lesson URL helpers (no DOM, unit tested)
-  content/
-    curriculum.js          Lesson registry: sections, lessons, Markdown imports
-    languageExamples.js    The 10 language tabs for the Arrays lesson
-    data-structures/       Data structure lessons (Markdown)
-    algorithms/            Algorithm lessons (Markdown)
-    CURRICULUM.md          Planned lesson order and writing rules (not rendered)
-    chapters/02-Arrays.md  Legacy note kept from the old layout (not rendered)
-  demos/
-    algorithms.js          Pure step generators for the demos (no DOM, unit tested)
-    player.js              Back / Play / Step controls shared by algorithm demos
-    index.js               One mount function per demo, keyed by the lesson's `demo` id
-  utils/
-    markdown.js            Small Markdown-to-HTML renderer
+  style.css                Design tokens (Stripe light, Geist dark) and styles
+  core/                    Progress storage and scrubbable worked examples
+  content/                 Lesson registry and Markdown lessons
+  demos/                   Step generators, the player, Motion helpers, one mount per demo
+  widgets/                 Inline teaching widgets (guess game, halving, bug lab)
+  utils/                   Markdown renderer and icons
 mcp/server.js              MCP server: lessons and algorithm traces for AI assistants
-plugin/                    Claude Code plugin: bundled server, dsa-tutor skill, /trace /quiz /explain-cost
-.claude-plugin/            Marketplace file, so the plugin installs from this repository
+plugin/                    Claude Code plugin: bundled server, dsa-tutor skill, commands
 scripts/build-plugin.js    Bundles mcp/server.js into plugin/server (pnpm build:plugin)
-tests/                     node:test unit tests (renderer, router, progress, demo algorithms, MCP server)
-e2e/                       Browser tests in Chromium (pnpm test:e2e)
-docs/                      Contributor guides and README screenshots
-vercel.json                Vercel build settings and the SPA rewrite
+tests/                     Unit tests (renderer, progress, demo algorithms, MCP server)
+e2e/                       Browser tests (pnpm test:e2e)
 ```
 
 ## Status and roadmap
@@ -259,20 +227,7 @@ These follow from the code as it is today:
 
 ## Contributing
 
-Contributions are welcome, and the codebase is written to be read by beginners. Start with:
-
-- [Strategy](./docs/STRATEGY.md): product, brand, research, tech, legal and the AI plan
-- [Publishing Guide](./docs/PUBLISHING.md): how to release the site, plugin, skill, connector and MCP Registry entry
-- [Practice Companion Plan](./docs/LEETCODE_COMPANION.md): browser extension with hints, pattern mapping and GitHub sync
-- [Contributor Guide](./docs/CONTRIBUTING.md): working rules, commits, adding a lesson, deploy previews
-- [JavaScript and OOP Guide](./docs/JS_OOP_GUIDE.md)
-- [CSS Guide](./docs/CSS_GUIDE.md)
-- [Content Guide](./docs/CONTENT_GUIDE.md) and [Language Comparison Guide](./docs/LANGUAGE_COMPARISON_GUIDE.md)
-- [Sources and Learnings](./docs/SOURCES_AND_LEARNINGS.md) and [Learning Experience Guide](./docs/LEARNING_EXPERIENCE.md)
-
-Run `pnpm test` and `pnpm build` before opening a pull request. Questions and review notes on the code and docs go in [issue #1](https://github.com/tahmidbintaslim/Simplified-DSA/issues/1).
-
-Bug reports and feature ideas use the [issue forms](https://github.com/tahmidbintaslim/Simplified-DSA/issues/new/choose). Pull requests get a short checklist from the [pull request template](./.github/pull_request_template.md).
+Simplified DSA is closed source. Issues and pull requests are by invitation. Working notes for collaborators are in [docs/](./docs/).
 
 ## Security
 
@@ -280,7 +235,5 @@ Please report security problems privately, not in a public issue. See [SECURITY.
 
 ## License
 
-- Code (the app and every code example, including snippets inside lessons) is under the [MIT License](./LICENSE).
-- Lesson text (the Markdown files in `src/content/` and the prose notes in `src/content/languageExamples.js`) is under [CC BY 4.0](./LICENSE-CONTENT). You can reuse and adapt it with credit.
+Proprietary. All rights reserved. See [LICENSE](./LICENSE). Using the hosted site and the public MCP connector is free.
 
-By contributing, you agree that your code is licensed under MIT and your lesson text under CC BY 4.0.

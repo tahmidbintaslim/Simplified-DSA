@@ -7,18 +7,30 @@
  */
 import { after, before, test } from 'node:test';
 import assert from 'node:assert/strict';
+import { spawn } from 'node:child_process';
 import * as playwright from 'playwright';
-import { preview } from 'vite';
+import { clerk, clerkSetup } from '@clerk/testing/playwright';
 import { loadLessons } from '../mcp/server.js';
 
 const lessons = loadLessons().map((lesson) => `/${lesson.section}/${lesson.id}`);
 let server;
 let browser;
 let base;
+let signedIn; // storage state of a signed-in learner (lessons need an account)
+
+// The Clerk test user; create it once in the Clerk dev instance (see README).
+const TEST_EMAIL = process.env.E2E_CLERK_USER_EMAIL || 'e2e+clerk_test@example.com';
 
 before(async () => {
-  server = await preview({ logLevel: 'silent', preview: { port: 4180, strictPort: false } });
-  base = server.resolvedUrls.local[0].replace(/\/$/, '');
+  // The production build, as Vercel runs it (`pnpm test:e2e` builds first).
+  const port = 4180 + Math.floor(Math.random() * 500);
+  base = `http://localhost:${port}`;
+  server = spawn('node_modules/.bin/next', ['start', '-p', String(port)], { stdio: 'ignore' });
+  for (let i = 0; i < 100; i++) {
+    if (await fetch(base).then((r) => r.ok, () => false)) break;
+    await new Promise((resolve) => setTimeout(resolve, 200));
+  }
+  await clerkSetup({ publishableKey: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY });
   // BROWSER picks the engine (chromium, firefox or webkit; CI runs all three).
   // CHROMIUM_PATH lets a machine with a preinstalled Chromium run the suite
   // when its Playwright version expects a different browser build.
@@ -26,16 +38,24 @@ before(async () => {
   browser = await playwright[engine].launch({
     executablePath: engine === 'chromium' ? process.env.CHROMIUM_PATH || undefined : undefined,
   });
+  const context = await browser.newContext();
+  const page = await context.newPage();
+  await page.goto(base);
+  await clerk.signIn({ page, emailAddress: TEST_EMAIL });
+  signedIn = await context.storageState();
+  await context.close();
 });
 
 after(async () => {
   await browser?.close();
-  await new Promise((resolve) => server?.httpServer.close(resolve));
+  server?.kill();
 });
 
-// A fresh page per test; any uncaught page error fails the test.
-const open = async (path, { width = 1280, init } = {}) => {
-  const page = await browser.newPage({ viewport: { width, height: 900 } });
+// A fresh signed-in page per test; any uncaught page error fails the test.
+const open = async (path, { width = 1280, init, signedOut = false, ...options } = {}) => {
+  const context = await browser.newContext({ viewport: { width, height: 900 }, storageState: signedOut ? undefined : signedIn, ...options });
+  const page = await context.newPage();
+  page.on('close', () => context.close());
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
   if (init) await page.addInitScript(init);
@@ -104,10 +124,12 @@ test('progress survives a reload and Next opens the next lesson at the top', asy
   const { page } = await open('/data-structures/hash-tables');
   await page.click('#complete-button');
   await page.reload();
+  await page.waitForSelector('#complete-button[aria-pressed="true"]');
   assert.match(await page.textContent('#complete-button'), /Completed/);
   await page.locator('.lesson-step:last-child').scrollIntoViewIfNeeded();
   await page.click('.lesson-step:last-child');
-  assert.equal(new URL(page.url()).pathname, '/data-structures/binary-search-trees');
+  await page.waitForURL('**/data-structures/binary-search-trees');
+  await page.waitForSelector('.lesson-content h1');
   assert.equal(await page.evaluate(() => window.scrollY), 0);
   await page.close();
 });
@@ -176,7 +198,8 @@ test('on a phone the lesson starts on the first screen and the list folds into a
   await page.click('.nav-drawer > summary');
   assert.equal(await page.isVisible('#lesson-link-algorithms-binary-search'), true);
   await page.click('#lesson-link-algorithms-sorting');
-  assert.equal(new URL(page.url()).pathname, '/algorithms/sorting');
+  await page.waitForURL('**/algorithms/sorting');
+  await page.waitForSelector('#lesson-link-algorithms-sorting', { state: 'hidden' });
   assert.equal(await page.isVisible('#lesson-link-algorithms-sorting'), false);
   await page.close();
 });
@@ -232,7 +255,8 @@ test('home shows the course map and a start button; lessons end with a folded an
   assert.match(await page.textContent('main h1'), /See every step/);
   assert.equal(await page.locator('.course-lesson').count(), lessons.length);
   await page.click('.home-actions .demo-button');
-  assert.equal(new URL(page.url()).pathname, '/data-structures/arrays-and-strings');
+  await page.waitForURL('**/data-structures/arrays-and-strings');
+  await page.waitForSelector('#complete-button');
 
   // The practice answer and the sources start folded.
   assert.equal(await page.locator('details.answer').getAttribute('open'), null);
@@ -277,15 +301,16 @@ test('critique 2: home links, jump list, stepped array insert, settled quiz', as
 
   // The site title goes home; home shows the drawn step and only section links.
   await page.click('.topbar .brand');
-  assert.equal(new URL(page.url()).pathname, '/');
+  await page.waitForURL(`${base}/`);
+  await page.waitForSelector('.hero-figure .array-cell');
   assert.equal(await page.locator('.hero-figure .array-cell').count(), 7);
   assert.equal(await page.locator('.lesson-sidebar .lesson-link').count(), 0);
   assert.deepEqual(errors, []);
   await page.close();
 
   const missing = await open('/nope/nothing');
-  await missing.page.click('.home-actions [data-home]');
-  assert.equal(new URL(missing.page.url()).pathname, '/');
+  await missing.page.click('.home-actions a');
+  await missing.page.waitForURL(`${base}/`);
   await missing.page.close();
 });
 
@@ -491,4 +516,19 @@ test('lesson widgets: the guess game plays, halving counts, the bug lab breaks, 
   assert.match(await page.textContent('.deep-dive'), /lo \+ \(hi - lo\) \/\/ 2/);
   assert.deepEqual(errors, []);
   await page.close();
+});
+
+test('auth: home is public; a signed-out visitor to a lesson is sent to sign in and the connector stays public', async () => {
+  const { page } = await open('/', { signedOut: true });
+  assert.match(await page.textContent('main h1'), /See every step/);
+  await page.goto(`${base}/algorithms/binary-search`);
+  assert.equal(new URL(page.url()).pathname, '/sign-in');
+  assert.equal(new URL(page.url()).searchParams.get('redirect_url'), '/algorithms/binary-search');
+  await page.close();
+  const mcp = await fetch(`${base}/mcp`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', accept: 'application/json, text/event-stream' },
+    body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'tools/list' }),
+  });
+  assert.equal(mcp.status, 200);
 });

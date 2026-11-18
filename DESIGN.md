@@ -1,31 +1,31 @@
 ---
 name: Simplified DSA
-description: Clear Steps. A clean white docs world with one blue accent, where algorithms are drawn one step at a time.
+description: Stripe-style light theme (navy ink, indigo accent) and Vercel Geist dark theme, where algorithms are drawn one step at a time.
 colors:
   page: "#ffffff"
-  surface: "#f8f8f9"
+  surface: "#f8fafd"
   sunken: "#ffffff"
   raised: "#ffffff"
-  code-bg: "#f4f4f5"
-  hover: "#f1f1f3"
-  line: "#e4e4e7"
-  line-soft: "#efeff1"
-  line-strong: "#d4d4d8"
-  edge: "#a1a1aa"
-  neutral-fill: "#d4d4d8"
-  ink-strong: "#09090b"
-  ink: "#18181b"
-  ink-body: "#27272a"
-  ink-code: "#27272a"
-  muted: "#52525b"
-  subtle: "#5c5c66"
-  faint: "#6b6b74"
-  accent: "#1d4ed8"
-  accent-hover: "#1e40af"
-  accent-soft: "#e0e9ff"
-  accent-ink: "#1d4ed8"
+  code-bg: "#f6f9fc"
+  hover: "#f0f4f9"
+  line: "#e5edf5"
+  line-soft: "#ecf1f6"
+  line-strong: "#d4dee9"
+  edge: "#95a4ba"
+  neutral-fill: "#d4dee9"
+  ink-strong: "#061b31"
+  ink: "#0d253d"
+  ink-body: "#3c4f69"
+  ink-code: "#273951"
+  muted: "#50617a"
+  subtle: "#50617a"
+  faint: "#64748d"
+  accent: "#533afd"
+  accent-hover: "#4032c8"
+  accent-soft: "#e8e9ff"
+  accent-ink: "#4032c8"
   accent-line: "#2563eb"
-  link: "#1d4ed8"
+  link: "#533afd"
   on-accent: "#ffffff"
   look: "#8a5e04"
   look-line: "#d4a12f"
@@ -208,6 +208,8 @@ components:
     rounded: "{rounded.band}"
     padding: "clamp(36px, 6vw, 64px) 24px"
 ---
+
+> Theme sources: the light tokens follow Stripe's marketing palette (brand-600 `#533afd`, navy neutrals, two-layer navy shadows); the dark tokens follow Vercel Geist (`#0a0a0a` background, gray scale, blue-700 `#0071f6` / blue-900 `#50a8ff`). Values live in `src/style.css`. Step-state colours (look, done, ruled out) are unchanged.
 
 # Design System: Simplified DSA
 
