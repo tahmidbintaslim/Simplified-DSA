@@ -30,7 +30,7 @@ before(async () => {
     if (await fetch(base).then((r) => r.ok, () => false)) break;
     await new Promise((resolve) => setTimeout(resolve, 200));
   }
-  await clerkSetup();
+  await clerkSetup({ publishableKey: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY });
   // BROWSER picks the engine (chromium, firefox or webkit; CI runs all three).
   // CHROMIUM_PATH lets a machine with a preinstalled Chromium run the suite
   // when its Playwright version expects a different browser build.
