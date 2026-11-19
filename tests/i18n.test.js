@@ -61,3 +61,18 @@ test('the resource library is well formed and every topic is a real lesson', () 
   // Every lesson has at least one resource to go deeper with.
   for (const id of lessonIds) assert.ok(resources.some((r) => r.topics.includes(id)), `no resource for ${id}`);
 });
+
+test('every mission belongs to a real demo and reads in both languages', async () => {
+  const { missions } = await import('../src/demos/missions.js');
+  const demoIds = new Set(curriculum.flatMap((s) => s.lessons.map((l) => l.demo)));
+  for (const [demo, list] of Object.entries(missions)) {
+    assert.ok(demoIds.has(demo), demo);
+    for (const m of list) {
+      assert.ok(m.en && m.bn && m.hint.en && m.hint.bn, `${demo}/${m.id}`);
+      assert.equal(typeof m.done, 'function');
+    }
+  }
+  // A sample event: inserting at the front completes exactly that mission.
+  const hit = missions['array-ops'].filter((m) => m.done({ op: 'insert', index: 0, moved: 5 })).map((m) => m.id);
+  assert.deepEqual(hit, ['front']);
+});

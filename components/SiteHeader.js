@@ -19,6 +19,8 @@ export default function SiteHeader({ lang }) {
         <nav className="topnav" aria-label="Site">
           <Link href={`/${lang}`}>{t.courseMap}</Link>
           <Link href={lessonPath(lang, first.id, first.lessons[0].id)}>{t.lessons}</Link>
+          <Link href={`/${lang}/simulators`}>{t.simulators.nav}</Link>
+          <Link href={`/${lang}/quizzes`}>{t.quizzes.nav}</Link>
         </nav>
         <div className="topbar-actions">
           <LangSwitch lang={lang} />

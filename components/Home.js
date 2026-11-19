@@ -32,7 +32,7 @@ function MiniFigure({ values, states, labels, caption }) {
 
 
 /** What this is, where to start (or continue), and the whole course as a map. */
-export default function Home({ lang, sections, numbers, children }) {
+export default function Home({ lang, sections, numbers, sims = [], children }) {
   const t = dict(lang).home;
   const path = (entry) => `/${lang}/${entry.section.id}/${entry.lesson.id}`;
   const [completed, setCompleted] = useState(() => new Set());
@@ -76,6 +76,31 @@ export default function Home({ lang, sections, numbers, children }) {
             <div key={label}><dt>{label}</dt><dd><strong>{value}</strong><span>{note}</span></dd></div>
           ))}
         </dl>
+      </section>
+
+      <section className="home-block" aria-labelledby="sims-title">
+        <div className="home-block-head">
+          <h2 id="sims-title">{dict(lang).simulators.homeTitle}</h2>
+          <Link href={`/${lang}/simulators`}>{dict(lang).simulators.all} <Icon name="arrowRight" /></Link>
+        </div>
+        <p className="home-block-lead">{dict(lang).simulators.homeLead}</p>
+        <ul className="hub-grid">
+          {sims.map((sim) => (
+            <li key={sim.id}>
+              <Link className="hub-card" href={`/${lang}/simulators/${sim.id}`}>
+                <span className="hub-tag">{sim.lesson}</span>
+                <strong>{sim.title}</strong>
+                <span className="hub-text">{sim.intro}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="home-block home-quiz-cta" aria-labelledby="quiz-cta-title">
+        <h2 id="quiz-cta-title">{dict(lang).quizzes.homeTitle}</h2>
+        <p className="home-block-lead">{dict(lang).quizzes.homeLead}</p>
+        <Link className="demo-button is-primary" href={`/${lang}/quizzes`}>{dict(lang).quizzes.all} <Icon name="arrowRight" /></Link>
       </section>
 
       <section className="home-block" aria-labelledby="sections-title">

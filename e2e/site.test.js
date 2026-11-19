@@ -585,3 +585,46 @@ test('arrays widgets: the address arrow jumps to any index, inserting at the fro
   assert.deepEqual(errors, []);
   await page.close();
 });
+
+test('simulators: the hub lists every demo, missions tick off from what you do, and progress is remembered', async () => {
+  const { page, errors } = await open('/simulators', { signedOut: true });
+  assert.equal(await page.locator('.hub-card').count(), lessons.length);
+  await page.close();
+
+  const sim = await open('/simulators/array-ops');
+  await sim.page.click('[data-op="read"]');
+  await sim.page.fill('[data-field="index"]', '0');
+  await sim.page.click('[data-op="insert"]');
+  await sim.page.click('[data-op="delete"]');
+  await sim.page.waitForFunction(() => document.querySelectorAll('.mission.is-done').length === 3);
+  await sim.page.click('[data-op="append"]');
+  await sim.page.waitForSelector('.sim-all-done');
+  await sim.page.reload();
+  await sim.page.waitForSelector('.mission.is-done');
+  assert.equal(await sim.page.textContent('.sim-count'), '4/4');
+  // A search the page starts by itself is not the learner's; only clicks count.
+  await sim.page.goto(`${base}/en/simulators/binary-search`);
+  await sim.page.waitForSelector('.mission');
+  assert.equal(await sim.page.locator('.mission.is-done').count(), 0);
+  assert.deepEqual([...errors, ...sim.errors], []);
+  await sim.page.close();
+});
+
+test('quizzes: a lesson quiz runs one question at a time and scores first-try answers', async () => {
+  const { page, errors } = await open('/quizzes');
+  const first = page.locator('.hub-card').first();
+  await first.click();
+  await page.waitForSelector('.quiz-runner .quiz');
+  const total = Number((await page.textContent('.quiz-step')).match(/of (\d+)/)[1]);
+  // First question wrong once, the rest right.
+  await page.locator('.quiz [data-quiz-option="false"]').first().click();
+  assert.equal(await page.isDisabled('.quiz-runner .demo-button.is-primary'), true);
+  await page.click('.quiz [data-quiz-option="true"]');
+  for (let i = 0; i < total; i++) {
+    if (i > 0) await page.click('.quiz [data-quiz-option="true"]');
+    await page.click('.quiz-runner .demo-button.is-primary');
+  }
+  assert.match(await page.textContent('.quiz-score-number'), new RegExp(`${total - 1} of ${total}`));
+  assert.deepEqual(errors, []);
+  await page.close();
+});

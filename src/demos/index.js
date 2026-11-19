@@ -55,6 +55,9 @@ const legend = (items) =>
     .map(([swatch, label]) => `<li><span class="swatch swatch-${swatch}" aria-hidden="true"></span>${label}</li>`)
     .join('')}</ul>`;
 
+// Tell simulator missions what the learner just did (src/demos/missions.js).
+const emit = (root, detail) => root.dispatchEvent(new CustomEvent('demo-op', { bubbles: true, detail }));
+
 // Status lines double as error messages; errors are styled and announced.
 const setStatus = (el, text, { error = false, keptPrevious = error, kept = 'The demo still shows the previous values.' } = {}) => {
   el.textContent = keptPrevious ? `${text} ${kept}` : text;
@@ -167,6 +170,7 @@ function mountArray(root, { lang = 'en' } = {}) {
       values.splice(index, 1);
     }
     const moved = frames.at(-1).moved.length;
+    emit(root, { op, index: op === 'append' ? values.length - 1 : index, moved, n: values.length });
     setStatus(status, w.moved(moved));
     player.load(frames, arrayCode[op]);
   });
@@ -670,7 +674,8 @@ function mountBinarySearch(root) {
     },
   });
 
-  const run = () => {
+  // `byLearner`: only searches the learner started count toward missions.
+  const run = (byLearner = false) => {
     const target = readInt(input);
     if (target === null) {
       setStatus(compare, 'Type a whole number to search for.', { error: true });
@@ -678,6 +683,8 @@ function mountBinarySearch(root) {
     }
     const frames = binarySearchFrames(values, target);
     const linear = values.indexOf(target);
+    const found = frames.at(-1).found >= 0;
+    if (byLearner) emit(root, { op: 'search', found, checks: frames.length - (found ? 0 : 1), n: values.length });
     setStatus(compare, `Binary search: ${frames.length - (frames.at(-1).found === -1 ? 1 : 0)} checks. Linear search would check ${linear === -1 ? values.length : linear + 1} of ${values.length} values.`);
     player.load(frames, binarySearchCode);
   };
@@ -698,7 +705,7 @@ function mountBinarySearch(root) {
 
   root.addEventListener('click', (event) => {
     const op = event.target.closest('[data-op]')?.dataset.op;
-    if (op === 'search') run();
+    if (op === 'search') run(true);
     if (op === 'shuffle') shuffle();
     if (op === 'use') {
       const list = readList(listInput, { min: -999, max: 999 });

@@ -4977,3 +4977,230 @@ input:focus-visible,
   width: 32px;
   height: 32px;
 }
+
+/* ---------- Hubs (simulators, quizzes), simulator missions, quiz runner ---------- */
+
+.hub {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 40px 24px 72px;
+}
+
+.hub-head h1 {
+  margin: 0 0 8px;
+  color: var(--ink-strong);
+  font-size: clamp(2rem, 4vw, 2.6rem);
+  letter-spacing: -0.03em;
+}
+
+.hub-head .lead {
+  max-width: 64ch;
+  margin: 0 0 20px;
+  color: var(--muted);
+  font-size: 1.1rem;
+}
+
+.hub-section h2 {
+  margin: 36px 0 12px;
+  color: var(--ink-strong);
+  font-size: 1.3rem;
+}
+
+.hub-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+  gap: 14px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hub-card {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  height: 100%;
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--raised);
+  color: var(--ink-body);
+  text-decoration: none;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+}
+
+.hub-card:hover {
+  border-color: var(--accent-line);
+  box-shadow: var(--shadow-paper);
+  transform: translateY(-1px);
+}
+
+.hub-card strong {
+  color: var(--ink-strong);
+  font-size: 1.08rem;
+}
+
+.hub-tag,
+.hub-meta {
+  color: var(--faint);
+  font-size: 0.82rem;
+}
+
+.hub-meta {
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+
+.crumbs {
+  margin-bottom: 16px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.sim-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
+}
+
+@media (min-width: 1000px) {
+  .sim-layout {
+    grid-template-columns: minmax(0, 1fr) 320px;
+    align-items: start;
+  }
+
+  .sim-missions {
+    position: sticky;
+    top: 84px;
+  }
+}
+
+.sim-stage {
+  margin: 0;
+}
+
+.sim-missions {
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--raised);
+}
+
+.sim-missions h2 {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 0 12px;
+  color: var(--ink-strong);
+  font-size: 1.05rem;
+}
+
+.sim-count {
+  color: var(--accent-ink);
+  font-family: var(--font-mono);
+}
+
+.mission-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mission {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.mission strong {
+  display: block;
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.mission small {
+  color: var(--muted);
+}
+
+.mission-check {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+  border: 1.5px solid var(--line-strong);
+  border-radius: 50%;
+  color: var(--on-done);
+}
+
+.mission-check .icon {
+  width: 14px;
+  height: 14px;
+}
+
+.mission.is-done {
+  border-color: var(--done);
+  background: var(--visited);
+}
+
+.mission.is-done .mission-check {
+  border-color: var(--done);
+  background: var(--done);
+}
+
+.sim-all-done,
+.sim-free {
+  margin: 12px 0 0;
+  color: var(--muted);
+}
+
+.sim-all-done {
+  color: var(--done);
+  font-weight: 600;
+}
+
+.quiz-runner {
+  max-width: 760px;
+}
+
+.quiz-progress {
+  height: 6px;
+  margin-bottom: 16px;
+  border-radius: 3px;
+  background: var(--line);
+  overflow: hidden;
+}
+
+.quiz-progress span {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  transition: width 0.3s ease;
+}
+
+.quiz-step {
+  margin: 0 0 4px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.quiz-score-number {
+  margin: 0 0 6px;
+  color: var(--ink-strong);
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.home-quiz-cta {
+  text-align: left;
+}
+
+.quiz-score .home-actions,
+.hub-head .demo-button {
+  gap: 10px;
+}
