@@ -95,7 +95,7 @@ A stack fits a dynamic array perfectly: push and pop both happen at the end, so 
 
 - A stack answers "what happened most recently?"
 - A queue answers "what has waited longest?"
-- Swapping a queue for a stack is the only difference between breadth-first and depth-first search.
+- Swapping a queue for a stack is the core difference between breadth-first and depth-first search.
 
 ## Practice Prompt
 

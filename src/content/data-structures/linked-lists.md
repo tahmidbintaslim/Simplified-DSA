@@ -59,7 +59,7 @@ That is `O(1)` whether the list has 3 nodes or 3 million. An array would have to
 
 ## Removing A Node
 
-To remove `3`, point the node before it (`7`) past it, straight at `9`. The `3` node is no longer reachable, and the language frees it.
+To remove `3`, point the node before it (`7`) past it, straight at `9`. The `3` node is no longer reachable: a garbage-collected language (Python, Java, JavaScript, Go) frees it for you, and in C you free it yourself.
 
 ```text
 7 ──→ 3 ──→ 9     becomes     7 ─────────→ 9

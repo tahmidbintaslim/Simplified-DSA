@@ -34,9 +34,10 @@ test('a Bangla lesson keeps the shared ids, and an untranslated one falls back t
   assert.ok(html.includes('<details class="sources">'));
   assert.ok(!headings.some(({ text }) => text.includes('{#')), 'ids are stripped from heading text');
 
-  const sorting = lessonMarkdown('bn', 'algorithms', 'sorting');
-  assert.equal(sorting.fallback, true);
-  assert.match(sorting.markdown, /^# Sorting/);
+  // A language without a file for a lesson falls back to the English text.
+  const missing = lessonMarkdown('xx', 'algorithms', 'sorting');
+  assert.equal(missing.fallback, true);
+  assert.match(missing.markdown, /^# Sorting/);
 });
 
 test('lesson paths carry the language', () => {

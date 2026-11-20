@@ -553,10 +553,10 @@ test('languages: / follows the browser, old links move under /en, the switch kee
   assert.equal(await page.locator('.lesson-jumps a[href="#cost-cheat-sheet"]').count(), 1);
   // The demo speaks Bangla too.
   assert.match(await page.textContent('.demo-panel [data-op="insert"]'), /যোগ করো/);
-  // A lesson not yet translated says so and shows the English text.
+  // Every lesson is translated now: Bangla text, no fallback notice.
   await page.goto(`${base}/bn/algorithms/sorting`);
-  assert.equal(await page.locator('.lesson-fallback').count(), 1);
-  assert.match(await page.textContent('.lesson-content h1'), /Sorting/);
+  assert.equal(await page.locator('.lesson-fallback').count(), 0);
+  assert.match(await page.textContent('.lesson-content h1'), /সর্টিং/);
   // The switch opens the same lesson in English.
   await page.click('.lang-switch');
   await page.waitForURL('**/en/algorithms/sorting');
