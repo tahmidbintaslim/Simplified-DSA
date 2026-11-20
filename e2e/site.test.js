@@ -628,3 +628,18 @@ test('quizzes: a lesson quiz runs one question at a time and scores first-try an
   assert.deepEqual(errors, []);
   await page.close();
 });
+
+test('search: Ctrl/Cmd+K finds lessons, simulators and quizzes in either language', async () => {
+  const { page, errors } = await open('/bn', { signedOut: true });
+  await page.keyboard.press('Control+k');
+  await page.waitForSelector('.search-dialog[open]');
+  // An English word finds the Bangla lesson, its simulator and its quiz.
+  await page.fill('.search-box input', 'stack');
+  const kinds = await page.locator('.search-results li .search-kind').allTextContents();
+  assert.ok(kinds.includes('পাঠ') && kinds.includes('সিমুলেটর') && kinds.includes('কুইজ'), kinds.join(','));
+  assert.match(await page.textContent('.search-results li.is-active strong'), /স্ট্যাক/);
+  await page.keyboard.press('Enter');
+  await page.waitForURL(/\/sign-in|\/bn\/data-structures\/stacks-and-queues/);
+  assert.deepEqual(errors, []);
+  await page.close();
+});

@@ -21,7 +21,8 @@ export default function Sidebar({ lang, activeSection, activeLesson }) {
     // "/" or Ctrl/Cmd+K jumps to lesson search.
     const onKey = (event) => {
       const typing = event.target.closest?.('input, textarea, select, [contenteditable="true"]');
-      if ((event.key === '/' && !typing) || (event.key.toLowerCase() === 'k' && (event.ctrlKey || event.metaKey))) {
+      // "/" jumps to this list's filter; Ctrl/Cmd+K opens the site search (SearchDialog).
+      if (event.key === '/' && !typing) {
         event.preventDefault();
         search.current?.closest('details')?.setAttribute('open', '');
         search.current?.focus();

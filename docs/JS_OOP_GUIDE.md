@@ -1,5 +1,7 @@
 # JavaScript and OOP Guide
 
+> **Historical note:** this guide walks through the original vanilla-JavaScript `App` class. The site is now a Next.js app (`app/`, `components/`); the demos, widgets and Markdown renderer it describes still live in `src/` and work the same way.
+
 This project uses modern JavaScript with ES modules and small classes.
 
 ## What Is A Class?

@@ -37,3 +37,14 @@ create table if not exists quiz_attempts (
   created_at timestamptz not null default now()
 );
 create index if not exists quiz_attempts_lesson_idx on quiz_attempts (lesson, quiz);
+
+-- Simulator missions: how many times each mission's goal was met (capped at
+-- the mission's `times`), per learner.
+create table if not exists mission_progress (
+  user_id    text not null,
+  demo       text not null,
+  mission    text not null,
+  count      int not null check (count >= 0 and count <= 20),
+  updated_at timestamptz not null default now(),
+  primary key (user_id, demo, mission)
+);

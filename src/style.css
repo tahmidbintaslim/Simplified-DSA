@@ -5204,3 +5204,118 @@ input:focus-visible,
 .hub-head .demo-button {
   gap: 10px;
 }
+
+/* ---------- Site search (Ctrl/Cmd+K) ---------- */
+
+.search-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--raised);
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.search-button:hover {
+  background: var(--hover);
+}
+
+.search-button kbd,
+.search-box kbd {
+  padding: 0 5px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+}
+
+@media (max-width: 760px) {
+  .search-label,
+  .search-button kbd {
+    display: none;
+  }
+}
+
+.search-dialog {
+  width: min(640px, calc(100vw - 32px));
+  margin: 12vh auto 0;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--raised);
+  color: var(--ink);
+  box-shadow: var(--shadow-paper);
+}
+
+.search-dialog::backdrop {
+  background: rgb(0 0 0 / 35%);
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+.search-box input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 1.05rem;
+}
+
+.search-results {
+  max-height: 60vh;
+  margin: 0;
+  padding: 6px;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.search-results li {
+  display: grid;
+  grid-template-columns: 84px minmax(0, 1fr);
+  column-gap: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.search-results li.is-active {
+  background: var(--accent-soft);
+}
+
+.search-kind {
+  grid-row: span 2;
+  align-self: center;
+  color: var(--accent-ink);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.search-results strong {
+  color: var(--ink-strong);
+}
+
+.search-sub {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.search-results .search-none {
+  display: block;
+  color: var(--muted);
+  cursor: default;
+}

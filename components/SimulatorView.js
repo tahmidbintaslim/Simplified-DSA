@@ -4,6 +4,7 @@ import { demos } from '../src/demos/index.js';
 import { missions } from '../src/demos/missions.js';
 import { dict } from '../lib/i18n.js';
 import { track } from './Analytics.js';
+import { loadMissions, saveMissions } from '../app/actions.js';
 import Icon from './Icon.js';
 
 const KEY = (id) => `simplified-dsa:missions:${id}`;
@@ -18,7 +19,8 @@ const load = (id) => {
 /**
  * One demo, full width, with its missions beside it. The demo reports what the
  * learner did through `demo-op` events; each mission counts the ones it needs.
- * Mission progress stays in this browser.
+ * Progress shows at once from this browser, then merges with the account's
+ * copy (the higher count wins) and is saved back as it changes.
  */
 export default function SimulatorView({ lang, demoId }) {
   const t = dict(lang).simulators;
@@ -31,11 +33,24 @@ export default function SimulatorView({ lang, demoId }) {
     if (el.dataset.mounted) return;
     el.dataset.mounted = '1';
     demos[demoId].mount(el, { lang });
-    setCounts(load(demoId));
+    const local = load(demoId);
+    setCounts(local);
+    loadMissions(demoId)
+      .then((saved) => {
+        if (!saved) return;
+        setCounts((now) => {
+          const merged = { ...now };
+          for (const [id, n] of Object.entries(saved)) merged[id] = Math.max(merged[id] ?? 0, n);
+          saveMissions(demoId, merged).catch(() => {});
+          return merged;
+        });
+      })
+      .catch(() => {});
     const onOp = (event) => {
       setCounts((before) => {
         const after = { ...before };
         for (const m of list) if ((after[m.id] ?? 0) < (m.times ?? 1) && m.done(event.detail)) after[m.id] = (after[m.id] ?? 0) + 1;
+        if (list.some((m) => after[m.id] !== before[m.id])) saveMissions(demoId, after).catch(() => {});
         try {
           localStorage.setItem(KEY(demoId), JSON.stringify(after));
         } catch {

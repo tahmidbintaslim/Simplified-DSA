@@ -71,7 +71,7 @@ changes
 1. Create a Markdown file in the right folder.
 2. Add that file to `src/content/curriculum.js`.
 3. Add language examples in `src/content/languageExamples.js` when the concept has meaningful language differences.
-4. Run `pnpm dev` and open the lesson in the browser. Its URL is `/<section-id>/<lesson-id>`.
+4. Run `pnpm dev` (needs `.env.local` with the Clerk keys, see the README) and open the lesson in the browser. Its URL is `/en/<section-id>/<lesson-id>`, and `/bn/...` for Bangla.
 5. Run `pnpm test` and `pnpm build`.
 6. Commit the lesson and registry update together.
 
