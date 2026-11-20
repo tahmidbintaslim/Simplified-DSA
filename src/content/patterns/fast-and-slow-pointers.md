@@ -89,7 +89,7 @@ Q: Why can't fast jump over slow on a loop and miss it?
 Why: Fast moves 2 and slow moves 1, so the distance from fast to slow (going forward around the loop) drops by 1 every step. It goes 3, 2, 1, 0 and cannot skip 0.
 ```
 
-> **When to use it:** A linked list or a "next" function, and the question is about a loop, the middle, or the k-th node from the end, especially when the problem asks for `O(1)` extra memory.
+> **When to use it:** A linked list or a "next" function, and the question is about a loop or the middle, especially when the problem asks for `O(1)` extra memory. (For the k-th node from the end, use the cousin of this idea: two pointers at the same speed, k nodes apart.)
 
 > **Watch out:** Check `fast` and `fast.next` before jumping two steps. On a plain list, `fast.next.next` on the last node is the classic crash.
 
