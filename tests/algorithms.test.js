@@ -213,3 +213,29 @@ test('bug lab: the correct search always finds; each classic bug fails in its ow
   // Both bugs together still find the middle value on the first check.
   assert.equal(binarySearchVariant(values, 14, { strict: true, hiMid: true }).result, 'found');
 });
+
+test('captions come in Bangla on request; the steps themselves do not change', async () => {
+  const m = await import('../src/demos/algorithms.js');
+  const grid = { rows: 3, cols: 3, walls: new Set(['1,1']), start: [0, 0], goal: [2, 2], mode: 'bfs' };
+  const runs = [
+    ...Object.values(sortingAlgorithms).map((a) => (lang) => a.frames([5, 1, 4, 2, 8], lang)),
+    (lang) => binarySearchFrames([1, 3, 5, 7], 4, lang),
+    (lang) => gridTraversalFrames(grid, lang),
+    (lang) => gridTraversalFrames({ ...grid, walls: new Set(['1,2', '2,1']) }, lang),
+    (lang) => pairSumFrames([1, 3, 4, 6], 7, lang),
+    (lang) => windowSumFrames([2, 1, 5, 1], 2, lang),
+    (lang) => windowSumFrames([2, 1], 5, lang),
+    (lang) => m.fastSlowFrames(6, 2, lang),
+    (lang) => m.fastSlowFrames(5, -1, lang),
+    (lang) => m.prefixSumFrames([3, -1, 4], 0, 2, lang),
+    (lang) => m.prefixSumFrames([3, -1, 4], 2, 0, lang),
+  ];
+  const strip = (frames) => frames.map(({ caption, ...rest }) => rest);
+  for (const run of runs) {
+    const en = run();
+    const bn = run('bn');
+    assert.deepEqual(strip(bn), strip(en));
+    assert.deepEqual(run('xx').map((f) => f.caption), en.map((f) => f.caption), 'unknown language falls back to English');
+    for (const f of bn) assert.match(f.caption, /[\u0964\u0980-\u09FF]/, f.caption);
+  }
+});

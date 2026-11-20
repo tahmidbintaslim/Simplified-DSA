@@ -76,4 +76,16 @@ test('every mission belongs to a real demo and reads in both languages', async (
   // A sample event: inserting at the front completes exactly that mission.
   const hit = missions['array-ops'].filter((m) => m.done({ op: 'insert', index: 0, moved: 5 })).map((m) => m.id);
   assert.deepEqual(hit, ['front']);
+
+  // Sample events from the other demos complete exactly the mission they teach.
+  const hits = (demo, detail) => missions[demo].filter((m) => m.done(detail)).map((m) => m.id);
+  assert.deepEqual(hits('linked-list', { op: 'find', found: false, index: -1, n: 3 }), ['missing']);
+  assert.deepEqual(hits('stack-queue', { op: 'dequeue', empty: false, left: 0 }), ['fifo', 'drain']);
+  assert.deepEqual(hits('bst', { op: 'sorted', size: 7, height: 7 }), ['line']);
+  assert.deepEqual(hits('sorting', { op: 'sort', algorithm: 'insertion', n: 12, moves: 1, reversed: false, passes: 0 }), ['nearly']);
+  assert.deepEqual(hits('grid-traversal', { op: 'run', mode: 'dfs', found: true, bfsPath: 18, dfsPath: 58, walls: 14 }), ['dfs']);
+  // The player's predict event only counts for missions that ask for predictions.
+  for (const [demo, list] of Object.entries(missions)) {
+    for (const m of list) assert.equal(m.done({ op: 'predict', right: true }), m.id === 'predict', `${demo}/${m.id}`);
+  }
 });
