@@ -22,87 +22,131 @@ const frame = (values, active, sorted, caption, line = -1, vars = {}) => ({
   vars,
 });
 
-export function bubbleSortFrames(input) {
+// Sorting captions in each language; English is the default.
+const SORT_WORDS = {
+  en: {
+    sorted: 'Sorted.',
+    bubbleStart: 'Start: compare neighbours and swap them when they are out of order.',
+    compare: (x, y) => `Compare ${x} and ${y}.`,
+    swap: (big, small) => `${big} > ${small}, so swap them.`,
+    bubbled: (v, end) => `The largest unsorted value, ${v}, has bubbled to index ${end}.`,
+    early: 'No swaps in a whole pass: the rest is already in order, so stop early.',
+    selectionStart: 'Start: find the smallest unsorted value and move it to the front.',
+    check: (min, v) => `Smallest so far is ${min}. Check ${v}.`,
+    place: (v, i) => `Place ${v} at index ${i}.`,
+    insertionStart: 'Start: the first value alone is a sorted hand of cards.',
+    pick: (v) => `Pick up ${v} and slide it left into place.`,
+    moveLeft: (big, small) => `${big} > ${small}, so ${small} moves left.`,
+    firstSorted: (k) => `The first ${k} values are now sorted.`,
+    mergeStart: 'Start: split the list in half until each piece has one value.',
+    split: (lo, hi, mid) => `Split indexes ${lo}-${hi} at ${mid}: sort each half first.`,
+    merge: (lo, hi, v, k) => `Merge indexes ${lo}-${hi}: take the smaller front value, ${v}, into index ${k}.`,
+  },
+  bn: {
+    sorted: 'সাজানো শেষ।',
+    bubbleStart: 'শুরু: পাশাপাশি দুটো মান তুলনা করো, ভুল ক্রমে থাকলে অদলবদল করো।',
+    compare: (x, y) => `${x} আর ${y} তুলনা করো।`,
+    swap: (big, small) => `${big} > ${small}, তাই দুটোকে অদলবদল করো।`,
+    bubbled: (v, end) => `না-সাজানো অংশের সবচেয়ে বড় মান ${v} ভেসে উঠে ইনডেক্স ${end}-এ পৌঁছে গেছে।`,
+    early: 'পুরো এক পাসে একটাও অদলবদল হয়নি: বাকিটা আগে থেকেই সাজানো, তাই এখানেই থামো।',
+    selectionStart: 'শুরু: না-সাজানো অংশের সবচেয়ে ছোট মানটা খুঁজে সামনে নিয়ে আসো।',
+    check: (min, v) => `এখন পর্যন্ত সবচেয়ে ছোট ${min}। এবার ${v} দেখো।`,
+    place: (v, i) => `${v}-কে ইনডেক্স ${i}-এ বসাও।`,
+    insertionStart: 'শুরু: প্রথম মানটা একাই এক হাত সাজানো তাস।',
+    pick: (v) => `${v} হাতে তুলে নাও, তারপর বামে সরিয়ে ঠিক জায়গায় বসাও।`,
+    moveLeft: (big, small) => `${big} > ${small}, তাই ${small} বামে সরে যায়।`,
+    firstSorted: (k) => `প্রথম ${k}টি মান এখন সাজানো।`,
+    mergeStart: 'শুরু: প্রতিটি টুকরোয় একটা করে মান না থাকা পর্যন্ত তালিকাকে অর্ধেক করতে থাকো।',
+    split: (lo, hi, mid) => `ইনডেক্স ${lo}-${hi}-কে ${mid}-এ ভাগ করো: আগে দুই অর্ধেক আলাদা করে সাজাও।`,
+    merge: (lo, hi, v, k) => `ইনডেক্স ${lo}-${hi} জোড়া দাও: দুই দিকের সামনের মানের মধ্যে ছোটটা, ${v}, যায় ইনডেক্স ${k}-এ।`,
+  },
+};
+
+export function bubbleSortFrames(input, lang = 'en') {
+  const w = SORT_WORDS[lang] ?? SORT_WORDS.en;
   const a = [...input];
   const sorted = new Set();
-  const frames = [frame(a, [], sorted, 'Start: compare neighbours and swap them when they are out of order.', 0)];
+  const frames = [frame(a, [], sorted, w.bubbleStart, 0)];
 
   for (let end = a.length - 1; end > 0; end--) {
     let swapped = false;
     for (let i = 0; i < end; i++) {
-      frames.push(frame(a, [i, i + 1], sorted, `Compare ${a[i]} and ${a[i + 1]}.`, 2, { end, i, 'a[i]': a[i], 'a[i+1]': a[i + 1] }));
+      frames.push(frame(a, [i, i + 1], sorted, w.compare(a[i], a[i + 1]), 2, { end, i, 'a[i]': a[i], 'a[i+1]': a[i + 1] }));
       if (a[i] > a[i + 1]) {
         [a[i], a[i + 1]] = [a[i + 1], a[i]];
         swapped = true;
-        frames.push(frame(a, [i, i + 1], sorted, `${a[i + 1]} > ${a[i]}, so swap them.`, 3, { end, i, swapped }));
+        frames.push(frame(a, [i, i + 1], sorted, w.swap(a[i + 1], a[i]), 3, { end, i, swapped }));
       }
     }
     sorted.add(end);
-    frames.push(frame(a, [], sorted, `The largest unsorted value, ${a[end]}, has bubbled to index ${end}.`, 4, { end, swapped }));
+    frames.push(frame(a, [], sorted, w.bubbled(a[end], end), 4, { end, swapped }));
     // No swaps in a full pass means everything left is already in order.
     if (!swapped) {
-      frames.push(frame(a, [], sorted, 'No swaps in a whole pass: the rest is already in order, so stop early.', 5, { swapped }));
+      frames.push(frame(a, [], sorted, w.early, 5, { swapped }));
       break;
     }
   }
 
   a.forEach((_, i) => sorted.add(i));
-  frames.push(frame(a, [], sorted, 'Sorted.'));
+  frames.push(frame(a, [], sorted, w.sorted));
   return frames;
 }
 
-export function selectionSortFrames(input) {
+export function selectionSortFrames(input, lang = 'en') {
+  const w = SORT_WORDS[lang] ?? SORT_WORDS.en;
   const a = [...input];
   const sorted = new Set();
-  const frames = [frame(a, [], sorted, 'Start: find the smallest unsorted value and move it to the front.', 0)];
+  const frames = [frame(a, [], sorted, w.selectionStart, 0)];
 
   for (let start = 0; start < a.length - 1; start++) {
     let min = start;
     for (let i = start + 1; i < a.length; i++) {
-      frames.push(frame(a, [min, i], sorted, `Smallest so far is ${a[min]}. Check ${a[i]}.`, 3, { start, i, min, 'a[min]': a[min] }));
+      frames.push(frame(a, [min, i], sorted, w.check(a[min], a[i]), 3, { start, i, min, 'a[min]': a[min] }));
       if (a[i] < a[min]) min = i;
     }
     [a[start], a[min]] = [a[min], a[start]];
     sorted.add(start);
-    frames.push(frame(a, [start], sorted, `Place ${a[start]} at index ${start}.`, 4, { start, min }));
+    frames.push(frame(a, [start], sorted, w.place(a[start], start), 4, { start, min }));
   }
 
   a.forEach((_, i) => sorted.add(i));
-  frames.push(frame(a, [], sorted, 'Sorted.'));
+  frames.push(frame(a, [], sorted, w.sorted));
   return frames;
 }
 
-export function insertionSortFrames(input) {
+export function insertionSortFrames(input, lang = 'en') {
+  const w = SORT_WORDS[lang] ?? SORT_WORDS.en;
   const a = [...input];
   const sorted = new Set([0]);
-  const frames = [frame(a, [], sorted, 'Start: the first value alone is a sorted hand of cards.', 0)];
+  const frames = [frame(a, [], sorted, w.insertionStart, 0)];
 
   for (let i = 1; i < a.length; i++) {
     let j = i;
-    frames.push(frame(a, [j], sorted, `Pick up ${a[j]} and slide it left into place.`, 1, { i, j, 'a[j]': a[j] }));
+    frames.push(frame(a, [j], sorted, w.pick(a[j]), 1, { i, j, 'a[j]': a[j] }));
     while (j > 0 && a[j - 1] > a[j]) {
       [a[j - 1], a[j]] = [a[j], a[j - 1]];
-      frames.push(frame(a, [j - 1, j], sorted, `${a[j]} > ${a[j - 1]}, so ${a[j - 1]} moves left.`, 3, { i, j: j - 1 }));
+      frames.push(frame(a, [j - 1, j], sorted, w.moveLeft(a[j], a[j - 1]), 3, { i, j: j - 1 }));
       j--;
     }
     for (let k = 0; k <= i; k++) sorted.add(k);
-    frames.push(frame(a, [j], sorted, `The first ${i + 1} values are now sorted.`, 2, { i, j }));
+    frames.push(frame(a, [j], sorted, w.firstSorted(i + 1), 2, { i, j }));
   }
 
-  frames.push(frame(a, [], sorted, 'Sorted.'));
+  frames.push(frame(a, [], sorted, w.sorted));
   return frames;
 }
 
-export function mergeSortFrames(input) {
+export function mergeSortFrames(input, lang = 'en') {
+  const w = SORT_WORDS[lang] ?? SORT_WORDS.en;
   const a = [...input];
-  const frames = [frame(a, [], [], 'Start: split the list in half until each piece has one value.', 0)];
+  const frames = [frame(a, [], [], w.mergeStart, 0)];
 
   const sort = (lo, hi) => {
     if (hi - lo < 1) return;
     const mid = Math.floor((lo + hi) / 2);
     const range = [];
     for (let k = lo; k <= hi; k++) range.push(k);
-    frames.push(frame(a, range, [], `Split indexes ${lo}-${hi} at ${mid}: sort each half first.`, 3, { lo, mid, hi }));
+    frames.push(frame(a, range, [], w.split(lo, hi, mid), 3, { lo, mid, hi }));
     sort(lo, mid);
     sort(mid + 1, hi);
 
@@ -116,12 +160,12 @@ export function mergeSortFrames(input) {
       a[k] = takeLeft ? left[i++] : right[j++];
       // Show values not merged yet after the merged ones, so no value appears twice.
       const view = [...a.slice(0, k + 1), ...left.slice(i), ...right.slice(j), ...a.slice(hi + 1)];
-      frames.push(frame(view, [k], [], `Merge indexes ${lo}-${hi}: take the smaller front value, ${a[k]}, into index ${k}.`, 4, { lo, mid, hi, k }));
+      frames.push(frame(view, [k], [], w.merge(lo, hi, a[k], k), 4, { lo, mid, hi, k }));
     }
   };
 
   sort(0, a.length - 1);
-  frames.push(frame(a, [], a.map((_, i) => i), 'Sorted.'));
+  frames.push(frame(a, [], a.map((_, i) => i), w.sorted));
   return frames;
 }
 
@@ -190,7 +234,21 @@ export const binarySearchCode = [
 ];
 
 // Frame: { lo, hi, mid, found, caption, line, vars }. found is the index, or -1 when absent.
-export function binarySearchFrames(sorted, target) {
+const SEARCH_WORDS = {
+  en: {
+    found: (v, t, mid) => `Middle value ${v} equals ${t}. Found at index ${mid}.`,
+    drop: (v, t, right) => `Middle value ${v} is ${right ? 'smaller' : 'larger'} than ${t}, so drop the ${right ? 'left' : 'right'} half.`,
+    missing: (t) => `lo passed hi, so nothing is left to check: ${t} is not in the list.`,
+  },
+  bn: {
+    found: (v, t, mid) => `মাঝের মান ${v} আর ${t} সমান। ইনডেক্স ${mid}-এ পাওয়া গেছে।`,
+    drop: (v, t, right) => `মাঝের মান ${v}, ${t}-এর চেয়ে ${right ? 'ছোট' : 'বড়'}, তাই ${right ? 'বাম' : 'ডান'} অর্ধেক বাদ দাও।`,
+    missing: (t) => `lo এখন hi-কে পেরিয়ে গেছে, দেখার মতো আর কিছু বাকি নেই: ${t} তালিকায় নেই।`,
+  },
+};
+
+export function binarySearchFrames(sorted, target, lang = 'en') {
+  const w = SEARCH_WORDS[lang] ?? SEARCH_WORDS.en;
   const frames = [];
   let lo = 0;
   let hi = sorted.length - 1;
@@ -200,7 +258,7 @@ export function binarySearchFrames(sorted, target) {
     const value = sorted[mid];
     const vars = { target, lo, hi, mid, 'a[mid]': value };
     if (value === target) {
-      frames.push({ lo, hi, mid, found: mid, line: 3, vars, caption: `Middle value ${value} equals ${target}. Found at index ${mid}.` });
+      frames.push({ lo, hi, mid, found: mid, line: 3, vars, caption: w.found(value, target, mid) });
       return frames;
     }
     const goRight = value < target;
@@ -211,13 +269,13 @@ export function binarySearchFrames(sorted, target) {
       found: null,
       line: goRight ? 4 : 5,
       vars,
-      caption: `Middle value ${value} is ${goRight ? 'smaller' : 'larger'} than ${target}, so drop the ${goRight ? 'left' : 'right'} half.`,
+      caption: w.drop(value, target, goRight),
     });
     if (goRight) lo = mid + 1;
     else hi = mid - 1;
   }
 
-  frames.push({ lo, hi, mid: -1, found: -1, line: 6, vars: { target, lo, hi }, caption: `lo passed hi, so nothing is left to check: ${target} is not in the list.` });
+  frames.push({ lo, hi, mid: -1, found: -1, line: 6, vars: { target, lo, hi }, caption: w.missing(target) });
   return frames;
 }
 
@@ -240,7 +298,23 @@ export const traversalCode = (mode) => {
  * BFS or DFS over a grid. `walls` is a Set of "row,col" strings.
  * Frame: { visited: [keys], frontier: [keys], current, path: [keys], caption, line, vars }.
  */
-export function gridTraversalFrames({ rows, cols, walls, start, goal, mode }) {
+const GRID_WORDS = {
+  en: {
+    queue: 'queue', stack: 'stack',
+    goal: (v, p) => `Reached the goal after visiting ${v} cells. Path length: ${p} steps.`,
+    visit: (r, c, list, waiting) => `Visit (${r}, ${c}). Add its unvisited neighbours to the ${list}: ${waiting} waiting.`,
+    blocked: 'The goal cannot be reached: walls block every route.',
+  },
+  bn: {
+    queue: 'কিউ', stack: 'স্ট্যাক',
+    goal: (v, p) => `${v}টি ঘর ঘোরার পর লক্ষ্যে পৌঁছানো গেল। পথের দৈর্ঘ্য: ${p} ধাপ।`,
+    visit: (r, c, list, waiting) => `(${r}, ${c}) ঘরে যাও। এর না-দেখা প্রতিবেশীদের ${list}-এ রাখো: ${waiting}টি অপেক্ষায়।`,
+    blocked: 'লক্ষ্যে পৌঁছানো যাবে না: দেয়াল সব পথ আটকে রেখেছে।',
+  },
+};
+
+export function gridTraversalFrames({ rows, cols, walls, start, goal, mode }, lang = 'en') {
+  const w = GRID_WORDS[lang] ?? GRID_WORDS.en;
   const key = ([r, c]) => `${r},${c}`;
   const startKey = key(start);
   const goalKey = key(goal);
@@ -267,7 +341,7 @@ export function gridTraversalFrames({ rows, cols, walls, start, goal, mode }) {
         path,
         line: 4,
         vars: { cell: `(${cellKey})`, visited: visited.length, 'path length': path.length - 1 },
-        caption: `Reached the goal after visiting ${visited.length} cells. Path length: ${path.length - 1} steps.`,
+        caption: w.goal(visited.length, path.length - 1),
       });
       return frames;
     }
@@ -291,11 +365,11 @@ export function gridTraversalFrames({ rows, cols, walls, start, goal, mode }) {
       path: [],
       line: 5,
       vars: { cell: `(${r},${c})`, visited: visited.length, [`${container} size`]: frontier.length },
-      caption: `Visit (${r}, ${c}). Add its unvisited neighbours to the ${container}: ${frontier.length} waiting.`,
+      caption: w.visit(r, c, w[container], frontier.length),
     });
   }
 
-  frames.push({ visited: [...visited], frontier: [], current: null, path: [], line: 6, vars: { visited: visited.length }, caption: 'The goal cannot be reached: walls block every route.' });
+  frames.push({ visited: [...visited], frontier: [], current: null, path: [], line: 6, vars: { visited: visited.length }, caption: w.blocked });
   return frames;
 }
 
@@ -395,7 +469,23 @@ export const pairSumCode = [
  * Each step rules out a whole row of pairs, so it takes at most n - 1 steps
  * instead of the n(n-1)/2 pairs a brute-force search checks.
  */
-export function pairSumFrames(sorted, target) {
+const PAIR_WORDS = {
+  en: {
+    found: (x, y, t) => `${x} + ${y} = ${t}. Found the pair.`,
+    small: (x, y, s) => `${x} + ${y} = ${s} is too small. Every pair with ${x} is too small too, so move the left pointer right.`,
+    big: (x, y, s) => `${x} + ${y} = ${s} is too big. Every pair with ${y} is too big too, so move the right pointer left.`,
+    none: (t) => `The pointers met: no two values add up to ${t}.`,
+  },
+  bn: {
+    found: (x, y, t) => `${x} + ${y} = ${t}। জোড়া পাওয়া গেছে।`,
+    small: (x, y, s) => `${x} + ${y} = ${s}, খুব ছোট। ${x}-এর সাথে যেকোনো জোড়াও ছোটই হবে, তাই বাম পয়েন্টার ডানে সরাও।`,
+    big: (x, y, s) => `${x} + ${y} = ${s}, খুব বড়। ${y}-এর সাথে যেকোনো জোড়াও বড়ই হবে, তাই ডান পয়েন্টার বামে সরাও।`,
+    none: (t) => `পয়েন্টার দুটো মিলে গেল: কোনো দুটো মান যোগ করে ${t} হয় না।`,
+  },
+};
+
+export function pairSumFrames(sorted, target, lang = 'en') {
+  const w = PAIR_WORDS[lang] ?? PAIR_WORDS.en;
   const frames = [];
   let left = 0;
   let right = sorted.length - 1;
@@ -404,7 +494,7 @@ export function pairSumFrames(sorted, target) {
     const sum = sorted[left] + sorted[right];
     const vars = { target, left, right, sum };
     if (sum === target) {
-      frames.push({ left, right, found: [left, right], line: 3, vars, caption: `${sorted[left]} + ${sorted[right]} = ${target}. Found the pair.` });
+      frames.push({ left, right, found: [left, right], line: 3, vars, caption: w.found(sorted[left], sorted[right], target) });
       return frames;
     }
     const tooSmall = sum < target;
@@ -414,15 +504,13 @@ export function pairSumFrames(sorted, target) {
       found: null,
       line: tooSmall ? 4 : 5,
       vars,
-      caption: tooSmall
-        ? `${sorted[left]} + ${sorted[right]} = ${sum} is too small. Every pair with ${sorted[left]} is too small too, so move the left pointer right.`
-        : `${sorted[left]} + ${sorted[right]} = ${sum} is too big. Every pair with ${sorted[right]} is too big too, so move the right pointer left.`,
+      caption: (tooSmall ? w.small : w.big)(sorted[left], sorted[right], sum),
     });
     if (tooSmall) left++;
     else right--;
   }
 
-  frames.push({ left, right, found: null, line: 6, vars: { target, left, right }, caption: `The pointers met: no two values add up to ${target}.` });
+  frames.push({ left, right, found: null, line: 6, vars: { target, left, right }, caption: w.none(target) });
   return frames;
 }
 
@@ -454,9 +542,25 @@ export const windowSumCode = [
  * Sliding adds the value entering and subtracts the value leaving, so each
  * step costs O(1) instead of re-adding all k values.
  */
-export function windowSumFrames(values, k) {
+const WINDOW_WORDS = {
+  en: {
+    badK: (n) => `The window size must be between 1 and ${n}.`,
+    first: (k, s) => `First window: add the first ${k} values. Sum = ${s}.`,
+    slide: (add, drop, s, improved, best) => `Slide right: add ${add}, drop ${drop}. Sum = ${s}${improved ? ', a new best.' : `, best is still ${best}.`}`,
+    done: (start, best) => `Done. The best window starts at index ${start} with sum ${best}.`,
+  },
+  bn: {
+    badK: (n) => `উইন্ডোর মাপ হতে হবে 1 থেকে ${n}-এর মধ্যে।`,
+    first: (k, s) => `প্রথম উইন্ডো: প্রথম ${k}টি মান যোগ করো। যোগফল = ${s}।`,
+    slide: (add, drop, s, improved, best) => `ডানে সরাও: ${add} যোগ করো, ${drop} বাদ দাও। যোগফল = ${s}${improved ? ', নতুন সেরা।' : `, সেরা এখনও ${best}।`}`,
+    done: (start, best) => `শেষ। সেরা উইন্ডো শুরু হয় ইনডেক্স ${start}-এ, যোগফল ${best}।`,
+  },
+};
+
+export function windowSumFrames(values, k, lang = 'en') {
+  const w = WINDOW_WORDS[lang] ?? WINDOW_WORDS.en;
   if (k < 1 || k > values.length) {
-    return [{ start: 0, end: -1, sum: 0, best: null, bestStart: -1, line: -1, vars: { k }, caption: `The window size must be between 1 and ${values.length}.` }];
+    return [{ start: 0, end: -1, sum: 0, best: null, bestStart: -1, line: -1, vars: { k }, caption: w.badK(values.length) }];
   }
 
   let sum = values.slice(0, k).reduce((total, value) => total + value, 0);
@@ -471,7 +575,7 @@ export function windowSumFrames(values, k) {
       bestStart,
       line: 0,
       vars: { k, start: 0, end: k - 1, sum, best },
-      caption: `First window: add the first ${k} values. Sum = ${sum}.`,
+      caption: w.first(k, sum),
     },
   ];
 
@@ -491,7 +595,7 @@ export function windowSumFrames(values, k) {
       bestStart,
       line: improved ? 3 : 2,
       vars: { k, start, end, sum, best },
-      caption: `Slide right: add ${values[end]}, drop ${values[end - k]}. Sum = ${sum}${improved ? ', a new best.' : `, best is still ${best}.`}`,
+      caption: w.slide(values[end], values[end - k], sum, improved, best),
     });
   }
 
@@ -503,7 +607,7 @@ export function windowSumFrames(values, k) {
     bestStart,
     line: 4,
     vars: { k, best },
-    caption: `Done. The best window starts at index ${bestStart} with sum ${best}.`,
+    caption: w.done(bestStart, best),
   });
   return frames;
 }
@@ -606,13 +710,28 @@ export const fastSlowCode = [
  * off the end. Slow moves 1 node per step, fast moves 2, so on a loop fast
  * gains one node each step and must land on slow.
  */
-export function fastSlowFrames(n, loopTo = -1) {
+const FAST_SLOW_WORDS = {
+  en: {
+    start: 'Both pointers start at the head, node 0.',
+    met: (s, f, steps) => `Slow steps to node ${s} and fast jumps to node ${f}: they meet, so the list has a loop. Found in ${steps} step${steps === 1 ? '' : 's'}.`,
+    step: (s, f) => `Slow steps to ${s < 0 ? 'the end' : `node ${s}`}; fast jumps two, to ${f < 0 ? 'the end' : `node ${f}`}.`,
+    end: (steps, s) => `Fast reached the end after ${steps} step${steps === 1 ? '' : 's'}, so there is no loop. Slow is at node ${s}, the middle.`,
+  },
+  bn: {
+    start: 'দুটো পয়েন্টারই শুরু করে head থেকে, নোড 0-তে।',
+    met: (s, f, steps) => `slow এক ঘর এগিয়ে নোড ${s}-এ, fast লাফিয়ে নোড ${f}-এ: দুজন মিলে গেল, তাই লিস্টে লুপ আছে। ধরা পড়ল ${steps} ধাপে।`,
+    step: (s, f) => `slow এক ঘর এগিয়ে ${s < 0 ? 'লিস্টের শেষে' : `নোড ${s}-এ`}; fast দুই ঘর লাফিয়ে ${f < 0 ? 'লিস্টের শেষে' : `নোড ${f}-এ`}।`,
+    end: (steps, s) => `${steps} ধাপ পরে fast লিস্টের শেষে পৌঁছে গেল, তাই কোনো লুপ নেই। slow আছে নোড ${s}-এ, ঠিক মাঝখানে।`,
+  },
+};
+
+export function fastSlowFrames(n, loopTo = -1, lang = 'en') {
+  const w = FAST_SLOW_WORDS[lang] ?? FAST_SLOW_WORDS.en;
   const next = (i) => (i < 0 ? -1 : i + 1 < n ? i + 1 : loopTo);
-  const name = (i) => (i < 0 ? 'the end' : `node ${i}`);
   let slow = 0;
   let fast = 0;
   let steps = 0;
-  const frames = [{ slow, fast, met: false, line: 0, vars: { slow, fast, steps }, caption: 'Both pointers start at the head, node 0.' }];
+  const frames = [{ slow, fast, met: false, line: 0, vars: { slow, fast, steps }, caption: w.start }];
 
   while (fast >= 0 && next(fast) >= 0) {
     slow = next(slow);
@@ -625,9 +744,7 @@ export function fastSlowFrames(n, loopTo = -1) {
       met,
       line: met ? 4 : 3,
       vars: { slow, fast, steps },
-      caption: met
-        ? `Slow steps to node ${slow} and fast jumps to node ${fast}: they meet, so the list has a loop. Found in ${steps} step${steps === 1 ? '' : 's'}.`
-        : `Slow steps to ${name(slow)}; fast jumps two, to ${name(fast)}.`,
+      caption: met ? w.met(slow, fast, steps) : w.step(slow, fast),
     });
     if (met) return frames;
   }
@@ -638,7 +755,7 @@ export function fastSlowFrames(n, loopTo = -1) {
     met: false,
     line: 5,
     vars: { slow, fast: fast < 0 ? 'none' : fast, steps },
-    caption: `Fast reached the end after ${steps} step${steps === 1 ? '' : 's'}, so there is no loop. Slow is at node ${slow}, the middle.`,
+    caption: w.end(steps, slow),
   });
   return frames;
 }
@@ -657,9 +774,25 @@ export const prefixSumCode = [
  * single subtraction. Frame: { prefix (filled so far), i, query, line, vars,
  * caption }; `query` is { l, r, sum } on the last frame.
  */
-export function prefixSumFrames(values, l, r) {
+const PREFIX_WORDS = {
+  en: {
+    zero: 'prefix[0] = 0: the sum of no values.',
+    stop: '.',
+    pick: (last) => `Pick 0 ≤ l ≤ r ≤ ${last} to ask for a range sum.`,
+    answer: (formula) => `${formula}. One subtraction, however long the range.`,
+  },
+  bn: {
+    zero: 'prefix[0] = 0: কোনো মান না নিলে যোগফল শূন্য।',
+    stop: '।',
+    pick: (last) => `রেঞ্জের যোগফল জানতে 0 ≤ l ≤ r ≤ ${last} বেছে নাও।`,
+    answer: (formula) => `${formula}। রেঞ্জ যত লম্বাই হোক, একটাই বিয়োগ।`,
+  },
+};
+
+export function prefixSumFrames(values, l, r, lang = 'en') {
+  const w = PREFIX_WORDS[lang] ?? PREFIX_WORDS.en;
   const prefix = [0];
-  const frames = [{ prefix: [...prefix], i: -1, query: null, line: 0, vars: { n: values.length }, caption: 'prefix[0] = 0: the sum of no values.' }];
+  const frames = [{ prefix: [...prefix], i: -1, query: null, line: 0, vars: { n: values.length }, caption: w.zero }];
   values.forEach((value, i) => {
     prefix.push(prefix[i] + value);
     frames.push({
@@ -668,13 +801,13 @@ export function prefixSumFrames(values, l, r) {
       query: null,
       line: 2,
       vars: { i, 'a[i]': value, [`prefix[${i + 1}]`]: prefix[i + 1] },
-      caption: `prefix[${i + 1}] = prefix[${i}] + a[${i}] = ${prefix[i]} + ${value} = ${prefix[i + 1]}.`,
+      caption: `prefix[${i + 1}] = prefix[${i}] + a[${i}] = ${prefix[i]} + ${value} = ${prefix[i + 1]}${w.stop}`,
     });
   });
 
   const valid = Number.isInteger(l) && Number.isInteger(r) && l >= 0 && r < values.length && l <= r;
   if (!valid) {
-    frames.push({ prefix: [...prefix], i: -1, query: null, line: -1, vars: { l, r }, caption: `Pick 0 ≤ l ≤ r ≤ ${values.length - 1} to ask for a range sum.` });
+    frames.push({ prefix: [...prefix], i: -1, query: null, line: -1, vars: { l, r }, caption: w.pick(values.length - 1) });
     return frames;
   }
   const sum = prefix[r + 1] - prefix[l];
@@ -684,7 +817,7 @@ export function prefixSumFrames(values, l, r) {
     query: { l, r, sum },
     line: 3,
     vars: { l, r, [`prefix[${r + 1}]`]: prefix[r + 1], [`prefix[${l}]`]: prefix[l], sum },
-    caption: `sum(${l}..${r}) = prefix[${r + 1}] - prefix[${l}] = ${prefix[r + 1]} - ${prefix[l]} = ${sum}. One subtraction, however long the range.`,
+    caption: w.answer(`sum(${l}..${r}) = prefix[${r + 1}] - prefix[${l}] = ${prefix[r + 1]} - ${prefix[l]} = ${sum}`),
   });
   return frames;
 }

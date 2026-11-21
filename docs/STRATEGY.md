@@ -37,7 +37,7 @@ Candidate directions (all unchecked; see the legal check below):
 Cheap and fast, in this order:
 
 - **5 think-aloud sessions** (30 minutes each): give a learner one lesson and its demo, ask them to explain the idea back. Note where they get confused, not what they like.
-- **One question on every lesson page:** "Did the demo make this clearer? Yes / No / Comment." Store answers with a privacy-friendly tool (see section 7), no accounts.
+- **One question on every lesson page:** "Did the demo make this clearer? Yes / No / Comment." Store answers in the database with the learner's account id.
 - **Watch where people already ask:** r/learnprogramming, r/cscareerquestions, CS Discords. Collect the exact phrases people use when stuck ("why is a hash map O(1)?"). Those phrases become lesson titles and SEO.
 - **Measure:** lesson completion (scrolled to "What To Remember"), demo interactions per visit, return visits within 7 days.
 
@@ -56,11 +56,11 @@ The current look (warm dark, gold accent, calm type) already reads as "patient t
 
 ## 5. Tech stack
 
-The current stack (Vite, plain JS, Markdown, Vercel) is the right size. Keep it until a real need forces a change.
+The stack is now Next.js + React, Clerk, Neon Postgres and Vercel (the move from Vite happened once accounts, two languages and saved progress were needed).
 
 | Need | When it arrives | Smallest fitting choice |
 | --- | --- | --- |
-| Progress tracking | Learners ask to resume | `localStorage` first, no accounts |
+| Progress tracking | Learners ask to resume | Done: saved per account in Neon, with a copy in the browser |
 | Quizzes | After user research | Quiz data in the lesson Markdown, checked in the browser |
 | Run learner code | Many learners ask | JS in a sandboxed Web Worker; Python via Pyodide. No server execution |
 | Search | 30+ lessons | Build-time index (e.g. MiniSearch) |
@@ -86,7 +86,7 @@ Teaching content markets itself if it is shareable:
 
 Not legal advice. For anything with money or personal data involved, ask a lawyer.
 
-- **Licences are already sound:** code under MIT, lesson text under CC BY 4.0 (`LICENSE`, `LICENSE-CONTENT`). Keep that split. Add a short `CONTRIBUTING` note that contributions are accepted under the same licences (inbound = outbound); a CLA is not needed at this size.
+- **Licence:** the project is proprietary and closed source (`LICENSE`); versions published earlier under MIT and CC BY 4.0 keep those licences for copies taken then. Outside contributors need written permission.
 - **Content sources:** keep writing in our own voice and listing sources. Never paste text, figures or problem statements from books, courses or LeetCode-style sites. Problem *ideas* are fine; their wording is not.
 - **Trademarks:** check the name (section 2) before investing in a brand. Mentioning language names (Rust, Java, Python) descriptively is fine; do not use their logos.
 - **Privacy:** today the site collects nothing. If analytics are added, choose a cookieless tool, add a privacy page, and avoid collecting anything that identifies a person. Accounts or emails bring GDPR (EU) obligations; a site aimed at under-13s brings COPPA (US) ones, so state the audience is 13+.

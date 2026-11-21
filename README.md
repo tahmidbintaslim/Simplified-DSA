@@ -83,6 +83,7 @@ The project has two learning goals. The app covers a small part of the first one
 | Analytics | PostHog, loaded only after the learner allows it (consent banner) |
 | Styling | Hand-written CSS on design tokens: Stripe-style light theme, Vercel Geist dark theme. Tailwind v4 for the reset only |
 | Animation | Motion (motion.dev) springs for demos, worked examples and widgets |
+| Practice | Simulators (`/[lang]/simulators`) run each demo full size with missions (`src/demos/missions.js`); quizzes (`/[lang]/quizzes`) run a lesson's quiz blocks one by one with a score |
 | Languages | English (`/en/...`) and Bangla (`/bn/...`). Interface text in `lib/i18n.js`; Bangla lessons in `src/content/bn/`, falling back to English until translated |
 | Content | Markdown lessons in `src/content/`, rendered on the server |
 | Database | Neon Postgres (`@neondatabase/serverless`): curated resource library, synced progress, quiz attempts. Schema in `db/schema.sql` |

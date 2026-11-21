@@ -17,7 +17,33 @@ const play = (el, keyframes, options = SPRING) => !reduceMotion() && el && anima
 
 /* ---------- Guess the card: binary search as a game, before any theory ---------- */
 
+const GUESS_WORDS = {
+  en: {
+    watch: 'Watch binary search play', fresh: 'New cards', row: 'Face-down cards, sorted from smallest to largest',
+    open: (i, v) => `Card ${i}: ${v}`, out: (i) => `Card ${i}: ruled out`, down: (i) => `Card ${i}: face down`,
+    goal: (n, t) => `The ${n} cards are sorted, smallest on the left. Find <strong>${t}</strong> by turning over as few cards as you can.`,
+    start: 'Pick any card to start.',
+    found: (t, g, best, n) =>
+      g <= best
+        ? `Found ${t} in ${g} guess${g === 1 ? '' : 'es'}. Always turning the middle card never needs more than ${best} for ${n} cards.`
+        : `Found ${t} in ${g} guesses. Always turning the middle card never needs more than ${best}. Try "Watch binary search play".`,
+    clue: (v, t, ruled) => `${v} is ${v < t ? 'smaller' : 'bigger'} than ${t}, so it must be to the ${v < t ? 'right' : 'left'}. That one guess ruled out ${ruled} card${ruled === 1 ? '' : 's'}.`,
+  },
+  bn: {
+    watch: 'বাইনারি সার্চকে খেলতে দেখো', fresh: 'নতুন কার্ড', row: 'উল্টো করে রাখা কার্ড, ছোট থেকে বড় ক্রমে সাজানো',
+    open: (i, v) => `কার্ড ${i}: ${v}`, out: (i) => `কার্ড ${i}: বাদ পড়েছে`, down: (i) => `কার্ড ${i}: উল্টো করা`,
+    goal: (n, t) => `${n}টি কার্ড সাজানো, সবচেয়ে ছোটটা বামে। যত কম কার্ড উল্টে পারো, <strong>${t}</strong> খুঁজে বের করো।`,
+    start: 'শুরু করতে যেকোনো একটা কার্ড বেছে নাও।',
+    found: (t, g, best, n) =>
+      g <= best
+        ? `${g}টি আন্দাজে ${t} পেয়ে গেছ। সবসময় মাঝের কার্ড উল্টালে ${n}টি কার্ডে কখনো ${best}টির বেশি লাগে না।`
+        : `${g}টি আন্দাজে ${t} পেয়ে গেছ। সবসময় মাঝের কার্ড উল্টালে কখনো ${best}টির বেশি লাগে না। "বাইনারি সার্চকে খেলতে দেখো" চেষ্টা করো।`,
+    clue: (v, t, ruled) => `${v}, ${t}-এর চেয়ে ${v < t ? 'ছোট' : 'বড়'}, তাই ${t} আছে ${v < t ? 'ডানে' : 'বামে'}। এক আন্দাজেই ${ruled}টি কার্ড বাদ পড়ল।`,
+  },
+};
+
 function guessGame(root, config) {
+  const w = GUESS_WORDS[config.lang] ?? GUESS_WORDS.en;
   const n = Math.min(32, Math.max(4, Number(config.cards) || 16));
   const best = Math.floor(Math.log2(n)) + 1; // the most checks binary search can need
   let values;
@@ -32,11 +58,11 @@ function guessGame(root, config) {
     <div class="widget-head">
       <p class="widget-goal"></p>
       <div class="widget-actions">
-        <button type="button" class="demo-button" data-act="watch">Watch binary search play</button>
-        <button type="button" class="demo-button" data-act="new">New cards</button>
+        <button type="button" class="demo-button" data-act="watch">${w.watch}</button>
+        <button type="button" class="demo-button" data-act="new">${w.fresh}</button>
       </div>
     </div>
-    <div class="guess-row" role="group" aria-label="Face-down cards, sorted from smallest to largest"></div>
+    <div class="guess-row" role="group" aria-label="${w.row}"></div>
     <p class="widget-message" aria-live="polite"></p>
   `;
   const row = root.querySelector('.guess-row');
@@ -49,7 +75,7 @@ function guessGame(root, config) {
         const open = flipped.has(i);
         const out = !open && (i < lo || i > hi);
         const state = open ? (value === target ? 'is-found' : 'is-open') : out ? 'is-out' : '';
-        return `<button type="button" class="guess-card ${state}" data-card="${i}" ${out || open ? 'disabled' : ''} aria-label="${open ? `Card ${i}: ${value}` : out ? `Card ${i}: ruled out` : `Card ${i}: face down`}">
+        return `<button type="button" class="guess-card ${state}" data-card="${i}" ${out || open ? 'disabled' : ''} aria-label="${open ? w.open(i, value) : out ? w.out(i) : w.down(i)}">
           <span class="guess-face">${open ? value : '?'}</span><span class="array-index">${i}</span></button>`;
       })
       .join('');
@@ -66,8 +92,8 @@ function guessGame(root, config) {
     lo = 0;
     hi = n - 1;
     guesses = 0;
-    goal.innerHTML = `The ${n} cards are sorted, smallest on the left. Find <strong>${target}</strong> by turning over as few cards as you can.`;
-    message.textContent = 'Pick any card to start.';
+    goal.innerHTML = w.goal(n, target);
+    message.textContent = w.start;
     draw();
   };
 
@@ -82,16 +108,13 @@ function guessGame(root, config) {
     draw();
     play(row.querySelector(`[data-card="${i}"]`), { rotateY: [90, 0], scale: [0.9, 1] });
     if (value === target) {
-      message.textContent =
-        guesses <= best
-          ? `Found ${target} in ${guesses} guess${guesses === 1 ? '' : 'es'}. Always turning the middle card never needs more than ${best} for ${n} cards.`
-          : `Found ${target} in ${guesses} guesses. Always turning the middle card never needs more than ${best}. Try "Watch binary search play".`;
+      message.textContent = w.found(target, guesses, best, n);
       play([...row.querySelectorAll('.guess-card.is-out')], { opacity: [1, 0.35] }, { duration: 0.3 });
       return;
     }
     // Cards this one guess removed from play (itself included).
     const ruled = before - (hi - lo + 1);
-    message.textContent = `${value} is ${value < target ? 'smaller' : 'bigger'} than ${target}, so it must be to the ${value < target ? 'right' : 'left'}. That one guess ruled out ${ruled} card${ruled === 1 ? '' : 's'}.`;
+    message.textContent = w.clue(value, target, ruled);
     play([...row.querySelectorAll('.guess-card.is-out')], { y: [0, 6, 0] }, { duration: 0.35, delay: stagger(0.02) });
   };
 
@@ -123,10 +146,22 @@ function guessGame(root, config) {
 
 /* ---------- Halving: how a million shrinks to one ---------- */
 
-function halving(root) {
+const HALVING_WORDS = {
+  en: {
+    label: 'Values in the list:', values: (n) => `${n} values`, start: 'Start', check: (i) => `Check ${i}`, left: (n) => `${n} left`,
+    message: (n, checks) => `${n} values, at most ${checks} checks. A left-to-right scan could need all ${n}.`,
+  },
+  bn: {
+    label: 'তালিকায় মান:', values: (n) => `${n}টি মান`, start: 'শুরু', check: (i) => `চেক ${i}`, left: (n) => `${n}টি বাকি`,
+    message: (n, checks) => `${n}টি মান, সর্বোচ্চ ${checks}টি চেক। বাম থেকে ডানে খুঁজলে হয়তো ${n}টিই দেখতে হতো।`,
+  },
+};
+
+function halving(root, { lang = 'en' } = {}) {
+  const w = HALVING_WORDS[lang] ?? HALVING_WORDS.en;
   const sizes = [8, 16, 100, 1000, 10000, 100000, 1000000];
   root.innerHTML = `
-    <label class="widget-slider">Values in the list: <output></output>
+    <label class="widget-slider">${w.label} <output></output>
       <input type="range" min="0" max="${sizes.length - 1}" value="${sizes.length - 1}" step="1" />
     </label>
     <ol class="halving-rows"></ol>
@@ -140,18 +175,18 @@ function halving(root) {
   const draw = () => {
     const n = sizes[Number(input.value)];
     output.textContent = n.toLocaleString('en-US');
-    input.setAttribute('aria-valuetext', `${n.toLocaleString('en-US')} values`);
+    input.setAttribute('aria-valuetext', w.values(n.toLocaleString('en-US')));
     const rows = [];
     // Worst case: each check leaves the bigger half, minus the value checked.
     for (let left = n; left >= 1; left = Math.floor(left / 2)) rows.push(left);
     list.innerHTML = rows
       .map(
-        (left, i) => `<li><span class="halving-label">${i === 0 ? 'Start' : `Check ${i}`}</span>
+        (left, i) => `<li><span class="halving-label">${i === 0 ? w.start : w.check(i)}</span>
           <span class="halving-track"><span class="halving-bar" style="width: max(3px, ${(left / n) * 100}%)"></span></span>
-          <span class="halving-count">${left.toLocaleString('en-US')} left</span></li>`,
+          <span class="halving-count">${w.left(left.toLocaleString('en-US'))}</span></li>`,
       )
       .join('');
-    message.textContent = `${n.toLocaleString('en-US')} values, at most ${rows.length} checks. A left-to-right scan could need all ${n.toLocaleString('en-US')}.`;
+    message.textContent = w.message(n.toLocaleString('en-US'), rows.length);
     play([...list.children], { opacity: [0, 1], x: [-10, 0] }, { ...SPRING, delay: stagger(0.035) });
   };
 
@@ -161,17 +196,41 @@ function halving(root) {
 
 /* ---------- Bug lab: switch on a classic mistake and watch it fail ---------- */
 
-function bugLab(root) {
+const BUG_WORDS = {
+  en: {
+    strict: 'Loop while', hiMid: 'Shrink with', searchFor: 'Search for', inList: (list) => `Search <code>[${list}]</code> for`,
+    found: 'found it', right: 'go right', left: 'go left',
+    verdicts: (t, lo, hi) => ({
+      found: `Found ${t}.`,
+      'not-found': `Correct: ${t} is not in the list.`,
+      missed: `Missed! ${t} is in the list, but the loop stopped (lo = ${lo}, hi = ${hi}) before checking it. With lo &lt; hi, the last candidate is never looked at.`,
+      stuck: 'Stuck! lo and hi stopped changing, so this loop never ends. hi = mid keeps a value that was already too big.',
+    }),
+  },
+  bn: {
+    strict: 'লুপ চলবে যতক্ষণ', hiMid: 'ছোট করো এভাবে', searchFor: 'যা খুঁজবে', inList: (list) => `<code>[${list}]</code>-এ খোঁজো:`,
+    found: 'পাওয়া গেছে', right: 'ডানে যাও', left: 'বামে যাও',
+    verdicts: (t, lo, hi) => ({
+      found: `${t} পাওয়া গেছে।`,
+      'not-found': `ঠিক: ${t} তালিকায় নেই।`,
+      missed: `ফসকে গেল! ${t} তালিকায় আছে, কিন্তু সেটা দেখার আগেই লুপ থেমে গেছে (lo = ${lo}, hi = ${hi})। lo &lt; hi হলে শেষ প্রার্থীটাকে কখনো দেখাই হয় না।`,
+      stuck: 'আটকে গেল! lo আর hi বদলানো বন্ধ হয়ে গেছে, তাই এই লুপ কখনো শেষ হবে না। hi = mid এমন একটা মান রেখে দেয় যেটা আগেই বড় বলে জানা গেছে।',
+    }),
+  },
+};
+
+function bugLab(root, { lang = 'en' } = {}) {
+  const w = BUG_WORDS[lang] ?? BUG_WORDS.en;
   const values = [3, 9, 14, 21, 30];
   let target = 30;
   root.innerHTML = `
     <div class="bug-switches">
-      <label class="bug-switch"><input type="checkbox" data-bug="strict" /> Loop while <code>lo &lt; hi</code></label>
-      <label class="bug-switch"><input type="checkbox" data-bug="hiMid" /> Shrink with <code>hi = mid</code></label>
+      <label class="bug-switch"><input type="checkbox" data-bug="strict" /> ${w.strict} <code>lo &lt; hi</code></label>
+      <label class="bug-switch"><input type="checkbox" data-bug="hiMid" /> ${w.hiMid} <code>hi = mid</code></label>
     </div>
     <pre class="bug-code"><code></code></pre>
-    <div class="widget-actions" role="group" aria-label="Search for">
-      <span class="bug-in">Search <code>[${values.join(', ')}]</code> for</span>
+    <div class="widget-actions" role="group" aria-label="${w.searchFor}">
+      <span class="bug-in">${w.inList(values.join(', '))}</span>
       ${[3, 14, 30, 10].map((t) => `<button type="button" class="demo-button" data-target="${t}">${t}</button>`).join('')}
     </div>
     <ol class="bug-trace"></ol>
@@ -202,17 +261,12 @@ function bugLab(root) {
     trace.innerHTML = shown
       .map(({ lo: l, hi: h, mid }, i) => {
         const v = values[mid];
-        const go = v === target ? 'found it' : v < target ? 'go right' : 'go left';
+        const go = v === target ? w.found : v < target ? w.right : w.left;
         return `<li class="${i >= steps.length ? 'is-repeat' : ''}"><code>lo=${l} hi=${h} mid=${mid}</code> ${v} ${v === target ? '=' : v < target ? '<' : '>'} ${target}: ${go}</li>`;
       })
       .join('');
-    const verdicts = {
-      found: [`Found ${target}.`, 'is-ok'],
-      'not-found': [`Correct: ${target} is not in the list.`, 'is-ok'],
-      missed: [`Missed! ${target} is in the list, but the loop stopped (lo = ${lo}, hi = ${hi}) before checking it. With lo &lt; hi, the last candidate is never looked at.`, 'is-bad'],
-      stuck: [`Stuck! lo and hi stopped changing, so this loop never ends. hi = mid keeps a value that was already too big.`, 'is-bad'],
-    };
-    const [text, tone] = verdicts[outcome];
+    const text = w.verdicts(target, lo, hi)[outcome];
+    const tone = outcome === 'missed' || outcome === 'stuck' ? 'is-bad' : 'is-ok';
     result.innerHTML = text;
     result.className = `bug-result ${tone}`;
     play([...trace.children], { opacity: [0, 1], x: [-8, 0] }, { ...SPRING, delay: stagger(0.12) });

@@ -4,6 +4,7 @@ import { dict, isLocale, LOCALES } from '../../lib/i18n.js';
 import { resourcesFor } from '../../lib/db.js';
 import Home from '../../components/Home.js';
 import Resources from '../../components/Resources.js';
+import { simulators } from '../../lib/simulators.js';
 
 export const generateStaticParams = () => LOCALES.map((lang) => ({ lang }));
 
@@ -35,7 +36,7 @@ export default async function HomePage({ params }) {
   const library = await resourcesFor('general', lang);
   return (
     <main id="main" className="lesson-main" tabIndex={-1}>
-      <Home lang={lang} sections={map} numbers={numbers}>
+      <Home lang={lang} sections={map} numbers={numbers} sims={simulators(lang).slice(0, 6).map(({ id, title, intro, lesson }) => ({ id, title, intro, lesson: lesson.title }))}>
         {library.length ? <Resources lang={lang} resources={library} id="library" /> : null}
       </Home>
     </main>

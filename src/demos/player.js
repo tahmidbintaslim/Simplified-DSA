@@ -193,6 +193,8 @@ export function createPlayer(root, onFrame, { predict, lang = 'en' } = {}) {
     predictCard.classList.toggle('is-wrong', picked !== null && !right);
     predictQuestion.textContent =
       picked === null ? w.itWas(answer, why) : right ? w.right(answer, why) : w.wrong(picked, answer, why);
+    // Simulator missions listen for these (see src/demos/missions.js).
+    root.dispatchEvent(new CustomEvent('demo-op', { bubbles: true, detail: { op: 'predict', right: picked !== null && right } }));
   };
   const stepOrAsk = () => {
     if (awaiting) return;

@@ -1,4 +1,5 @@
 # Simplified DSA - Platform Plan
+> **Superseded (November 2026):** the site moved to Next.js + React with Clerk sign-in, a Neon database and English/Bangla pages. The stack notes below describe the original Vite plan and are kept for history; see the README for the current architecture.
 
 ## Vision
 

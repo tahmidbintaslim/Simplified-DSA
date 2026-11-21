@@ -4,6 +4,8 @@ import { Show, SignInButton, UserButton } from '@clerk/nextjs';
 import { course, lessonPath } from '../lib/course.js';
 import { dict } from '../lib/i18n.js';
 import LangSwitch from './LangSwitch.js';
+import SearchDialog from './SearchDialog.js';
+import { searchItems } from '../lib/search.js';
 import ThemeToggle from './ThemeToggle.js';
 
 export default function SiteHeader({ lang }) {
@@ -19,8 +21,11 @@ export default function SiteHeader({ lang }) {
         <nav className="topnav" aria-label="Site">
           <Link href={`/${lang}`}>{t.courseMap}</Link>
           <Link href={lessonPath(lang, first.id, first.lessons[0].id)}>{t.lessons}</Link>
+          <Link href={`/${lang}/simulators`}>{t.simulators.nav}</Link>
+          <Link href={`/${lang}/quizzes`}>{t.quizzes.nav}</Link>
         </nav>
         <div className="topbar-actions">
+          <SearchDialog lang={lang} items={searchItems(lang)} />
           <LangSwitch lang={lang} />
           <ThemeToggle labels={[t.switchTheme(false), t.switchTheme(true)]} />
           {/* Only the account button waits for Clerk; the rest of the header renders at once. */}

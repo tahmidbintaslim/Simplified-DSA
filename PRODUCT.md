@@ -29,9 +29,9 @@ A free, open learning site that teaches data structures, algorithms and intervie
 
 ## Capabilities and Constraints
 
-- Existing stack (from the codebase): vanilla JavaScript + Vite, Markdown lessons rendered by a small escaping renderer, no JS framework, deployed on Vercel. Hard constraint not yet confirmed by the owner; keep it unless they decide otherwise.
+- Stack: Next.js (App Router) + React, Markdown lessons rendered on the server by a small escaping renderer, Clerk sign-in, Neon Postgres, deployed on Vercel. English and Bangla at `/en` and `/bn`.
 - Lessons: 13 across Data Structures, Algorithms and Interview Patterns, each with an inline demo, quizzes and traced examples.
-- No accounts, no analytics, no tracking (see `public/privacy.html`). Progress is stored only in the learner's browser.
+- Free, with a free account required for lessons, simulators and quizzes. Progress and quiz answers are saved to the account; analytics (PostHog) only after consent (see `public/privacy.html`).
 - Terminology used consistently: lesson, demo, step, trace, pattern, cost (Big O).
 - Open decisions: rename (waits for user research), light vs dark theme, a home/course-map page.
 
@@ -55,7 +55,7 @@ A free, open learning site that teaches data structures, algorithms and intervie
 2. **Every number is real.** Captions, counts and traces come from running the actual algorithm, never from hand-typed claims.
 3. **Beginner path first, shortcuts second.** Nothing a prepper needs should make the first lesson harder for a beginner.
 4. **Predict, then reveal.** Quizzes and demos ask the learner to think before showing the answer.
-5. **Free and private by default.** No account, no tracking, open source.
+5. **Free and respectful.** Free to use, closed source, analytics only with consent, never sell data.
 
 ## Accessibility & Inclusion
 

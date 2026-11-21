@@ -8,7 +8,8 @@ import { revealOnScroll } from '../src/demos/motion.js';
 import { loadCompleted, saveCompleted } from '../src/core/progress.js';
 import { track } from './Analytics.js';
 import { dict } from '../lib/i18n.js';
-import { loadProgress, mergeProgress, recordQuiz, setComplete } from '../app/actions.js';
+import { loadProgress, mergeProgress, setComplete } from '../app/actions.js';
+import { answerQuiz } from './quiz.js';
 import Icon from './Icon.js';
 import LanguageComparison from './LanguageComparison.js';
 
@@ -168,40 +169,4 @@ export default function LessonView({ lang, contentLang, lessonKey, html, heading
       </nav>
     </div>
   );
-}
-
-/**
- * A wrong pick says "try again" with what that choice gets wrong; the answer
- * appears on a right pick, or after two wrong ones. Each answer is saved.
- */
-function answerQuiz(option, lessonKey, words, lang) {
-  const quiz = option.closest('.quiz');
-  if (quiz.dataset.solved) return;
-  const correct = option.dataset.quizOption === 'true';
-  const misses = Number(quiz.dataset.misses ?? 0) + (correct ? 0 : 1);
-  quiz.dataset.misses = misses;
-  option.classList.add(correct ? 'is-right' : 'is-wrong');
-  option.setAttribute('aria-pressed', 'true');
-  option.dataset.mark = correct ? words.markRight : words.markWrong;
-  const attempt = misses + (correct ? 1 : 0);
-  const index = [...quiz.closest('.lesson-content').querySelectorAll('.quiz')].indexOf(quiz);
-  track('quiz_answered', { lesson: lessonKey, quiz: index, correct, attempt, lang });
-  recordQuiz(lessonKey, index, correct, attempt, lang).catch(() => {});
-
-  const reveal = correct || misses >= 2;
-  if (reveal) {
-    quiz.dataset.solved = 'true';
-    quiz.querySelectorAll('[data-quiz-option]').forEach((b) => b.setAttribute('aria-disabled', 'true'));
-    const right = quiz.querySelector('[data-quiz-option="true"]');
-    right.classList.add('is-right');
-    right.dataset.mark = words.markRight;
-  }
-  const why = quiz.querySelector('.quiz-why').textContent;
-  const whyNot = correct ? '' : option.querySelector('.quiz-why-not')?.textContent ?? '';
-  const notQuite = `${words.notQuite}${whyNot ? ` ${whyNot}` : ''}`;
-  quiz.querySelector('.quiz-feedback').textContent = correct
-    ? `${words.correct} ${why}`
-    : reveal
-      ? `${notQuite} ${words.highlighted} ${why}`
-      : `${notQuite} ${words.tryAgain}`;
 }

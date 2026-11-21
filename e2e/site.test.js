@@ -553,10 +553,10 @@ test('languages: / follows the browser, old links move under /en, the switch kee
   assert.equal(await page.locator('.lesson-jumps a[href="#cost-cheat-sheet"]').count(), 1);
   // The demo speaks Bangla too.
   assert.match(await page.textContent('.demo-panel [data-op="insert"]'), /যোগ করো/);
-  // A lesson not yet translated says so and shows the English text.
+  // Every lesson is translated now: Bangla text, no fallback notice.
   await page.goto(`${base}/bn/algorithms/sorting`);
-  assert.equal(await page.locator('.lesson-fallback').count(), 1);
-  assert.match(await page.textContent('.lesson-content h1'), /Sorting/);
+  assert.equal(await page.locator('.lesson-fallback').count(), 0);
+  assert.match(await page.textContent('.lesson-content h1'), /সর্টিং/);
   // The switch opens the same lesson in English.
   await page.click('.lang-switch');
   await page.waitForURL('**/en/algorithms/sorting');
@@ -582,6 +582,64 @@ test('arrays widgets: the address arrow jumps to any index, inserting at the fro
   await page.click('.widget-string-bytes [data-text="বাংলা"]');
   const counts = await page.locator('.bytes-row strong').allTextContents();
   assert.deepEqual(counts.slice(1), ['5', '15']); // code points, UTF-8 bytes
+  assert.deepEqual(errors, []);
+  await page.close();
+});
+
+test('simulators: the hub lists every demo, missions tick off from what you do, and progress is remembered', async () => {
+  const { page, errors } = await open('/simulators', { signedOut: true });
+  assert.equal(await page.locator('.hub-card').count(), lessons.length);
+  await page.close();
+
+  const sim = await open('/simulators/array-ops');
+  await sim.page.click('[data-op="read"]');
+  await sim.page.fill('[data-field="index"]', '0');
+  await sim.page.click('[data-op="insert"]');
+  await sim.page.click('[data-op="delete"]');
+  await sim.page.waitForFunction(() => document.querySelectorAll('.mission.is-done').length === 3);
+  await sim.page.click('[data-op="append"]');
+  await sim.page.waitForSelector('.sim-all-done');
+  await sim.page.reload();
+  await sim.page.waitForSelector('.mission.is-done');
+  assert.equal(await sim.page.textContent('.sim-count'), '4/4');
+  // A search the page starts by itself is not the learner's; only clicks count.
+  await sim.page.goto(`${base}/en/simulators/binary-search`);
+  await sim.page.waitForSelector('.mission');
+  assert.equal(await sim.page.locator('.mission.is-done').count(), 0);
+  assert.deepEqual([...errors, ...sim.errors], []);
+  await sim.page.close();
+});
+
+test('quizzes: a lesson quiz runs one question at a time and scores first-try answers', async () => {
+  const { page, errors } = await open('/quizzes');
+  const first = page.locator('.hub-card').first();
+  await first.click();
+  await page.waitForSelector('.quiz-runner .quiz');
+  const total = Number((await page.textContent('.quiz-step')).match(/of (\d+)/)[1]);
+  // First question wrong once, the rest right.
+  await page.locator('.quiz [data-quiz-option="false"]').first().click();
+  assert.equal(await page.isDisabled('.quiz-runner .demo-button.is-primary'), true);
+  await page.click('.quiz [data-quiz-option="true"]');
+  for (let i = 0; i < total; i++) {
+    if (i > 0) await page.click('.quiz [data-quiz-option="true"]');
+    await page.click('.quiz-runner .demo-button.is-primary');
+  }
+  assert.match(await page.textContent('.quiz-score-number'), new RegExp(`${total - 1} of ${total}`));
+  assert.deepEqual(errors, []);
+  await page.close();
+});
+
+test('search: Ctrl/Cmd+K finds lessons, simulators and quizzes in either language', async () => {
+  const { page, errors } = await open('/bn', { signedOut: true });
+  await page.keyboard.press('Control+k');
+  await page.waitForSelector('.search-dialog[open]');
+  // An English word finds the Bangla lesson, its simulator and its quiz.
+  await page.fill('.search-box input', 'stack');
+  const kinds = await page.locator('.search-results li .search-kind').allTextContents();
+  assert.ok(kinds.includes('পাঠ') && kinds.includes('সিমুলেটর') && kinds.includes('কুইজ'), kinds.join(','));
+  assert.match(await page.textContent('.search-results li.is-active strong'), /স্ট্যাক/);
+  await page.keyboard.press('Enter');
+  await page.waitForURL(/\/sign-in|\/bn\/data-structures\/stacks-and-queues/);
   assert.deepEqual(errors, []);
   await page.close();
 });
