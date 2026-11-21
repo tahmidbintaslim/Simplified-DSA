@@ -1,6 +1,6 @@
 # Binary Search
 
-Binary search finds a value in a sorted list by looking at the middle, throwing away the half that cannot contain it, and repeating. It finds any value among a million in about 20 checks. Before any of that, though, let's play a game.
+Binary search finds a value in a sorted list by looking at the middle, throwing away the half that cannot contain it, and repeating. It finds any value among a million in about 20 checks. By the end of this lesson you will be able to say why it needs so few, why it only works on sorted data, and which two small mistakes break it. Before any of that, though, let's play a game.
 
 ```widget
 guess-game
@@ -107,7 +107,7 @@ def binary_search(values, target):
     return -1              # lo passed hi: not found
 ```
 
-Seven lines, and two of them are famous for breaking. Binary search is easy to describe and surprisingly easy to get wrong: the bugs hide in the tiny details at the edges. So let's break it on purpose. Flip a switch, pick a target, and watch what happens.
+Eleven lines, and two of them are famous for breaking. Binary search is easy to describe and surprisingly easy to get wrong: the bugs hide in the tiny details at the edges. So let's break it on purpose. Flip a switch, pick a target, and watch what happens.
 
 ```widget
 bug-lab
@@ -116,6 +116,22 @@ bug-lab
 Search for `30` with the first switch on: the loop stops while `30` is the only value left, before ever looking at it. Then turn that switch off, turn the second one on, and search for `10`: `hi` lands on a value that is too big and never moves again. Both bugs pass most tests, which is exactly why they survive into interviews.
 
 > **Watch out:** Use `lo <= hi` (not `<`), or you skip the last candidate. Use `mid + 1` and `mid - 1` (not `mid`), or the range can stop shrinking and loop forever.
+
+## When A Value Appears Twice
+
+The code returns as soon as it lands on a match. If the value appears more than once, that is the first match it happens to hit, which is not always the first one in the list.
+
+```quiz
+Q: You run the code above on `[2, 4, 4, 4, 9]` and search for 4. Which index does it return?
+- 1, the first 4 in the list
+  Why not: The code never looks for the leftmost match. It returns the moment values[mid] equals the target, and the first mid is not index 1.
+* 2
+- 3, the last 4 in the list
+  Why not: The search does not scan to the right either. The very first check already lands on a 4 and returns.
+Why: lo=0 and hi=4 give mid=2. values[2] is 4, so the function returns 2 straight away, without ever seeing the 4s on either side.
+```
+
+That is fine when you only ask "is it here?". When you need the **first** position, do not stop on a match: remember it, set `hi = mid - 1`, and keep searching the left part. Library functions say which behaviour they give. Python's `bisect_left` returns the position before any equal values, while Java's `Arrays.binarySearch` promises nothing about which equal value it finds.
 
 ```deep-dive
 title: Deep dive: why some code writes `lo + (hi - lo) // 2`
@@ -126,11 +142,22 @@ In Python, integers grow as big as they need to, so `(lo + hi) // 2` is always f
 
 > **When to use it:** The data is sorted (or can be sorted once and searched many times), or the problem asks for "the first position where something becomes true". Binary search also works on answers: "what is the smallest speed that finishes in time?"
 
+## Cost Cheat Sheet
+
+| Operation | Cost | Why |
+| --- | --- | --- |
+| Binary search, time | `O(log n)` | Each check halves what is left |
+| Binary search, extra memory | `O(1)` | It only stores `lo`, `hi` and `mid` |
+| Linear search | `O(n)` | It may have to check every value |
+| Sorting first | `O(n log n)` | Paid once, before the first search |
+| Inserting into a sorted array | `O(n)` | Finding the spot is `O(log n)`, but later values still shift |
+
 ## What To Remember
 
 - Sorted data plus "throw away half" equals `O(log n)`.
 - Track `lo` and `hi` carefully; stop when `lo` passes `hi`.
 - If you must sort first, that costs `O(n log n)`, so it pays off when you search many times.
+- With repeated values, a plain binary search returns some match, not necessarily the first.
 
 ## Practice Prompt
 
@@ -157,4 +184,5 @@ Search for `60`:
 
 - [CP-Algorithms: Binary Search](https://cp-algorithms.com/num_methods/binary_search.html)
 - [Python bisect](https://docs.python.org/3/library/bisect.html)
+- [Java Arrays.binarySearch](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Arrays.html)
 - [Google Research: Nearly All Binary Searches and Mergesorts are Broken (2006)](https://research.google/blog/extra-extra-read-all-about-it-nearly-all-binary-searches-and-mergesorts-are-broken/)

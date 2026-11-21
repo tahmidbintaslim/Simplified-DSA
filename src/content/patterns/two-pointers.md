@@ -1,6 +1,6 @@
 # Two Pointers
 
-Two pointers is a way to search through ordered data by keeping two positions and moving them toward each other (or in the same direction) based on what you see. It turns many "check every pair" problems from `O(n²)` into `O(n)`.
+Two pointers is a way to search through ordered data by keeping two positions and moving them toward each other (or in the same direction) based on what you see. It turns many "check every pair" problems from `O(n²)` into `O(n)`. By the end of this lesson you will be able to trace it by hand, and explain the part that feels like cheating: how it can skip most of the pairs and still be sure it missed nothing.
 
 > **Analogy:** Two people searching a bookshelf sorted by height, one starting from each end. If the pair of books they hold together is too short for the gap, the person at the short end moves inward to a taller book. Too tall? The person at the tall end moves inward. They never need to go back.
 
@@ -15,7 +15,25 @@ note: Find two values that add up to 10.
 
 ## Brute Force First
 
-Try every pair: 1+3, 1+4, 1+6, … then 3+4, 3+6, … For 6 values that is 15 pairs. For 10,000 values it is about 50 million. That is `O(n²)`.
+Try every pair: 1+3, 1+4, 1+6, … then 3+4, 3+6, … For 6 values that is 15 pairs. For 10,000 values it is about 50 million. The number of pairs grows with the square of the list, so this is `O(n²)`.
+
+```quiz
+Q: A list has 5 values. How many different pairs does brute force have to check in the worst case?
+- 5
+  Why not: That is one pair per value. But each value can pair with all 4 others, not with just one.
+* 10
+- 25
+  Why not: 5 × 5 pairs every value with itself and counts each pair twice (1+3 and 3+1). Drop those and 10 remain.
+Why: The first value pairs with 4 others, the next with 3 new ones, then 2, then 1: 4 + 3 + 2 + 1 = 10.
+```
+
+## The Core Idea
+
+Brute force ignores the one thing we were given for free: the list is sorted. Put one pointer, `L`, on the smallest value and another, `R`, on the largest, and add them up.
+
+If the sum is too small, look at the smaller value, the one under `L`. It is already paired with the biggest partner available. If even that is not enough, no other partner will be. That value can never be part of the answer, so move `L` right, past it.
+
+If the sum is too big, the same argument runs the other way. The value under `R` is paired with the smallest partner available, and it is still too much, so move `R` left.
 
 > **Key idea:** Sorted order tells you which way to move. If the sum is too small, the only way to grow it is to raise the smaller value. If the sum is too big, the only way to shrink it is to lower the bigger value.
 
@@ -74,6 +92,16 @@ Q: In `[2, 4, 7, 9]` you want a sum of 13. `L` is on 2 and `R` is on 9, so the s
 Why: 11 is too small. Moving R left would only pick a smaller value and shrink the sum. Moving L right picks a bigger value: 4 + 9 = 13.
 ```
 
+## Why Nothing Is Missed
+
+Five steps looked at five sums. What about the other ten pairs? They were never added up, yet each one was ruled out. To see how, lay all 15 pairs out as a grid. Step through it with the two buttons, and try the wrong button once to see what it would throw away. Then switch the target to 13, which has no answer.
+
+```widget
+pair-grid
+```
+
+Each move crossed out a whole row or a whole column, not one square. Along a row the sums only shrink as you go left, so if the square you are on is too small, everything to its left in that row is too small as well. Down a column the sums only grow, so a too-big square rules out everything below it. One look, many pairs gone. With `n` values there are at most `n - 1` moves, and together they cover every square in the grid.
+
 ## Try It
 
 Step through the search and read the pseudocode alongside. Change the target, or type your own list (it gets sorted for you). The line under the array compares the steps with a brute-force search.
@@ -103,12 +131,17 @@ Why: On a sorted list, moving L right can only raise the sum and moving R left c
 
 ## Cost Cheat Sheet
 
-| Approach | Time | Extra space |
-| --- | --- | --- |
-| Brute force: every pair | `O(n²)` | `O(1)` |
-| Hash set (unsorted input) | `O(n)` | `O(n)` |
-| Two pointers (sorted input) | `O(n)` | `O(1)` |
-| Sort first, then two pointers | `O(n log n)` | depends on the sort |
+| Approach | Time | Extra space | Why |
+| --- | --- | --- | --- |
+| Brute force: every pair | `O(n²)` | `O(1)` | `n(n − 1)/2` pairs, each one added up |
+| Hash set (unsorted input) | `O(n)` | `O(n)` | One pass, but it remembers every value seen |
+| Two pointers (sorted input) | `O(n)` | `O(1)` | Each step retires one value, so at most `n − 1` steps |
+| Sort first, then two pointers | `O(n log n)` | depends on the sort | The sort costs more than the search |
+
+```deep-dive
+title: Deep dive: the same-direction shape, step by step
+Remove the repeats from the sorted list `[1, 1, 2, 3, 3]` without a second list. `slow` marks the last value we decided to keep; `fast` reads ahead. Both start at the left. `fast` reads the second 1: same as the value under `slow`, so skip it. `fast` reads 2: new, so move `slow` one step right and write 2 there. `fast` reads 3: new again, so move `slow` and write 3. `fast` reads the last 3: a repeat, skip. The list now begins `[1, 2, 3]`, and `slow` sits on the last value kept. Each pointer only ever moved right, so this is one pass: `O(n)` time and `O(1)` extra space. It works because sorting put equal values next to each other.
+```
 
 > **Interview tip:** Say the brute force out loud first ("checking every pair is `O(n²)`"), then the observation that unlocks the pattern ("because it is sorted, a too-small sum means the left value can never work"). That one sentence is what interviewers listen for.
 
@@ -116,6 +149,7 @@ Why: On a sorted list, moving L right can only raise the sum and moving R left c
 
 - Two positions, each move rules something out for good.
 - Sorted order is what tells you which pointer to move.
+- One sum rules out a whole row or column of pairs, so `n - 1` steps cover all of them.
 - From both ends for pairs and palindromes; same direction for in-place rewriting.
 
 ## Practice Prompt
@@ -131,3 +165,4 @@ Check whether `racecar` and `rocket` are palindromes with two pointers. Write th
 ## Sources Checked
 
 - [USACO Guide: Two Pointers](https://usaco.guide/silver/two-pointers)
+- [GeeksforGeeks: Two Pointers Technique](https://www.geeksforgeeks.org/dsa/two-pointers-technique/)

@@ -1,0 +1,153 @@
+/* ---------- Prefix sums widget: range subtract ---------- */
+
+.range-subtract-label {
+  margin: 12px 0 4px;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+/* 14 half-cell columns: values and running totals are offset by half a cell,
+   so each total sits on the wall before its value. */
+.range-subtract-grid {
+  display: grid;
+  grid-template-columns: repeat(14, minmax(0, 1fr));
+  max-width: 560px;
+}
+
+.range-subtract-cell,
+.range-subtract-total {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  min-width: 0;
+  margin: 0 2px;
+  padding: 8px 0 4px;
+  border: 1.5px solid var(--edge);
+  border-radius: 8px;
+  background: var(--raised);
+  color: var(--ink-strong);
+  font: inherit;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+  transition:
+    background-color 220ms ease,
+    border-color 220ms ease,
+    color 220ms ease;
+}
+
+.range-subtract-cell {
+  cursor: pointer;
+}
+
+.range-subtract-cell:hover {
+  border-color: var(--accent-line);
+}
+
+.range-subtract-total {
+  border-style: dashed;
+  border-color: var(--line-strong);
+  background: transparent;
+}
+
+.range-subtract-cell small,
+.range-subtract-total small {
+  color: var(--faint);
+  font-size: 0.7rem;
+  font-weight: 400;
+}
+
+/* Beats the shared .widget [aria-pressed="true"] accent look: gold means "in the range". */
+.widget .range-subtract-cell.is-in {
+  border-color: var(--look-line);
+  background: var(--look-fill);
+  color: var(--on-look);
+}
+
+.widget .range-subtract-cell.is-missed,
+.widget .range-subtract-cell[aria-pressed="true"].is-missed {
+  border-color: var(--danger);
+  background: var(--danger-fill);
+  color: var(--danger-ink);
+}
+
+.range-subtract-cell.is-in small,
+.range-subtract-cell.is-missed small {
+  color: inherit;
+}
+
+.range-subtract-total.is-keep {
+  border-style: solid;
+  border-color: var(--done);
+  background: var(--done-fill);
+  color: var(--on-done-fill);
+}
+
+.range-subtract-total.is-take {
+  border-style: solid;
+  border-color: var(--danger);
+  color: var(--danger-ink);
+}
+
+.range-subtract-bars {
+  row-gap: 3px;
+  min-height: 19px;
+  padding: 5px 0;
+}
+
+.range-subtract-bar {
+  height: 5px;
+  margin: 0 2px;
+  border-radius: 3px;
+}
+
+.range-subtract-bar[hidden] {
+  display: none;
+}
+
+.range-subtract-bar.is-keep {
+  grid-row: 1;
+  background: var(--done);
+}
+
+.range-subtract-bar.is-take {
+  grid-row: 2;
+  background: var(--danger);
+}
+
+.range-subtract-formula {
+  margin: 12px 0 0;
+  color: var(--ink);
+  font-family: var(--font-mono);
+  overflow-wrap: anywhere;
+}
+
+.range-subtract-formula .f-keep {
+  color: var(--done);
+  font-weight: 700;
+}
+
+.range-subtract-formula .f-take {
+  color: var(--danger-ink);
+  font-weight: 700;
+}
+
+.range-subtract-formula strong {
+  display: inline-block;
+  color: var(--ink-strong);
+}
+
+.range-subtract-formula.is-bad strong {
+  color: var(--danger-ink);
+  text-decoration: line-through;
+}
+
+.range-subtract-switch {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 12px;
+  color: var(--ink);
+  cursor: pointer;
+}

@@ -8,6 +8,7 @@ import { revealOnScroll } from '../src/demos/motion.js';
 import { loadCompleted, saveCompleted } from '../src/core/progress.js';
 import { track } from './Analytics.js';
 import { dict } from '../lib/i18n.js';
+import { burst } from './Whimsy.js';
 import { loadProgress, mergeProgress, setComplete } from '../app/actions.js';
 import { answerQuiz } from './quiz.js';
 import Icon from './Icon.js';
@@ -99,6 +100,7 @@ export default function LessonView({ lang, contentLang, lessonKey, html, heading
     else {
       completed.add(lessonKey);
       track('lesson_completed', { lesson: lessonKey });
+      burst(document.getElementById('complete-button'), 22);
     }
     saveCompleted(completed);
     setComplete(lessonKey, completed.has(lessonKey)).catch(() => {});

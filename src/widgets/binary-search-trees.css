@@ -1,0 +1,78 @@
+/* Arrival order: tap values into a tree and watch the order decide its height. */
+.arrival-order-chips [aria-disabled="true"] {
+  border-style: dashed;
+  background: transparent;
+  color: var(--faint);
+  cursor: default;
+  text-decoration: line-through;
+}
+
+.arrival-order-tree {
+  display: block;
+  width: 100%;
+  max-width: 440px;
+  margin: 16px auto 0;
+}
+
+.arrival-order-level {
+  fill: var(--faint);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+.arrival-order-edge {
+  stroke: var(--edge);
+  stroke-width: 2;
+}
+
+.arrival-order-edge.is-path {
+  stroke: var(--done);
+  stroke-width: 3;
+}
+
+.arrival-order-node {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.arrival-order-node circle {
+  fill: var(--raised);
+  stroke: var(--line-strong);
+  stroke-width: 2;
+}
+
+.arrival-order-node.is-path circle {
+  fill: var(--done-fill);
+  stroke: var(--done);
+}
+
+.arrival-order-node.is-new circle {
+  fill: var(--look-fill);
+  stroke: var(--look);
+}
+
+.arrival-order-node text {
+  fill: var(--ink-strong);
+  font-size: 13px;
+  font-weight: 700;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+.arrival-order-stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 16px;
+  min-height: 1.6em;
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+}
+
+.arrival-order-stats strong {
+  color: var(--ink-strong);
+}

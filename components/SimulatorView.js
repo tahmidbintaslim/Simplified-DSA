@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { demos } from '../src/demos/index.js';
 import { missions } from '../src/demos/missions.js';
 import { dict } from '../lib/i18n.js';
+import { burst } from './Whimsy.js';
 import { track } from './Analytics.js';
 import { loadMissions, saveMissions } from '../app/actions.js';
 import Icon from './Icon.js';
@@ -56,7 +57,12 @@ export default function SimulatorView({ lang, demoId }) {
         } catch {
           // Not remembered; the page still counts.
         }
-        for (const m of list) if ((after[m.id] ?? 0) >= (m.times ?? 1) && (before[m.id] ?? 0) < (m.times ?? 1)) track('mission_done', { demo: demoId, mission: m.id });
+        for (const m of list) {
+          if ((after[m.id] ?? 0) >= (m.times ?? 1) && (before[m.id] ?? 0) < (m.times ?? 1)) {
+            track('mission_done', { demo: demoId, mission: m.id });
+            burst(document.querySelector(`[data-mission="${m.id}"]`));
+          }
+        }
         return after;
       });
     };
@@ -81,7 +87,7 @@ export default function SimulatorView({ lang, demoId }) {
               const need = m.times ?? 1;
               const done = n >= need;
               return (
-                <li key={m.id} className={`mission ${done ? 'is-done' : ''}`}>
+                <li key={m.id} data-mission={m.id} className={`mission ${done ? 'is-done' : ''}`}>
                   <span className="mission-check" aria-hidden="true">{done ? <Icon name="check" /> : null}</span>
                   <span>
                     <strong>{m[lang] ?? m.en}</strong>

@@ -6,9 +6,21 @@ import '@fontsource-variable/geist';
 import '@fontsource-variable/geist-mono';
 import '@fontsource-variable/anek-bangla';
 import '../src/style.css';
+import '../src/widgets/big-o.css';
+import '../src/widgets/binary-search-trees.css';
+import '../src/widgets/fast-and-slow-pointers.css';
+import '../src/widgets/graph-traversal.css';
+import '../src/widgets/hash-tables.css';
+import '../src/widgets/linked-lists.css';
+import '../src/widgets/prefix-sums.css';
+import '../src/widgets/sliding-window.css';
+import '../src/widgets/sorting.css';
+import '../src/widgets/stacks-and-queues.css';
+import '../src/widgets/two-pointers.css';
 import SiteHeader from '../components/SiteHeader.js';
 import SiteFooter from '../components/SiteFooter.js';
 import Analytics from '../components/Analytics.js';
+import Whimsy from '../components/Whimsy.js';
 import { themeScript } from '../components/ThemeToggle.js';
 import { dict, isLocale, DEFAULT_LOCALE } from '../lib/i18n.js';
 
@@ -37,6 +49,7 @@ export default async function RootLayout({ children }) {
           <SiteFooter lang={lang} />
           <Suspense>
             <Analytics lang={lang} />
+            <Whimsy />
           </Suspense>
         </ClerkProvider>
       </body>
