@@ -204,3 +204,4 @@ BFS সবসময় ফাঁক দিয়ে একটা শর্টে
 - [CP-Algorithms: Breadth-first search](https://cp-algorithms.com/graph/breadth-first-search.html)
 - [CP-Algorithms: Depth-first search](https://cp-algorithms.com/graph/depth-first-search.html)
 - [শাফায়েতের ব্লগ: গ্রাফ থিওরিতে হাতেখড়ি-৪ (BFS)](https://www.shafaetsplanet.com/?p=604)
+- [Python: sys.setrecursionlimit](https://docs.python.org/3/library/sys.html#sys.setrecursionlimit)
