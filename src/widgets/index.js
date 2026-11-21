@@ -2,6 +2,18 @@ import { animate, stagger } from 'motion';
 import { binarySearchVariant } from '../demos/algorithms.js';
 import { identityKeys, patchRow, reduceMotion, SPRING } from '../demos/motion.js';
 import { escapeHtml } from '../utils/markdown.js';
+// One teaching widget per lesson, each in its own file beside its CSS.
+import lessonBigO from './big-o.js';
+import lessonBinarySearchTrees from './binary-search-trees.js';
+import lessonFastAndSlowPointers from './fast-and-slow-pointers.js';
+import lessonGraphTraversal from './graph-traversal.js';
+import lessonHashTables from './hash-tables.js';
+import lessonLinkedLists from './linked-lists.js';
+import lessonPrefixSums from './prefix-sums.js';
+import lessonSlidingWindow from './sliding-window.js';
+import lessonSorting from './sorting.js';
+import lessonStacksAndQueues from './stacks-and-queues.js';
+import lessonTwoPointers from './two-pointers.js';
 
 /**
  * Small interactive widgets that sit inside a lesson's reading, one idea
@@ -547,6 +559,17 @@ function stringBytes(root, { lang = 'en' }) {
 }
 
 export const widgets = {
+  ...lessonBigO,
+  ...lessonBinarySearchTrees,
+  ...lessonFastAndSlowPointers,
+  ...lessonGraphTraversal,
+  ...lessonHashTables,
+  ...lessonLinkedLists,
+  ...lessonPrefixSums,
+  ...lessonSlidingWindow,
+  ...lessonSorting,
+  ...lessonStacksAndQueues,
+  ...lessonTwoPointers,
   'guess-game': guessGame,
   halving,
   'bug-lab': bugLab,

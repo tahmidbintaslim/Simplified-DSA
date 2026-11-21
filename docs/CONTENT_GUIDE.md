@@ -279,7 +279,7 @@ cards: 16
 ```
 ````
 
-Widgets live in `src/widgets/index.js` (`guess-game`, `halving`, `bug-lab` so far). Add one there and register it in `widgets`.
+Widgets live in `src/widgets/`. The shared ones are in `index.js`; each lesson's own widget is in `<lesson-id>.js` with its styles in `<lesson-id>.css`, exporting `{ 'widget-name': mount }`. Register a new file in `index.js` and import its CSS in `app/layout.js`.
 
 A deep dive folds away until opened:
 

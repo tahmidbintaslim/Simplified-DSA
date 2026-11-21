@@ -637,3 +637,28 @@ test('search: Ctrl/Cmd+K finds lessons, simulators and quizzes in either languag
   assert.deepEqual(errors, []);
   await page.close();
 });
+
+test('every lesson mounts its teaching widgets in both languages, usable at phone width', async () => {
+  for (const path of lessons) {
+    for (const lang of ['en', 'bn']) {
+      const { page, errors } = await open(path.replace('/en/', `/${lang}/`), { width: 380 });
+      await page.waitForSelector('figure.widget');
+      const state = await page.evaluate(() => ({
+        left: document.querySelectorAll('[data-widget]').length, // a placeholder left behind means an unknown widget
+        empty: [...document.querySelectorAll('figure.widget')].filter((el) => !el.textContent.trim()).length,
+        overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      }));
+      assert.deepEqual(state, { left: 0, empty: 0, overflow: 0 }, `${lang} ${path}`);
+      // Pressing a widget's first control must not throw.
+      const first = page.locator('figure.widget button:not([disabled])').first();
+      if (await first.count()) await first.click();
+      // WIDGET_SHOTS=dir saves a picture of each widget for a human to look at.
+      if (process.env.WIDGET_SHOTS) {
+        const figures = page.locator('figure.widget');
+        for (let i = 0; i < (await figures.count()); i++) await figures.nth(i).screenshot({ path: `${process.env.WIDGET_SHOTS}/${lang}-${path.split('/').pop()}-${i}.png` });
+      }
+      assert.deepEqual(errors, [], `${lang} ${path}`);
+      await page.close();
+    }
+  }
+});
