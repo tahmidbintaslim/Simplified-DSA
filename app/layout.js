@@ -9,6 +9,7 @@ import '../src/style.css';
 import SiteHeader from '../components/SiteHeader.js';
 import SiteFooter from '../components/SiteFooter.js';
 import Analytics from '../components/Analytics.js';
+import Whimsy from '../components/Whimsy.js';
 import { themeScript } from '../components/ThemeToggle.js';
 import { dict, isLocale, DEFAULT_LOCALE } from '../lib/i18n.js';
 
@@ -37,6 +38,7 @@ export default async function RootLayout({ children }) {
           <SiteFooter lang={lang} />
           <Suspense>
             <Analytics lang={lang} />
+            <Whimsy />
           </Suspense>
         </ClerkProvider>
       </body>

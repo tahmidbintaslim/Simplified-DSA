@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { loadCompleted } from '../src/core/progress.js';
 import HeroFigure from './HeroFigure.js';
 import Icon from './Icon.js';
+import CardArt from './CardArt.js';
+import { burst } from './Whimsy.js';
 import { dict } from '../lib/i18n.js';
 
 // Section cards show one real step in the step vocabulary, not decoration.
@@ -30,6 +32,38 @@ function MiniFigure({ values, states, labels, caption }) {
 }
 
 
+/** One real question on the landing page: the visitor learns something before signing up. */
+function SampleQuiz({ words }) {
+  const [picked, setPicked] = useState(null);
+  const right = picked === 0;
+  return (
+    <div className="sample-quiz">
+      <p className="sample-q">{words.q}</p>
+      <div className="sample-options" role="group" aria-label={words.q}>
+        {words.options.map((option, i) => (
+          <button
+            key={option}
+            type="button"
+            className={`sample-option ${picked === i ? (i === 0 ? 'is-right' : 'is-wrong') : ''}`}
+            aria-pressed={picked === i}
+            onClick={(event) => {
+              setPicked(i);
+              if (i === 0) burst(event.currentTarget);
+            }}
+          >
+            {option}
+          </button>
+        ))}
+      </div>
+      <p className="sample-feedback" aria-live="polite">
+        {picked === null ? '\u00a0' : right ? `${words.right} ${words.why}` : `${words.wrong} ${words.whyNot[picked]}`}
+      </p>
+    </div>
+  );
+}
+
+// What floats in the closing band: values from the lessons, not decoration for its own sake.
+const TILES = ['a[2]', 'O(1)', 'lo', 'mid', 'hi', 'push', 'BFS', 'n²'];
 
 /** What this is, where to start (or continue), and the whole course as a map. */
 export default function Home({ lang, sections, numbers, sims = [], children }) {
@@ -50,6 +84,7 @@ export default function Home({ lang, sections, numbers, sims = [], children }) {
         <div className="hero-haze" aria-hidden="true" />
         <section className="hero" aria-labelledby="home-title">
           <div className="hero-text">
+            <p className="hero-badge"><span className="hero-dot" aria-hidden="true" /> {t.badge}</p>
             <h1 id="home-title">{t.title}<span>{t.titleAccent}</span></h1>
             <p className="lead">{t.lead}</p>
             <p className="home-actions">
@@ -67,18 +102,20 @@ export default function Home({ lang, sections, numbers, sims = [], children }) {
       </div>
 
       <section className="home-block home-numbers" aria-labelledby="numbers-title">
+        <p className="eyebrow">{t.eyebrow.numbers}</p>
         <div className="home-block-head">
           <h2 id="numbers-title">{t.numbersTitle}</h2>
           <p className="home-block-lead">{t.numbersLead}</p>
         </div>
         <dl className="numbers-panel">
           {numbers.map(([label, value, note]) => (
-            <div key={label}><dt>{label}</dt><dd><strong>{value}</strong><span>{note}</span></dd></div>
+            <div key={label}><dt>{label}</dt><dd><strong data-count={value}>{value}</strong><span>{note}</span></dd></div>
           ))}
         </dl>
       </section>
 
       <section className="home-block" aria-labelledby="sims-title">
+        <p className="eyebrow">{t.eyebrow.sims}</p>
         <div className="home-block-head">
           <h2 id="sims-title">{dict(lang).simulators.homeTitle}</h2>
           <Link href={`/${lang}/simulators`}>{dict(lang).simulators.all} <Icon name="arrowRight" /></Link>
@@ -88,6 +125,7 @@ export default function Home({ lang, sections, numbers, sims = [], children }) {
           {sims.map((sim) => (
             <li key={sim.id}>
               <Link className="hub-card" href={`/${lang}/simulators/${sim.id}`}>
+                <CardArt topic={sim.topic} tab={dict(lang).simulators.missionsTab(sim.missions)} />
                 <span className="hub-tag">{sim.lesson}</span>
                 <strong>{sim.title}</strong>
                 <span className="hub-text">{sim.intro}</span>
@@ -97,13 +135,18 @@ export default function Home({ lang, sections, numbers, sims = [], children }) {
         </ul>
       </section>
 
-      <section className="home-block home-quiz-cta" aria-labelledby="quiz-cta-title">
-        <h2 id="quiz-cta-title">{dict(lang).quizzes.homeTitle}</h2>
-        <p className="home-block-lead">{dict(lang).quizzes.homeLead}</p>
-        <Link className="demo-button is-primary" href={`/${lang}/quizzes`}>{dict(lang).quizzes.all} <Icon name="arrowRight" /></Link>
+      <section className="home-block feature-row" aria-labelledby="quiz-cta-title">
+        <div>
+          <p className="eyebrow">{t.eyebrow.quiz}</p>
+          <h2 id="quiz-cta-title">{dict(lang).quizzes.homeTitle}</h2>
+          <p className="home-block-lead">{dict(lang).quizzes.homeLead}</p>
+          <Link className="demo-button is-primary" href={`/${lang}/quizzes`}>{dict(lang).quizzes.all} <Icon name="arrowRight" /></Link>
+        </div>
+        <SampleQuiz words={t.sample} />
       </section>
 
       <section className="home-block" aria-labelledby="sections-title">
+        <p className="eyebrow">{t.eyebrow.parts}</p>
         <h2 id="sections-title">{t.partsTitle}</h2>
         <p className="home-block-lead">{t.partsLead}</p>
         <ol className="section-cards">
@@ -114,7 +157,7 @@ export default function Home({ lang, sections, numbers, sims = [], children }) {
             return (
               <li key={section.id}>
                 <Link className="section-card" href={path(target)}>
-                  <span className="section-card-art" aria-hidden="true"><MiniFigure {...SECTION_FIGURES[i % SECTION_FIGURES.length]} /></span>
+                  <span className="section-card-art" aria-hidden="true"><MiniFigure {...SECTION_FIGURES[i % SECTION_FIGURES.length]} caption={t.figures[i % t.figures.length]} /></span>
                   <span className="section-card-tab">{t.lessonsCount(section.lessons.length)}</span>
                   <strong>{section.title}</strong>
                   <span className="lesson-summary">{section.description}</span>
@@ -127,6 +170,7 @@ export default function Home({ lang, sections, numbers, sims = [], children }) {
       </section>
 
       <section className="home-block" id="course-map" aria-labelledby="map-title" tabIndex={-1}>
+        <p className="eyebrow">{t.eyebrow.map}</p>
         <div className="home-block-head">
           <h2 id="map-title">{t.mapTitle}</h2>
           <span className="home-progress">{t.progress(doneCount, all.length)}</span>
@@ -158,6 +202,9 @@ export default function Home({ lang, sections, numbers, sims = [], children }) {
       {children ? <section className="home-block">{children}</section> : null}
 
       <section className="home-closing" aria-labelledby="closing-title">
+        <span className="closing-tiles" aria-hidden="true">
+          {TILES.map((tile, i) => (<span key={tile} className="closing-tile" style={{ '--i': i }}>{tile}</span>))}
+        </span>
         <h2 id="closing-title">{t.closingTitle(nextUp.lesson.minutes ?? 12)}</h2>
         <p>{t.closingLead}</p>
         <Link className="demo-button is-primary" href={path(nextUp)}>{startLabel} <Icon name="arrowRight" /></Link>

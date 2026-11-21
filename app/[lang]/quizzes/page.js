@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { dict, isLocale, LOCALES } from '../../../lib/i18n.js';
+import CardArt from '../../../components/CardArt.js';
 import { course, lessonQuizzes } from '../../../lib/lessons.js';
 
 export const generateStaticParams = () => LOCALES.map((lang) => ({ lang }));
@@ -30,9 +31,9 @@ export default async function QuizzesPage({ params }) {
               return n ? (
                 <li key={lesson.id}>
                   <Link className="hub-card" href={`/${lang}/quizzes/${section.id}/${lesson.id}`}>
+                    <CardArt topic={lesson.id} tab={t.questions(n)} />
                     <strong>{lesson.title}</strong>
                     <span className="hub-text">{lesson.summary}</span>
-                    <span className="hub-meta">{t.questions(n)}</span>
                   </Link>
                 </li>
               ) : null;

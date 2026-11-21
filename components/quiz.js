@@ -1,6 +1,7 @@
 'use client';
 import { track } from './Analytics.js';
 import { recordQuiz } from '../app/actions.js';
+import { burst } from './Whimsy.js';
 
 /**
  * Answer one quiz (the lesson page and the quiz page share this). A wrong
@@ -25,6 +26,7 @@ export function answerQuiz(option, lessonKey, words, lang) {
 
   const reveal = correct || misses >= 2;
   if (correct && misses === 0) quiz.dataset.firstTry = 'true';
+  if (correct) burst(option, misses === 0 ? 16 : 8);
   if (reveal) {
     quiz.dataset.solved = 'true';
     quiz.querySelectorAll('[data-quiz-option]').forEach((b) => b.setAttribute('aria-disabled', 'true'));

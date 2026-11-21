@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { dict, isLocale, LOCALES } from '../../../lib/i18n.js';
 import { simulators } from '../../../lib/simulators.js';
+import CardArt from '../../../components/CardArt.js';
 import { missions } from '../../../src/demos/missions.js';
 
 export const generateStaticParams = () => LOCALES.map((lang) => ({ lang }));
@@ -26,10 +27,10 @@ export default async function SimulatorsPage({ params }) {
         {simulators(lang).map((sim) => (
           <li key={sim.id}>
             <Link className="hub-card" href={`/${lang}/simulators/${sim.id}`}>
+              <CardArt topic={sim.lesson.id} tab={missions[sim.id] ? t.missionsTab(missions[sim.id].length) : null} />
               <span className="hub-tag">{sim.section.title} · {sim.lesson.title}</span>
               <strong>{sim.title}</strong>
               <span className="hub-text">{sim.intro}</span>
-              {missions[sim.id] ? <span className="hub-meta">{t.missions}: {missions[sim.id].length}</span> : null}
             </Link>
           </li>
         ))}
