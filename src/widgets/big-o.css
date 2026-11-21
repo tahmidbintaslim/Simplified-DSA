@@ -1,0 +1,88 @@
+/* Constant race: two bars on one scale, and the constant that only moves the crossover. */
+.constant-race-pick {
+  margin: 14px 0;
+}
+
+.constant-race-label {
+  color: var(--muted);
+  font-family: var(--font-ui);
+}
+
+.constant-race-rows {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.constant-race-row {
+  display: grid;
+  grid-template-columns: 7.5em minmax(0, 1fr) 10.5em;
+  grid-template-areas: "name track count";
+  align-items: center;
+  gap: 4px 10px;
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+}
+
+.constant-race-name {
+  grid-area: name;
+  color: var(--ink-strong);
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+
+.constant-race-track {
+  grid-area: track;
+  height: 14px;
+  border-radius: 999px;
+  background: var(--line-soft);
+}
+
+.constant-race-bar {
+  display: block;
+  width: 1%;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--edge);
+}
+
+.constant-race-count {
+  grid-area: count;
+  color: var(--ink-strong);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+/* The badge is always laid out, so the rows do not jump when the winner changes. */
+.constant-race-badge {
+  grid-column: 2 / -1;
+  justify-self: end;
+  visibility: hidden;
+  border-radius: 999px;
+  background: var(--done-fill);
+  padding: 1px 9px;
+  color: var(--on-done-fill);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.constant-race-row.is-winner .constant-race-bar {
+  background: var(--done);
+}
+
+.constant-race-row.is-winner .constant-race-badge {
+  visibility: visible;
+}
+
+@media (max-width: 560px) {
+  .constant-race-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "name count"
+      "track track";
+  }
+
+  .constant-race-badge {
+    grid-column: 1 / -1;
+  }
+}

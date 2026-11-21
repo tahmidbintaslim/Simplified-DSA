@@ -1,0 +1,46 @@
+/* ---------- Stacks and Queues widget: ring-queue (indexes move, values do not) ---------- */
+
+.widget .ring-queue-row {
+  width: 100%;
+  align-items: start;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.ring-queue-row .array-cell {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.ring-queue-free > .array-value {
+  border-style: dashed;
+  background: transparent;
+}
+
+.ring-queue-dot {
+  color: var(--faint);
+}
+
+.ring-queue-tags {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  min-height: 2.9em;
+  padding-top: 2px;
+}
+
+.ring-queue-tag {
+  border-radius: 4px;
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  padding: 0 4px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
+
+.ring-queue-tally {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+}

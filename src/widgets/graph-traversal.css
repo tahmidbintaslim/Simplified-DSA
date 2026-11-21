@@ -1,0 +1,116 @@
+/* ---------- Graph traversal widget: waiting-list (which end you take from decides BFS or DFS) ---------- */
+
+.waiting-list-graph {
+  display: block;
+  width: 100%;
+  max-width: 420px;
+  height: auto;
+  margin: 14px auto 6px;
+  overflow: visible;
+}
+
+.waiting-list-level {
+  stroke: var(--line);
+  stroke-dasharray: 3 5;
+}
+
+.waiting-list-level-label {
+  fill: var(--faint);
+  font-size: 10px;
+}
+
+.waiting-list-edge {
+  stroke: var(--edge);
+  stroke-width: 1.5;
+}
+
+.waiting-list-node circle {
+  fill: var(--raised);
+  stroke: var(--line-strong);
+  stroke-width: 1.5;
+  transform-box: fill-box;
+  transform-origin: center;
+  transition:
+    fill 220ms ease,
+    stroke 220ms ease;
+}
+
+.waiting-list-name {
+  fill: var(--ink-strong);
+  font-size: 14px;
+  font-weight: 700;
+  text-anchor: middle;
+}
+
+.waiting-list-step {
+  fill: var(--on-done-fill);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.waiting-list-node.is-waiting circle {
+  fill: var(--look-fill);
+  stroke: var(--look-line);
+}
+
+.waiting-list-node.is-waiting .waiting-list-name {
+  fill: var(--on-look);
+}
+
+.waiting-list-node.is-visited circle {
+  fill: var(--done-fill);
+  stroke: var(--done);
+}
+
+.waiting-list-node.is-visited .waiting-list-name {
+  fill: var(--on-done-fill);
+}
+
+.waiting-list-node.is-now circle {
+  stroke-width: 3;
+}
+
+.waiting-list-queue {
+  display: grid;
+  gap: 6px;
+  margin: 10px 0 14px;
+}
+
+.waiting-list-label {
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.waiting-list-track {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-height: 46px;
+}
+
+.widget .waiting-list-row {
+  width: auto;
+  gap: 4px;
+}
+
+.waiting-list-end,
+.waiting-list-empty {
+  color: var(--faint);
+  font-size: 0.8rem;
+}
+
+.waiting-list-order {
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+}
+
+.widget .demo-button:disabled {
+  cursor: default;
+  opacity: 0.5;
+}

@@ -1,0 +1,77 @@
+/* ---------- Sorting widget: merge-fronts (only the two fronts ever get compared) ---------- */
+
+.merge-fronts-halves {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 32px;
+  margin-bottom: 16px;
+}
+
+.merge-fronts-half {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.merge-fronts-label {
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.widget .merge-fronts-row,
+.widget .merge-fronts-out {
+  flex-wrap: wrap;
+  width: auto;
+  min-height: 44px;
+  gap: 4px;
+}
+
+.merge-fronts-card {
+  border: 0;
+  background: none;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.merge-fronts-card:disabled {
+  cursor: default;
+}
+
+.merge-fronts-card:disabled > .array-value {
+  color: var(--faint);
+}
+
+.merge-fronts-card:not(:disabled):hover > .array-value {
+  border-color: var(--accent-line);
+}
+
+.merge-fronts-card:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+.merge-fronts-out .array-cell {
+  min-width: 30px;
+}
+
+.merge-fronts-out .is-gap > .array-value {
+  border-style: dashed;
+  background: transparent;
+}
+
+.merge-fronts-empty {
+  align-self: center;
+  color: var(--faint);
+  font-size: 0.9rem;
+}
+
+.merge-fronts-count {
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+  font-variant-numeric: tabular-nums;
+}

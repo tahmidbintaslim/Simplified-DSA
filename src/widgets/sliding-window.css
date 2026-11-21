@@ -1,0 +1,74 @@
+/* ---------- Sliding window widget: window stretch ---------- */
+
+.window-stretch-row {
+  width: auto;
+  margin: 16px 0 14px;
+}
+
+/* Eight letters share the row, so it still fits a 360px phone. */
+.window-stretch-row .array-cell {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 56px;
+}
+
+.window-stretch-row .array-value {
+  padding-inline: 0;
+}
+
+.window-stretch-row .is-clash > .array-value {
+  border-color: var(--danger);
+  background: var(--danger-fill);
+  color: var(--danger-ink);
+}
+
+.window-stretch-meters {
+  display: grid;
+  gap: 8px;
+  max-width: 440px;
+  margin: 16px 0 0;
+}
+
+.window-stretch-meter dt {
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.window-stretch-meter dd {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 2px 0 0;
+}
+
+.window-stretch-track {
+  flex: 1 1 auto;
+  height: 8px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--neutral-fill);
+}
+
+.window-stretch-fill {
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: 4px;
+  background: var(--done);
+  transition: width 220ms ease;
+}
+
+.window-stretch-count {
+  flex: 0 0 auto;
+  min-width: 4.5em;
+  color: var(--ink);
+  font-size: 0.88rem;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .window-stretch-fill {
+    transition: none;
+  }
+}

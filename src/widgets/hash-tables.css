@@ -1,0 +1,60 @@
+/* ---------- Hash Tables widget: load-factor (keys ÷ buckets decides chain length) ---------- */
+
+.load-factor-formula {
+  margin: 0 0 12px;
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 1rem;
+}
+
+.load-factor-formula strong.is-high {
+  color: var(--danger-ink);
+}
+
+.load-factor-buckets {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(58px, 1fr));
+  gap: 6px;
+}
+
+.load-factor-bucket {
+  display: grid;
+  align-content: start;
+  justify-items: center;
+  gap: 4px;
+  min-height: 118px;
+  padding: 6px 4px;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: var(--page);
+}
+
+.load-factor-index {
+  color: var(--faint);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+}
+
+.load-factor-key {
+  width: 100%;
+  border: 1px solid var(--line-strong);
+  border-radius: 5px;
+  background: var(--raised);
+  color: var(--ink-strong);
+  padding: 2px 0;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+}
+
+.load-factor-key.is-hit {
+  border-color: var(--look-line);
+  background: var(--look-fill);
+  color: var(--on-look);
+}
+
+.load-factor-key.is-moved {
+  border-color: var(--done);
+  background: var(--done-fill);
+  color: var(--on-done-fill);
+}
