@@ -75,7 +75,7 @@ function ringQueue(root, { lang = 'en' } = {}) {
     const back = (front + count) % SIZE;
     row.innerHTML = slots
       .map((value, i) => {
-        const tags = [i === front && count > 0 ? w.front : '', i === back && count < SIZE ? w.back : ''].filter(Boolean);
+        const tags = [i === front && count > 0 ? w.front : '', i === back ? w.back : ''].filter(Boolean);
         return `<div class="array-cell ${i === hit ? 'is-hit' : ''} ${value === null ? 'ring-queue-free' : ''}">
           <span class="array-value">${value === null ? '<span class="ring-queue-dot" aria-hidden="true">·</span>' : escapeHtml(value)}</span>
           <span class="array-index">${i}</span>

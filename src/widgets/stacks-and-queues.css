@@ -23,6 +23,7 @@
 
 .ring-queue-tags {
   display: grid;
+  align-content: start;
   justify-items: center;
   gap: 2px;
   min-height: 2.9em;

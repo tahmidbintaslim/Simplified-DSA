@@ -305,8 +305,8 @@ test('critique 2: home links, jump list, stepped array insert, settled quiz', as
   // The site title goes home; home shows the drawn step and only section links.
   await page.click('.topbar .brand');
   await page.waitForURL(`${base}/en`);
-  await page.waitForSelector('.hero-figure .array-cell');
-  assert.equal(await page.locator('.hero-figure .array-cell').count(), 7);
+  await page.waitForSelector('.playground-stage .block');
+  assert.equal(await page.locator('.playground-stage .block').count(), 7);
   assert.equal(await page.locator('.lesson-sidebar .lesson-link').count(), 0);
   assert.deepEqual(errors, []);
   await page.close();
@@ -369,21 +369,33 @@ test('new patterns: fast and slow pointers meet on the loop; prefix sums answer 
   await prefix.page.close();
 });
 
-test('critique 3: the hero search is drivable and the beam follows the middle cell', async () => {
+test('the hero blocks can be sorted by keyboard, by dragging, and by the algorithm', async () => {
   const { page, errors } = await open('/');
-  const left = () => page.evaluate(() => document.querySelector('.beam').getBoundingClientRect().left);
-  const start = await left();
-  await page.click('#hero-next');
-  assert.match(await page.textContent('.hero-figure figcaption'), /Step 2 of 3/);
-  await page.waitForTimeout(600); // the beam slides on the same element now
-  assert.ok((await left()) > start, 'beam moved right, to the new middle');
-  await page.click('#hero-next');
-  assert.equal(await page.locator('.hero-figure .array-cell.is-found').count(), 1);
-  assert.equal(await page.isDisabled('#hero-next'), true);
-  // Focus stays on a button that still works.
-  assert.equal(await page.evaluate(() => document.activeElement.id), 'hero-reset');
-  await page.click('#hero-reset');
-  assert.match(await page.textContent('.hero-figure figcaption'), /Step 1 of 3/);
+  const order = () => page.evaluate(() => [...document.querySelectorAll('.playground-stage .block')].sort((a, b) => a.style.getPropertyValue('--i') - b.style.getPropertyValue('--i')).map((b) => b.textContent.trim()).join(''));
+  assert.equal(await order(), '4726153');
+  assert.match(await page.textContent('.playground-caption'), /pairs are still out of order/);
+
+  // Keyboard: the focused block moves one slot.
+  await page.focus('.block[style*="--v: 4"], .block[style*="--v:4"]');
+  await page.keyboard.press('ArrowRight');
+  assert.equal(await order(), '7426153');
+  assert.match(await page.textContent('.playground-caption'), /1 move so far/);
+
+  // Dragging a block past its neighbours reorders the row.
+  const box = await page.locator('.block', { hasText: '7' }).boundingBox();
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(box.x + box.width * 6.6, box.y + box.height / 2, { steps: 12 });
+  await page.mouse.up();
+  assert.equal(await order(), '4261537');
+
+  // The algorithm finishes the job with one swap per pair out of order.
+  const left = Number((await page.textContent('.playground-caption')).match(/(\d+) pairs?/)[1]);
+  await page.click('.playground-tool.is-wand');
+  await page.waitForSelector('.playground-stage.is-sorted', { timeout: 15000 });
+  assert.equal(await order(), '1234567');
+  await page.waitForFunction(() => /Done in/.test(document.querySelector('.playground-caption').textContent));
+  assert.match(await page.textContent('.playground-caption'), new RegExp(`Done in ${left} swaps`));
   assert.deepEqual(errors, []);
   await page.close();
 });
@@ -465,24 +477,6 @@ test('predict, then reveal: Step asks first, a picked cell plays the step and sa
   await page.close();
 });
 
-test('the home hero plays its search once by itself when it comes into view', async () => {
-  const { page, errors } = await open('/');
-  const beam = await page.locator('.beam').elementHandle();
-  await page.waitForTimeout(4800);
-  assert.match(await page.textContent('.hero-figure figcaption'), /Step 3 of 3/);
-  assert.equal(await page.locator('.hero-figure .array-cell.is-found').count(), 1);
-  // Updated in place: the beam is the same element, so it slid rather than jumped.
-  assert.equal(await beam.evaluate((el) => el.isConnected), true);
-  await page.close();
-
-  const calm = await open('/');
-  await calm.page.emulateMedia({ reducedMotion: 'reduce' });
-  await calm.page.reload();
-  await calm.page.waitForTimeout(3500);
-  assert.match(await calm.page.textContent('.hero-figure figcaption'), /Step 1 of 3/);
-  assert.deepEqual([...errors, ...calm.errors], []);
-  await calm.page.close();
-});
 
 test('the binary-search demo never starts on a one-step search', async () => {
   for (let i = 0; i < 12; i++) {

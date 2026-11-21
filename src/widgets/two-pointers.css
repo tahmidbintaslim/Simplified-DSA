@@ -1,0 +1,101 @@
+/* ---------- Two pointers widget: pair-grid (one sum crosses out a whole row or column) ---------- */
+
+.pair-grid-label {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.pair-grid-board {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 4px;
+  max-width: 380px;
+  margin: 16px 0;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.pair-grid-corner,
+.pair-grid-head,
+.pair-grid-cell {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  min-height: 34px;
+  border-radius: 6px;
+}
+
+.pair-grid-corner {
+  color: var(--faint);
+  font-size: 0.68rem;
+  white-space: nowrap;
+}
+
+.pair-grid-head {
+  position: relative;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.pair-grid-head.is-on {
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+}
+
+.pair-grid-head b {
+  position: absolute;
+  top: 1px;
+  left: 3px;
+  font-size: 0.62rem;
+  line-height: 1;
+}
+
+.pair-grid-cell {
+  border: 1px solid var(--line-strong);
+  background: var(--raised);
+  color: var(--ink-strong);
+  transition:
+    background-color 220ms ease,
+    border-color 220ms ease,
+    opacity 220ms ease;
+}
+
+.pair-grid-cell.is-none {
+  border-color: transparent;
+  background: transparent;
+}
+
+.pair-grid-cell.is-hit {
+  border-color: var(--look-line);
+  background: var(--look-fill);
+  color: var(--on-look);
+  font-weight: 700;
+}
+
+.pair-grid-cell.is-found {
+  border-color: var(--done);
+  background: var(--done);
+  color: var(--on-done);
+  font-weight: 700;
+}
+
+/* Ruled out is a form, not only a colour: faded and crossed out, as in the figures. */
+.pair-grid-cell.is-out {
+  opacity: 0.55;
+  background-image: linear-gradient(to top right, transparent calc(50% - 1px), var(--faint) calc(50% - 1px), var(--faint) calc(50% + 1px), transparent calc(50% + 1px));
+}
+
+.pair-grid-cell.is-risk {
+  border-color: var(--danger);
+  background: var(--danger-fill);
+  color: var(--danger-ink);
+  font-weight: 700;
+}
+
+.pair-grid-count {
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+  font-variant-numeric: tabular-nums;
+}

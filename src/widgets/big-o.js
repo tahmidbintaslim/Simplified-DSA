@@ -22,7 +22,7 @@ const WORDS = {
     after: (n, ratio, c) => `At n = ${n}, A does ${ratio}× less work than B, and the gap keeps widening: double n and A's work doubles, but B's quadruples. The ${c} only decided where the two crossed, not who wins.`,
   },
   bn: {
-    goal: 'দুটি প্রোগ্রাম একই কাজ করে। <strong>A</strong> একটু ঢিলে, কিন্তু linear: প্রতিটি মানের পেছনে সে নির্দিষ্ট কয়েকটা ধাপ খরচ করে। <strong>B</strong>-এর প্রতিটি ধাপ চটপটে, কিন্তু সে quadratic: প্রতিটি মানকে বাকি প্রতিটির সাথে জোড়া বাঁধে। <code>n</code> টেনে দেখো কার কাজ কম।',
+    goal: 'দুটি প্রোগ্রাম একই কাজ করে। <strong>A</strong> একটু ঢিলে, কিন্তু রৈখিক (linear): প্রতিটি মানের পেছনে সে নির্দিষ্ট কয়েকটা ধাপ খরচ করে। <strong>B</strong>-এর প্রতিটি ধাপ চটপটে, কিন্তু সে বর্গীয় (quadratic): প্রতিটি মানকে বাকি প্রতিটির সাথে জোড়া বাঁধে। <code>n</code> টেনে দেখো কার কাজ কম।',
     perItem: 'প্রতি মানে A-র ধাপ',
     items: 'মানের সংখ্যা (n):',
     itemsText: (n) => `${n}টি মান`,

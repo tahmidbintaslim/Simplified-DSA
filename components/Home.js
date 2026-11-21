@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { loadCompleted } from '../src/core/progress.js';
-import HeroFigure from './HeroFigure.js';
+import HeroPlayground from './HeroPlayground.js';
 import Icon from './Icon.js';
 import CardArt from './CardArt.js';
 import { burst } from './Whimsy.js';
@@ -82,6 +82,7 @@ export default function Home({ lang, sections, numbers, sims = [], children }) {
     <div className="home">
       <div className="hero-band">
         <div className="hero-haze" aria-hidden="true" />
+        <div className="hero-plume" aria-hidden="true" />
         <section className="hero" aria-labelledby="home-title">
           <div className="hero-text">
             <p className="hero-badge"><span className="hero-dot" aria-hidden="true" /> {t.badge}</p>
@@ -97,7 +98,7 @@ export default function Home({ lang, sections, numbers, sims = [], children }) {
               ))}
             </ul>
           </div>
-          <HeroFigure lang={lang} />
+          <HeroPlayground lang={lang} />
         </section>
       </div>
 

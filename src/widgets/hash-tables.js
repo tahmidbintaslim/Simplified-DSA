@@ -106,8 +106,8 @@ function loadFactor(root, { lang = 'en' } = {}) {
       const key = KEYS[used];
       used += 1;
       const b = bucketOf(key);
-      const text = w.added(key, b, chains()[b].length) + (used / size > 0.75 && size < MAX_BUCKETS ? w.over : '');
-      message.textContent = used === KEYS.length ? `${text} ${w.allIn}` : text;
+      const text = w.added(key, b, chains()[b].length);
+      message.textContent = used === KEYS.length ? `${text} ${w.allIn}` : text + (used / size > 0.75 && size < MAX_BUCKETS ? w.over : '');
       draw({ [key]: 'is-hit' });
     }
     if (act === 'grow') {

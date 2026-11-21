@@ -10,6 +10,8 @@ const paths = {
   next: '<path d="m9 5.5 6.5 6.5L9 18.5"/>',
   play: '<path d="M7.5 5.6v12.8a1 1 0 0 0 1.52.85l10.24-6.4a1 1 0 0 0 0-1.7L9.02 4.75A1 1 0 0 0 7.5 5.6Z"/>',
   pause: '<rect x="6.5" y="5" width="4" height="14" rx="1.2"/><rect x="13.5" y="5" width="4" height="14" rx="1.2"/>',
+  shuffle: '<path d="M3 7h3c5.5 0 6.5 10 12 10h3"/><path d="M3 17h3c1.7 0 3-.9 4.1-2.2M13.9 9.2C15 7.900 16.300 7 18 7h3"/><path d="m18.500 4 3 3-3 3M18.500 14l3 3-3 3"/>',
+  wand: '<path d="m4 20 10.500-10.500"/><path d="m13 8 3 3"/><path d="M18.500 3v3M17 4.500h3M20 10.500v2M19 11.500h2M9 3.500v2M8 4.500h2"/>',
   check: '<path d="m5.5 12.5 4 4 9-9"/>',
   chevronDown: '<path d="m6 9.5 6 6 6-6"/>',
   arrowLeft: '<path d="M19 12H5"/><path d="m11 6-6 6 6 6"/>',
