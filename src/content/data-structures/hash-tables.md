@@ -85,7 +85,7 @@ What keeps chains short? Having enough buckets for the keys you store. The measu
 load factor = number of keys ÷ number of buckets
 ```
 
-It is the average chain length. At 0.5, half the buckets are empty and most chains hold one key. At 3, an average lookup walks three keys.
+It is the average chain length. At 0.5 there are twice as many buckets as keys, so most keys sit alone. At 3, an average chain holds three keys.
 
 Add keys below until the chains get long, then double the buckets. Watch which keys change bucket.
 
